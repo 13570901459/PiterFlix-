@@ -1,153 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PITER FLIX</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="css/slick.css" />
-  <link rel="stylesheet" href="css/slick-theme.css" />
-  <link rel="stylesheet" href="css/owl.carousel.min.css" />
-  <link rel="stylesheet" href="css/animate.min.css" />
-  <link rel="stylesheet" href="css/magnific-popup.css" />
-  <link rel="stylesheet" href="css/select2.min.css" />
-  <link rel="stylesheet" href="css/select2-bootstrap4.min.css" />
-  <link rel="stylesheet" href="css/slick-animation.css" />
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    /* Estilos personalizados para fixar o menu no topo */
-    #main-header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-      background-color: #1c1c1c;
-    }
-
-    body {
-      padding-top: 70px; /* Espaço para compensar o menu fixo */
-      background-color: #121212;
-      color: #ffffff;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Título da Página</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .cover {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .episodes {
+            list-style: none;
+            padding: 0;
+        }
+        .episodes li {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+        .episodes a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .episodes a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <!-- Menu fixo no topo -->
-  <header id="main-header">
-    <div class="main-header">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-12">
-            <nav class="navbar navbar-expand-lg navbar-light p-0">
-              <a href="#" class="navbar-toggler c-toggler" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <div class="navbar-toggler-icon" data-toggle="collapse">
-                  <span class="navbar-menu-icon navbar-menu-icon--top"></span>
-                  <span class="navbar-menu-icon navbar-menu-icon--middle"></span>
-                  <span class="navbar-menu-icon navbar-menu-icon--bottom"></span>
-                </div>
-              </a>
-              <a href="index.html" class="navbar-brand">
-                <img src="images/logo.png" class="img-fluid logo" alt="Logo Piter Flix" />
-              </a>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="menu-main-menu-container">
-                  <ul id="top-menu" class="navbar-nav ml-auto">
-                    <li class="menu-item"><a href="#">Início</a></li>
-                    <li class="menu-item"><a href="#">Filmes</a></li>
-                    <li class="menu-item"><a href="#">Séries</a></li>
-                    <li class="menu-item">
-                      <a href="#">Contate-nos</a>
-                      <ul class="sub-menu">
-                        <li class="menu-item"><a href="#">Sobre Nós</a></li>
-                        <li class="menu-item"><a href="#">Contato</a></li>
-                        <li class="menu-item"><a href="#">FAQ</a></li>
-                        <li class="menu-item"><a href="#">Política de Privacidade</a></li>
-                        <li class="menu-item">
-                          <a href="#">Planos</a>
-                          <ul class="sub-menu">
-                            <li class="menu-item"><a href="#">Gold Membership</a></li>
-                            <li class="menu-item"><a href="#">Silver Membership</a></li>
-                            <li class="menu-item"><a href="#">Bronze Membership</a></li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
 
-  <!-- Seção do slider abaixo do menu fixo -->
-  <section id="home" class="iq-main-slider p-0">
-    <div id="home-slider" class="slider m-0 p-0">
-      <div class="slide slick-bg s-bg-1">
-        <div class="container-fluid position-relative h-100">
-          <div class="slider-inner h-100">
-            <div class="row align-items-center h--100">
-              <div class="col-xl-6 col-lg-12 col-md-12">
-                <a href="javascript:void(0)">
-                  <div class="channel-logo" data-animation-in="fadeInLeft" data-delay-in="0.5">
-                    <img src="images/logo.png" class="c-logo" alt="Logo Piter Flix" />
-                  </div>
-                </a>
-                <h1 class="slider-text big-title title text-uppercase" data-animation-in="fadeInLeft" data-delay-in="0.6">
-                  Filme em Destaque
-                </h1>
-                <div class="d-flex flex-wrap align-items-center fadeInLeft animated" data-animation-in="fadeInLeft"
-                  style="opacity: 1">
-                  <div class="slider-ratting d-flex align-items-center mr-4 mt-2 mt-md-3">
-                    <ul class="ratting-start p-0 m-0 list-inline text-primary d-flex align-items-center justify-content-left">
-                      <li><i class="fa fa-star"></i></li>
-                      <li><i class="fa fa-star"></i></li>
-                      <li><i class="fa fa-star"></i></li>
-                      <li><i class="fa fa-star"></i></li>
-                      <li><i class="fa fa-star-half"></i></li>
-                    </ul>
-                    <span class="text-white ml-2">7.3 (IMDb)</span>
-                  </div>
-                  <div class="d-flex align-items-center mt-2 mt-md-3">
-                    <span class="badge badge-secondary p-2">16+</span>
-                    <span class="ml-3">2h 21min</span>
-                  </div>
-                </div>
-                <p data-animation-in="fadeInUp">
-                  Quando Tony Stark e Bruce Banner tentam ativar um programa de paz chamado Ultron, as coisas saem do controle e os heróis precisam enfrentar um vilão perigoso.
-                </p>
-                <div class="trending-list" data-animation-in="fadeInUp" data-delay-in="1.2">
-                  <div class="text-primary title starring">
-                    Estrelando : <span class="text-body">Robert Downey Jr., Chris Evans, Mark Ruffalo</span>
-                  </div>
-                  <div class="text-primary title genres">
-                    Gêneros : <span class="text-body">Ação</span>
-                  </div>
-                  <div class="text-primary title tag">
-                    Tags : <span class="text-body">Ação, Aventura, Horror</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center r-mb-23 mt-4" data-animation-in="fadeInUp" data-delay-in="1.2">
-                  <a href="index1.html" class="btn btn-hover iq-button"><i class="fa fa-play mr-3"></i>Assistir Agora</a>
-                  <a href="#" class="btn btn-link">Mais Detalhes</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-xl-5 col-lg-12 col-md-12 trailor-video">
-              <a href="video/trailer.mp4" class="video-open playbtn">
-                <img src="images/play.png" class="play" alt="Play" />
-                <span class="w-trailor">Assistir Trailer</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="container">
+        <h1 class="title">Título da Página</h1>
+        <img src="capa.jpg" alt="Capa do Filme ou Série" class="cover">
+        
+        <h2>:: ONLINE DUBLADO ::</h2>
+        <ul class="episodes">
+            <li><a href="https://watch.brplayer.site/watch?v=97OD68JT">Episódio 1</a></li>
+            <li><a href="episodio2.html">Episódio 2</a></li>
+            <li><a href="episodio3.html">Episódio 3</a></li>
+            <li><a href="episodio4.html">Episódio 4</a></li>
+            <li><a href="episodio5.html">Episódio 5</a></li>
+            <li><a href="episodio6.html">Episódio 6</a></li>
+            <!-- Adicione mais episódios conforme necessário -->
+        </ul>
     </div>
-  </section>
+
 </body>
 </html>
