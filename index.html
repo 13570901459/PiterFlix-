@@ -1,66 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Leandro Silva - Desenvolvedor de Sites</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leandro Silva - Portfólio</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-white text-gray-800 font-sans">
 
-  <!-- Cabeçalho -->
-  <header class="bg-red-600 text-white p-6">
-    <div class="container mx-auto text-center">
-      <h1 class="text-3xl font-bold">Leandro Silva</h1>
-      <p class="text-lg">Desenvolvedor de Sites Profissionais e Catálogos Online</p>
+  <!-- Navbar -->
+  <header class="bg-red-600 text-white shadow-md">
+    <div class="max-w-6xl mx-auto flex items-center justify-between p-4">
+      <h1 class="text-2xl font-bold">Leandro Silva</h1>
+      <nav class="space-x-6">
+        <a href="#sobre" class="hover:underline">Sobre</a>
+        <a href="#projetos" class="hover:underline">Projetos</a>
+        <a href="#servicos" class="hover:underline">Serviços</a>
+        <a href="#contato" class="hover:underline">Contato</a>
+      </nav>
     </div>
   </header>
 
-  <!-- Sobre mim -->
-  <section class="container mx-auto px-4 py-10">
-    <h2 class="text-2xl font-bold mb-4">O que eu faço</h2>
-    <p class="mb-4">Crio sites rápidos, profissionais e com ótimo custo-benefício. Ideal para comércios locais, deliverys, catálogos de produtos e serviços. Seu site pronto e funcionando em poucos dias, com integração ao WhatsApp.</p>
+  <!-- Hero -->
+  <section class="bg-gray-100 py-20 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">Desenvolvedor de Sites e Catálogos Profissionais</h2>
+    <p class="text-lg max-w-xl mx-auto mb-6">Transformo ideias em presença digital. Sites bonitos, rápidos e prontos pra vender!</p>
+    <a href="https://wa.me/5581991152441?text=Olá%2C%20Leandro!%20Quero%20fazer%20um%20site%20com%20você." target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded inline-flex items-center transition">
+      <i class="ri-whatsapp-line mr-2 text-xl"></i> Fale comigo no WhatsApp
+    </a>
+  </section>
 
-    <ul class="list-disc pl-5 space-y-2">
-      <li>Site catálogo com fotos e botões de WhatsApp</li>
-      <li>Integração com redes sociais</li>
-      <li>Subdomínio personalizado (ex: seunome.rotadevenda.site)</li>
-      <li>Responsivo para celular</li>
-      <li>Rápido, bonito e fácil de usar</li>
-    </ul>
+  <!-- Sobre -->
+  <section id="sobre" class="max-w-6xl mx-auto py-16 px-4">
+    <h3 class="text-2xl font-bold mb-4">Sobre mim</h3>
+    <p class="leading-relaxed text-lg">Sou Leandro Silva, desenvolvedor de sites com foco em pequenos negócios e empreendedores locais. Tenho experiência com HTML, Tailwind CSS e crio catálogos modernos, rápidos e funcionais. Meu objetivo é ajudar você a crescer na internet com um site de qualidade, fácil de acessar e com integração ao WhatsApp.</p>
   </section>
 
   <!-- Projetos -->
-  <section class="bg-white py-10 px-4">
-    <div class="container mx-auto">
-      <h2 class="text-2xl font-bold mb-6">Projetos Realizados</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <section id="projetos" class="bg-gray-100 py-16 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h3 class="text-2xl font-bold mb-6">Projetos</h3>
+      <div class="grid md:grid-cols-3 gap-6">
         
-        <!-- Exemplo de projeto -->
-        <div class="bg-gray-100 p-4 rounded shadow">
-          <img src="https://via.placeholder.com/300x150?text=Catálogo+de+Motos" alt="Catálogo de Motos" class="mb-3 rounded">
-          <h3 class="text-xl font-semibold mb-1">Catálogo de Motos</h3>
-          <p class="mb-2">Catálogo com modelos, preços e botão direto para o WhatsApp.</p>
+        <!-- Projeto 1 -->
+        <div class="bg-white shadow rounded p-4">
+          <img src="https://via.placeholder.com/300x150?text=Catálogo+de+Motos" class="rounded mb-3" alt="Catálogo de Motos">
+          <h4 class="font-bold text-lg mb-2">Catálogo de Motos</h4>
+          <p class="mb-3">Site simples com catálogo de motos e integração com WhatsApp para atendimento.</p>
           <a href="https://rotadevenda.site/jaylson" target="_blank" class="text-red-600 font-bold hover:underline">Ver projeto</a>
         </div>
 
-        <!-- Adicione mais projetos aqui -->
-        
+        <!-- + outros projetos, se quiser -->
+
       </div>
     </div>
   </section>
 
+  <!-- Serviços -->
+  <section id="servicos" class="max-w-6xl mx-auto py-16 px-4">
+    <h3 class="text-2xl font-bold mb-6">Serviços</h3>
+    <ul class="grid md:grid-cols-2 gap-4 text-lg list-disc pl-5">
+      <li>Criação de sites com layout personalizado</li>
+      <li>Hospedagem com subdomínio gratuito</li>
+      <li>Botão de WhatsApp integrado</li>
+      <li>Atualizações e manutenção de conteúdo</li>
+      <li>Otimizado para celular</li>
+    </ul>
+  </section>
+
   <!-- Contato -->
-  <section class="bg-red-600 text-white py-10 text-center">
-    <h2 class="text-2xl font-bold mb-4">Quer um site assim?</h2>
-    <p class="mb-6">Fale comigo agora mesmo no WhatsApp e peça seu orçamento!</p>
-    <a href="https://wa.me/5581991152441?text=Olá%2C%20Leandro%21%20Tenho%20interesse%20em%20criar%20um%20site." target="_blank" class="bg-white text-red-600 font-bold py-3 px-6 rounded shadow hover:bg-gray-200 transition">Falar no WhatsApp</a>
+  <section id="contato" class="bg-red-600 text-white py-16 px-4 text-center">
+    <h3 class="text-2xl font-bold mb-4">Vamos trabalhar juntos?</h3>
+    <p class="mb-6 text-lg">Entre em contato pelo WhatsApp ou Instagram e peça seu orçamento sem compromisso.</p>
+    <a href="https://wa.me/5581991152441?text=Olá%2C%20Leandro!%20Gostaria%20de%20um%20site." target="_blank" class="bg-white text-red-600 font-bold px-6 py-3 rounded inline-flex items-center hover:bg-gray-100 transition">
+      <i class="ri-whatsapp-line mr-2 text-xl"></i> Falar no WhatsApp
+    </a>
   </section>
 
   <!-- Rodapé -->
-  <footer class="bg-gray-800 text-white text-center py-6">
-    <p>&copy; 2025 Leandro Silva | Desenvolvedor Web</p>
-    <p>Surubim - PE | Contato: <a href="https://wa.me/5581991152441" class="underline">WhatsApp</a></p>
+  <footer class="bg-gray-800 text-white text-center py-6 text-sm">
+    <p>&copy; 2025 Leandro Silva - Desenvolvedor Web</p>
+    <p>Surubim - PE | <a href="https://wa.me/5581991152441" class="underline">WhatsApp</a></p>
   </footer>
 
 </body>
