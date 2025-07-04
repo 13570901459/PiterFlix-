@@ -1,92 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Walking Dead: Daryl Dixon 1ª Temporada </title>
-    <style>
-        /* Estilo geral */
-        body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #141414;
-            color: #fff;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .title {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .cover {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-        }
-
-        .subtitle {
-            font-size: 1.5em;
-            margin: 30px 0 10px;
-            text-transform: uppercase;
-            color: #e50914;
-        }
-
-        /* Lista de episódios */
-        .episodes {
-            list-style: none;
-            padding: 0;
-        }
-
-        .episodes li {
-            margin: 15px 0;
-            background-color: #333;
-            padding: 15px;
-            border-radius: 5px;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-
-        .episodes a {
-            text-decoration: none;
-            color: #fff;
-            font-size: 1.2em;
-            display: block;
-        }
-
-        .episodes li:hover {
-            transform: scale(1.05);
-            background-color: #e50914;
-        }
-
-        .episodes a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leandro Silva - Desenvolvedor de Sites</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="container">
-        <h1 class="title">The Walking Dead: Daryl Dixon 1ª Temporada</h1>
-        <img src="images/slider/slider1.jpg" alt="Capa do Filme ou Série" class="cover">
-        
-        <h2 class="subtitle">1ª Temporada</h2>
-        <ul class="episodes">
-            <li><a href="https://watch.brplayer.site/watch?v=97OD68JT">Episódio 1</a></li>
-            <li><a href="https://watch.brplayer.site/watch?v=0PSHERXF">Episódio 2</a></li>
-            <li><a href="https://watch.brplayer.site/watch?v=97OD68JT">Episódio 3</a></li>
-            <li><a href="https://watch.brplayer.site/watch?v=KLDXUB87">Episódio 4</a></li>
-            <li><a href="https://watch.brplayer.site/watch?v=DJLB9KE7">Episódio 5</a></li>
-            <li><a href="https://watch.brplayer.site/watch?v=S0TRNK47">Episódio 6</a></li>
-        </ul>
+  <!-- Cabeçalho -->
+  <header class="bg-red-600 text-white p-6">
+    <div class="container mx-auto text-center">
+      <h1 class="text-3xl font-bold">Leandro Silva</h1>
+      <p class="text-lg">Desenvolvedor de Sites Profissionais e Catálogos Online</p>
     </div>
+  </header>
+
+  <!-- Sobre mim -->
+  <section class="container mx-auto px-4 py-10">
+    <h2 class="text-2xl font-bold mb-4">O que eu faço</h2>
+    <p class="mb-4">Crio sites rápidos, profissionais e com ótimo custo-benefício. Ideal para comércios locais, deliverys, catálogos de produtos e serviços. Seu site pronto e funcionando em poucos dias, com integração ao WhatsApp.</p>
+
+    <ul class="list-disc pl-5 space-y-2">
+      <li>Site catálogo com fotos e botões de WhatsApp</li>
+      <li>Integração com redes sociais</li>
+      <li>Subdomínio personalizado (ex: seunome.rotadevenda.site)</li>
+      <li>Responsivo para celular</li>
+      <li>Rápido, bonito e fácil de usar</li>
+    </ul>
+  </section>
+
+  <!-- Projetos -->
+  <section class="bg-white py-10 px-4">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold mb-6">Projetos Realizados</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Exemplo de projeto -->
+        <div class="bg-gray-100 p-4 rounded shadow">
+          <img src="https://via.placeholder.com/300x150?text=Catálogo+de+Motos" alt="Catálogo de Motos" class="mb-3 rounded">
+          <h3 class="text-xl font-semibold mb-1">Catálogo de Motos</h3>
+          <p class="mb-2">Catálogo com modelos, preços e botão direto para o WhatsApp.</p>
+          <a href="https://rotadevenda.site/jaylson" target="_blank" class="text-red-600 font-bold hover:underline">Ver projeto</a>
+        </div>
+
+        <!-- Adicione mais projetos aqui -->
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Contato -->
+  <section class="bg-red-600 text-white py-10 text-center">
+    <h2 class="text-2xl font-bold mb-4">Quer um site assim?</h2>
+    <p class="mb-6">Fale comigo agora mesmo no WhatsApp e peça seu orçamento!</p>
+    <a href="https://wa.me/5581991152441?text=Olá%2C%20Leandro%21%20Tenho%20interesse%20em%20criar%20um%20site." target="_blank" class="bg-white text-red-600 font-bold py-3 px-6 rounded shadow hover:bg-gray-200 transition">Falar no WhatsApp</a>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="bg-gray-800 text-white text-center py-6">
+    <p>&copy; 2025 Leandro Silva | Desenvolvedor Web</p>
+    <p>Surubim - PE | Contato: <a href="https://wa.me/5581991152441" class="underline">WhatsApp</a></p>
+  </footer>
 
 </body>
 </html>
