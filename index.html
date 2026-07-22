@@ -30,7 +30,7 @@
     body {
       background-color: var(--bg-dark);
       color: var(--text-light);
-      padding-bottom: 60px;
+      padding-bottom: 80px;
     }
 
     a {
@@ -53,7 +53,7 @@
     }
 
     /* ==========================================
-       2. CABEÇALHO E LOGO DINÂMICA
+       2. CABEÇALHO E LOGO AJUSTADA
        ========================================== */
     header {
       background-color: rgba(10, 14, 23, 0.95);
@@ -69,15 +69,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
+      gap: 20px;
     }
 
-    /* Logo Dinâmica e Interativa */
+    /* Logo Ajustada: Ícone Azul DS + Store */
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: 1px;
@@ -92,72 +91,54 @@
     }
 
     .logo-icon {
-      width: 42px;
-      height: 42px;
+      width: 45px;
+      height: 45px;
       background: linear-gradient(135deg, var(--accent-blue), var(--ocean-glow));
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-      animation: floatLogo 3s ease-in-out infinite alternative;
+      box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+      animation: floatLogo 3s ease-in-out infinite alternate;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #fff;
     }
 
     @keyframes floatLogo {
       0% { transform: translateY(0px) rotate(0deg); }
-      100% { transform: translateY(-5px) rotate(3deg); }
+      100% { transform: translateY(-4px) rotate(2deg); }
     }
 
-    .logo span {
-      color: var(--ocean-glow);
+    .logo-text {
+      color: var(--text-light);
     }
 
-    /* Busca e Ações */
+    /* Busca de Produtos */
     .search-box {
       flex: 1;
-      max-width: 400px;
+      max-width: 500px;
       position: relative;
     }
 
     .search-box input {
       width: 100%;
-      padding: 10px 15px;
-      border-radius: 20px;
+      padding: 12px 20px;
+      border-radius: 25px;
       border: 1px solid var(--border-color);
       background-color: var(--bg-card);
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
     }
 
     .search-box input:focus {
       border-color: var(--ocean-glow);
       outline: none;
-      box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+      box-shadow: 0 0 12px rgba(0, 210, 255, 0.3);
     }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .cart-btn-header {
-      background: linear-gradient(135deg, var(--accent-blue), var(--ocean-glow));
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cart-btn-header:hover {
-      opacity: 0.9;
-      transform: scale(1.03);
-    }
-
-    /* Menu de Categorias Nav */
+    /* Menu Nav de Categorias */
     nav {
       background-color: var(--bg-card);
       border-bottom: 1px solid var(--border-color);
@@ -168,18 +149,21 @@
       display: flex;
       white-space: nowrap;
       list-style: none;
-      padding: 10px 0;
+      padding: 12px 0;
       gap: 10px;
     }
 
     .nav-categories li button {
       background: transparent;
       color: var(--text-muted);
-      padding: 8px 16px;
-      border-radius: 15px;
+      padding: 8px 18px;
+      border-radius: 20px;
       font-size: 0.9rem;
       font-weight: 600;
       border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .nav-categories li button.active,
@@ -189,102 +173,35 @@
       border-color: var(--ocean-glow);
     }
 
-    /* ==========================================
-       3. SEÇÃO DE SERVIÇOS DE MANUTENÇÃO (ORÇAMENTO)
-       ========================================== */
-    .maintenance-banner {
-      background: linear-gradient(135deg, rgba(0, 119, 190, 0.2), rgba(18, 26, 41, 0.9)), url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80');
-      background-size: cover;
-      background-position: center;
-      border-radius: 15px;
-      padding: 30px 20px;
-      margin: 25px auto;
-      border: 1px solid var(--border-color);
-    }
-
-    .maintenance-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-items: center;
-    }
-
-    .maintenance-info {
-      flex: 1;
-      min-width: 280px;
-    }
-
-    .maintenance-info h2 {
-      font-size: 1.8rem;
-      color: var(--ocean-glow);
-      margin-bottom: 10px;
-    }
-
-    .maintenance-info p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .maintenance-form {
-      flex: 1;
-      min-width: 280px;
-      background-color: var(--bg-card);
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .form-group input, 
-    .form-group textarea {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-dark);
+    .nav-categories li button.btn-tech-menu {
+      background: rgba(0, 119, 190, 0.2);
+      border-color: var(--accent-blue);
       color: #fff;
-      font-size: 0.9rem;
     }
 
-    .form-group textarea {
-      resize: vertical;
-      height: 60px;
-    }
-
-    .btn-submit-budget {
-      width: 100%;
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      color: white;
-      padding: 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    .btn-submit-budget:hover {
-      opacity: 0.9;
+    .nav-categories li button.btn-tech-menu:hover,
+    .nav-categories li button.btn-tech-menu.active {
+      background: linear-gradient(135deg, var(--accent-blue), var(--ocean-glow));
+      color: #fff;
     }
 
     /* ==========================================
-       4. VITRINE DE PRODUTOS
+       3. SEÇÕES DE CONTEÚDO (PRODUTOS / ASSISTÊNCIA)
        ========================================== */
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
     .section-title {
-      font-size: 1.4rem;
-      margin: 20px 0;
+      font-size: 1.5rem;
+      margin: 25px 0;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .section-title::after {
@@ -294,36 +211,38 @@
       background-color: var(--border-color);
     }
 
+    /* Vitrine de Produtos Grid */
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
     }
 
     .product-card {
       background-color: var(--bg-card);
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid var(--border-color);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      transition: transform 0.25 ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .product-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent-blue);
+      transform: translateY(-5px);
+      border-color: var(--ocean-glow);
+      box-shadow: 0 8px 20px rgba(0, 210, 255, 0.15);
     }
 
     .product-img {
       width: 100%;
-      height: 180px;
+      height: 190px;
       object-fit: cover;
       background-color: #000;
     }
 
     .product-details {
-      padding: 15px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -334,17 +253,17 @@
       color: var(--ocean-glow);
       text-transform: uppercase;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
     .product-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       margin-bottom: 8px;
     }
 
     .product-desc {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       margin-bottom: 12px;
       flex: 1;
@@ -352,8 +271,8 @@
 
     .product-obs {
       width: 100%;
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
       background-color: var(--bg-dark);
       color: #fff;
@@ -362,10 +281,10 @@
     }
 
     .product-price {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: bold;
       color: #fff;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .product-actions {
@@ -378,8 +297,8 @@
       background-color: transparent;
       border: 1px solid var(--accent-blue);
       color: var(--ocean-glow);
-      padding: 8px;
-      border-radius: 6px;
+      padding: 9px;
+      border-radius: 8px;
       font-size: 0.85rem;
       font-weight: 600;
     }
@@ -393,8 +312,8 @@
       flex: 1;
       background: linear-gradient(135deg, var(--accent-blue), var(--ocean-glow));
       color: #fff;
-      padding: 8px;
-      border-radius: 6px;
+      padding: 9px;
+      border-radius: 8px;
       font-size: 0.85rem;
       font-weight: 600;
     }
@@ -403,41 +322,140 @@
       opacity: 0.9;
     }
 
-    /* Alerta Flutuante ao Adicionar */
-    #toast {
-      visibility: hidden;
-      min-width: 250px;
-      background-color: var(--ocean-glow);
-      color: #000;
-      text-align: center;
-      border-radius: 25px;
-      padding: 12px 20px;
-      position: fixed;
-      z-index: 200;
-      bottom: 30px;
-      right: 30px;
-      font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0,210,255,0.4);
-      opacity: 0;
-      transition: opacity 0.3s, bottom 0.3s;
+    /* Página da Assistência Técnica */
+    .maintenance-container {
+      max-width: 700px;
+      margin: 20px auto;
+      background-color: var(--bg-card);
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
-      bottom: 40px;
+    .maintenance-header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .maintenance-header h2 {
+      color: var(--ocean-glow);
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .maintenance-header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-group input, 
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      height: 90px;
+    }
+
+    .btn-submit-budget {
+      width: 100%;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: white;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.05rem;
+      margin-top: 10px;
+    }
+
+    .btn-submit-budget:hover {
+      opacity: 0.95;
     }
 
     /* ==========================================
-       5. MODAL DO CARRINHO DE COMPRAS
+       4. CARRINHO FLUTUANTE SOFISTICADO
        ========================================== */
+    .floating-cart-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue), var(--ocean-glow));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4);
+      z-index: 120;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .floating-cart-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 25px rgba(0, 210, 255, 0.6);
+    }
+
+    .floating-cart-icon {
+      font-size: 1.6rem;
+    }
+
+    /* Badge Contador Dinâmico */
+    .cart-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: var(--danger);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: bold;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      border: 2px solid var(--bg-dark);
+      animation: pulseBadge 0.3s ease-out;
+    }
+
+    @keyframes pulseBadge {
+      0% { transform: scale(0.6); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    /* Modal do Carrinho Lateral */
     .cart-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
       display: none;
       justify-content: flex-end;
       z-index: 150;
@@ -454,7 +472,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 20px;
+      padding: 24px;
       border-left: 1px solid var(--border-color);
       overflow-y: auto;
     }
@@ -471,7 +489,7 @@
     .close-cart {
       background: transparent;
       color: var(--text-muted);
-      font-size: 1.5rem;
+      font-size: 1.8rem;
     }
 
     .cart-items {
@@ -485,18 +503,18 @@
 
     .cart-item {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       background-color: var(--bg-dark);
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid var(--border-color);
     }
 
     .cart-item-img {
-      width: 60px;
-      height: 60px;
+      width: 65px;
+      height: 65px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
     }
 
     .cart-item-info {
@@ -504,18 +522,18 @@
     }
 
     .cart-item-title {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 600;
     }
 
     .cart-item-obs {
       font-size: 0.75rem;
       color: var(--ocean-glow);
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .cart-item-price {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
       margin-top: 4px;
     }
@@ -524,22 +542,22 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .btn-qty {
       background-color: var(--border-color);
       color: #fff;
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
       font-weight: bold;
     }
 
     .btn-remove {
       background: transparent;
       color: var(--danger);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       margin-left: auto;
     }
 
@@ -557,7 +575,7 @@
 
     .coupon-box input {
       flex: 1;
-      padding: 8px;
+      padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
       background-color: var(--bg-dark);
@@ -567,7 +585,7 @@
     .coupon-box button {
       background-color: var(--accent-blue);
       color: #fff;
-      padding: 0 12px;
+      padding: 0 15px;
       border-radius: 6px;
       font-weight: 600;
     }
@@ -580,7 +598,7 @@
     }
 
     .checkout-form input {
-      padding: 8px;
+      padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
       background-color: var(--bg-dark);
@@ -610,7 +628,7 @@
       font-weight: bold;
       color: #fff;
       border-top: 1px dashed var(--border-color);
-      padding-top: 5px;
+      padding-top: 8px;
     }
 
     .cart-actions-footer {
@@ -623,7 +641,7 @@
       background: linear-gradient(135deg, #25d366, #128c7e);
       color: #fff;
       padding: 12px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: bold;
       font-size: 1rem;
       text-align: center;
@@ -636,7 +654,32 @@
       font-size: 0.85rem;
     }
 
-    /* Ajustes para Dispositivos Móveis */
+    /* Alerta Toaster Flutuante */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: var(--ocean-glow);
+      color: #000;
+      text-align: center;
+      border-radius: 25px;
+      padding: 12px 20px;
+      position: fixed;
+      z-index: 200;
+      bottom: 30px;
+      left: 30px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,210,255,0.4);
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+      bottom: 40px;
+    }
+
+    /* Dispositivos Móveis */
     @media (max-width: 600px) {
       .header-content {
         flex-direction: column;
@@ -645,14 +688,17 @@
       .logo {
         justify-content: center;
       }
-      .cart-btn-header {
-        justify-content: center;
-      }
       .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       }
       .product-img {
-        height: 130px;
+        height: 140px;
+      }
+      .floating-cart-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
       }
     }
   </style>
@@ -664,89 +710,86 @@
        ========================================== -->
   <header>
     <div class="container header-content">
-      <!-- Logo Dinâmica e Movel (Arraste no PC/Touch no Celular) -->
+      <!-- Logo Ajustada: Somente DS no ícone azul + Store -->
       <div class="logo" id="draggableLogo" title="Clique e arraste a logo!">
         <div class="logo-icon">DS</div>
-        <div>DS <span>Store</span></div>
+        <div class="logo-text">Store</div>
       </div>
 
       <!-- Buscar Produtos -->
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Buscar produtos..." onkeyup="filterProducts()" />
-      </div>
-
-      <!-- Ações (Carrinho) -->
-      <div class="header-actions">
-        <button class="cart-btn-header" onclick="toggleCart()">
-          🛒 Carrinho (<span id="cartCount">0</span>)
-        </button>
+        <input type="text" id="searchInput" placeholder="Buscar produtos por nome ou categoria..." onkeyup="filterProducts()" />
       </div>
     </div>
   </header>
 
   <!-- ==========================================
-       NAVEGAÇÃO POR CATEGORIAS
+       MENU DE CATEGORIAS E ASSISTÊNCIA TÉCNICA
        ========================================== -->
   <nav>
     <div class="container">
       <ul class="nav-categories" id="categoriesMenu">
-        <!-- Renderizado dinamicamente via JS -->
+        <!-- Renderizado via JS -->
       </ul>
     </div>
   </nav>
 
   <main class="container">
     <!-- ==========================================
-         ORÇAMENTO DE MANUTENÇÃO / CONSERTO
+         PÁGINA 1: CATÁLOGO DE PRODUTOS
          ========================================== -->
-    <section class="maintenance-banner">
-      <div class="maintenance-container">
-        <div class="maintenance-info">
-          <h2>Assistência Técnica Especializada</h2>
-          <p>Seu celular quebrou ou parou de funcionar? Faça um orçamento rápido e sem compromisso. Receba o atendimento direto no nosso WhatsApp!</p>
-        </div>
-        <form class="maintenance-form" onsubmit="sendBudgetWhatsApp(event)">
-          <div class="form-group">
-            <label>Seu Nome</label>
-            <input type="text" id="budgetName" placeholder="Ex: Leandro Silva" required />
-          </div>
-          <div class="form-group">
-            <label>Modelo do Celular</label>
-            <input type="text" id="budgetModel" placeholder="Ex: iPhone 11, Galaxy S20" required />
-          </div>
-          <div class="form-group">
-            <label>Defeito Apresentado</label>
-            <textarea id="budgetDefect" placeholder="Ex: Tela quebrada, não carrega..." required></textarea>
-          </div>
-          <div class="checkout-row">
-            <div class="form-group" style="flex:1;">
-              <label>Telefone</label>
-              <input type="tel" id="budgetPhone" placeholder="(81) 99999-9999" required />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Endereço</label>
-            <input type="text" id="budgetAddress" placeholder="Rua, Número, Bairro" required />
-          </div>
-          <button type="submit" class="btn-submit-budget">Solicitar Orçamento via WhatsApp</button>
-        </form>
+    <section id="productsSection" class="page-section active">
+      <h2 class="section-title" id="currentCategoryTitle">Todos os Produtos</h2>
+      <div class="products-grid" id="productsGrid">
+        <!-- Produtos injetados via JS -->
       </div>
     </section>
 
     <!-- ==========================================
-         VITRINE DE PRODUTOS
+         PÁGINA 2: FORMULÁRIO DE ASSISTÊNCIA TÉCNICA
          ========================================== -->
-    <section>
-      <h2 class="section-title" id="currentCategoryTitle">Todos os Produtos</h2>
-      <div class="products-grid" id="productsGrid">
-        <!-- Produtos serão inseridos aqui via JS / JSON -->
+    <section id="maintenanceSection" class="page-section">
+      <div class="maintenance-container">
+        <div class="maintenance-header">
+          <h2>🛠️ Orçamento de Manutenção</h2>
+          <p>Preencha os dados do seu aparelho para receber a cotação diretamente no nosso WhatsApp!</p>
+        </div>
+        <form onsubmit="sendBudgetWhatsApp(event)">
+          <div class="form-group">
+            <label>Nome do Cliente</label>
+            <input type="text" id="budgetName" placeholder="Ex: Leandro Silva" required />
+          </div>
+          <div class="form-group">
+            <label>Modelo do Celular</label>
+            <input type="text" id="budgetModel" placeholder="Ex: iPhone 11, Galaxy A54" required />
+          </div>
+          <div class="form-group">
+            <label>Defeito Apresentado</label>
+            <textarea id="budgetDefect" placeholder="Ex: Tela trincada, não carrega, conector solto..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Telefone para Contato</label>
+            <input type="tel" id="budgetPhone" placeholder="(81) 99999-9999" required />
+          </div>
+          <div class="form-group">
+            <label>Endereço Completo</label>
+            <input type="text" id="budgetAddress" placeholder="Rua, Número, Bairro e Cidade" required />
+          </div>
+          <button type="submit" class="btn-submit-budget">Enviar Orçamento para o WhatsApp</button>
+        </form>
       </div>
     </section>
   </main>
 
   <!-- ==========================================
-       MODAL CARRINHO DE COMPRAS
+       CARRINHO FLUTUANTE SOFISTICADO
        ========================================== -->
+  <div class="floating-cart-btn" onclick="toggleCart()">
+    <span class="floating-cart-icon">🛒</span>
+    <span class="cart-badge" id="cartCount">0</span>
+  </div>
+
+  <!-- Modal do Carrinho Lateral -->
   <div class="cart-modal" id="cartModal">
     <div class="cart-content">
       <div class="cart-header">
@@ -755,19 +798,19 @@
       </div>
 
       <div class="cart-items" id="cartItemsContainer">
-        <!-- Itens do carrinho inseridos dinamicamente -->
+        <!-- Itens injetados via JS -->
       </div>
 
       <div class="cart-summary">
-        <!-- Cupom de Desconto -->
+        <!-- Cupom -->
         <div class="coupon-box">
-          <input type="text" id="couponInput" placeholder="Cupom (Ex: DS10)" />
+          <input type="text" id="couponInput" placeholder="Cupom de desconto (Ex: DS10)" />
           <button onclick="applyCoupon()">Aplicar</button>
         </div>
 
-        <!-- Form de Entrega -->
+        <!-- Dados de Entrega -->
         <div class="checkout-form">
-          <input type="text" id="custName" placeholder="Nome Completo" />
+          <input type="text" id="custName" placeholder="Seu Nome Completo" />
           <input type="text" id="custAddress" placeholder="Endereço / Rua" />
           <div class="checkout-row">
             <input type="text" id="custNumber" placeholder="Nº" style="width: 80px;" />
@@ -776,7 +819,7 @@
           <input type="text" id="custCity" placeholder="Cidade" />
         </div>
 
-        <!-- Valores Totais -->
+        <!-- Totais -->
         <div class="cart-total-details">
           <div class="cart-total-row">
             <span>Subtotal:</span>
@@ -792,26 +835,23 @@
           </div>
         </div>
 
-        <!-- Botões de Ação -->
+        <!-- Botões -->
         <div class="cart-actions-footer">
-          <button class="btn-finish" onclick="finishCheckoutWhatsApp()">Finalizar Compra no WhatsApp</button>
+          <button class="btn-finish" onclick="finishCheckoutWhatsApp()">Finalizar Compra via WhatsApp</button>
           <button class="btn-clear" onclick="clearCart()">Limpar Carrinho</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Alerta Toaster -->
+  <!-- Alerta Toast -->
   <div id="toast">Produto adicionado ao carrinho!</div>
 
   <!-- ==========================================
-       SISTEMA LÓGICO EM JAVASCRIPT
+       LÓGICA JAVASCRIPT
        ========================================== -->
   <script>
-    /* ----------------------------------------------------
-       1. DADOS DOS PRODUTOS (JSON)
-       Estrutura configurada para fácil atualização/expansão.
-       ---------------------------------------------------- */
+    /* 1. DADOS DOS PRODUTOS (JSON) */
     const initialProductsJSON = [
       {
         "id": 1,
@@ -891,18 +931,15 @@
       "celular novo"
     ];
 
-    // Estado da Aplicação
+    // Estados da Aplicação
     let products = [];
     let cart = [];
     let currentCategory = "todas";
     let activeDiscount = 0;
     const WHATSAPP_NUMBER = "5581991152441";
 
-    /* ----------------------------------------------------
-       2. INICIALIZAÇÃO DA APLICAÇÃO E LOCALSTORAGE
-       ---------------------------------------------------- */
+    /* 2. INICIALIZAÇÃO */
     document.addEventListener("DOMContentLoaded", () => {
-      // Carregar Produtos (Se não houver no localStorage, usa os padrão)
       const savedProducts = localStorage.getItem("dsstore_products");
       if (savedProducts) {
         products = JSON.parse(savedProducts);
@@ -911,7 +948,6 @@
         localStorage.setItem("dsstore_products", JSON.stringify(products));
       }
 
-      // Carregar Carrinho do LocalStorage
       const savedCart = localStorage.getItem("dsstore_cart");
       if (savedCart) {
         cart = JSON.parse(savedCart);
@@ -923,27 +959,63 @@
       makeLogoDraggable();
     });
 
-    // Atualizar LocalStorage do Carrinho
     function saveCartToStorage() {
       localStorage.setItem("dsstore_cart", JSON.stringify(cart));
     }
 
-    /* ----------------------------------------------------
-       3. RENDERIZAÇÃO DE INTERFACE
-       ---------------------------------------------------- */
+    /* 3. MENU DE CATEGORIAS E NAVEGAÇÃO ENTRE PÁGINAS */
     function renderCategoriesMenu() {
       const container = document.getElementById("categoriesMenu");
-      container.innerHTML = categoriesList.map(cat => `
+      
+      let html = categoriesList.map(cat => `
         <li>
           <button 
-            class="${cat === currentCategory ? 'active' : ''}" 
-            onclick="filterByCategory('${cat}')">
+            class="${(currentCategory === cat && isProductsPageActive()) ? 'active' : ''}" 
+            onclick="selectCategory('${cat}')">
             ${cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
         </li>
       `).join('');
+
+      // Botão especial da Assistência Técnica no Menu
+      html += `
+        <li>
+          <button 
+            class="btn-tech-menu ${!isProductsPageActive() ? 'active' : ''}" 
+            onclick="showMaintenancePage()">
+            🛠️ Assistência Técnica
+          </button>
+        </li>
+      `;
+
+      container.innerHTML = html;
     }
 
+    function isProductsPageActive() {
+      return document.getElementById("productsSection").classList.contains("active");
+    }
+
+    function selectCategory(category) {
+      currentCategory = category;
+      showProductsPage();
+      document.getElementById("currentCategoryTitle").innerText = 
+        category === "todas" ? "Todos os Produtos" : category.charAt(0).toUpperCase() + category.slice(1);
+      renderCategoriesMenu();
+      renderProducts();
+    }
+
+    function showProductsPage() {
+      document.getElementById("productsSection").classList.add("active");
+      document.getElementById("maintenanceSection").classList.remove("active");
+    }
+
+    function showMaintenancePage() {
+      document.getElementById("productsSection").classList.remove("active");
+      document.getElementById("maintenanceSection").classList.add("active");
+      renderCategoriesMenu();
+    }
+
+    /* 4. RENDERIZAÇÃO E FILTRO DE PRODUTOS */
     function renderProducts(filteredList = null) {
       const container = document.getElementById("productsGrid");
       const listToRender = filteredList || getProductsByCategory();
@@ -984,15 +1056,8 @@
       return products.filter(p => p.category.toLowerCase() === currentCategory.toLowerCase());
     }
 
-    function filterByCategory(category) {
-      currentCategory = category;
-      document.getElementById("currentCategoryTitle").innerText = 
-        category === "todas" ? "Todos os Produtos" : category.charAt(0).toUpperCase() + category.slice(1);
-      renderCategoriesMenu();
-      renderProducts();
-    }
-
     function filterProducts() {
+      showProductsPage(); // Garante que volta para os produtos ao digitar na busca
       const term = document.getElementById("searchInput").value.toLowerCase();
       const filtered = products.filter(p => 
         p.name.toLowerCase().includes(term) || 
@@ -1002,15 +1067,12 @@
       renderProducts(filtered);
     }
 
-    /* ----------------------------------------------------
-       4. GERENCIAMENTO DO CARRINHO (COMPRAS E ALTERAÇÕES)
-       ---------------------------------------------------- */
+    /* 5. SISTEMA DO CARRINHO (ACUMULATIVO E FLUTUANTE) */
     function addToCart(productId, directBuy = false) {
       const product = products.find(p => p.id === productId);
       const obsInput = document.getElementById(`obs-${productId}`);
       const obsText = obsInput ? obsInput.value.trim() : "";
 
-      // Verifica se o mesmo produto com a MESMA observação já está no carrinho
       const existingItem = cart.find(item => item.id === productId && item.obs === obsText);
 
       if (existingItem) {
@@ -1026,7 +1088,7 @@
         });
       }
 
-      if (obsInput) obsInput.value = ""; // Limpa a observação
+      if (obsInput) obsInput.value = "";
       saveCartToStorage();
       updateCartUI();
       showToast();
@@ -1037,11 +1099,12 @@
     }
 
     function updateCartUI() {
-      // Atualiza Badge
-      const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-      document.getElementById("cartCount").innerText = totalItems;
+      // Soma dinâmica acumulativa de produtos (1, 2, 3...)
+      const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+      const badge = document.getElementById("cartCount");
+      badge.innerText = totalCount;
 
-      // Renderiza Itens
+      // Renderiza os itens no modal
       const container = document.getElementById("cartItemsContainer");
       
       if (cart.length === 0) {
@@ -1066,7 +1129,7 @@
         `).join('');
       }
 
-      // Atualiza Valores de Total
+      // Cálculo de Totais
       const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
       const discount = subtotal * activeDiscount;
       const total = subtotal - discount;
@@ -1099,7 +1162,7 @@
     }
 
     function clearCart() {
-      if (confirm("Tem certeza que deseja limpar o carrinho?")) {
+      if (confirm("Deseja mesmo esvaziar seu carrinho?")) {
         cart = [];
         activeDiscount = 0;
         saveCartToStorage();
@@ -1119,13 +1182,13 @@
     function applyCoupon() {
       const coupon = document.getElementById("couponInput").value.trim().toUpperCase();
       if (coupon === "DS10") {
-        activeDiscount = 0.10; // 10% de desconto
-        alert("Cupom DS10 aplicado com sucesso! (10% OFF)");
+        activeDiscount = 0.10;
+        alert("Cupom DS10 aplicado (10% de desconto)!");
       } else if (coupon === "DSSTORE") {
-        activeDiscount = 0.15; // 15% de desconto
-        alert("Cupom DSSTORE aplicado com sucesso! (15% OFF)");
+        activeDiscount = 0.15;
+        alert("Cupom DSSTORE aplicado (15% de desconto)!");
       } else {
-        alert("Cupom inválido. Tente 'DS10'");
+        alert("Cupom inválido. Use 'DS10' para testar.");
         activeDiscount = 0;
       }
       updateCartUI();
@@ -1139,10 +1202,7 @@
       }, 2500);
     }
 
-    /* ----------------------------------------------------
-       5. INTEGRAÇÕES COM WHATSAPP
-       ---------------------------------------------------- */
-    // Finalização de Pedido do Carrinho
+    /* 6. INTEGRAÇÃO WHATSAPP */
     function finishCheckoutWhatsApp() {
       if (cart.length === 0) {
         alert("Seu carrinho está vazio!");
@@ -1183,13 +1243,11 @@
         message += `*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
         message += `*Desconto:* R$ ${discount.toFixed(2).replace('.', ',')}\n`;
       }
-      message += `*TOTAL A PAGAR:* R$ ${total.toFixed(2).replace('.', ',')}\n`;
+      message += `*TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}\n`;
 
-      const encodedMsg = encodeURIComponent(message);
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`, '_blank');
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    // Pedido de Orçamento de Manutenção
     function sendBudgetWhatsApp(event) {
       event.preventDefault();
 
@@ -1203,19 +1261,16 @@
       message += `-----------------------------------\n`;
       message += `*Cliente:* ${name}\n`;
       message += `*Telefone:* ${phone}\n`;
-      message += `*Modelo do Celular:* ${model}\n`;
+      message += `*Modelo:* ${model}\n`;
       message += `*Defeito:* ${defect}\n`;
       message += `*Endereço:* ${address}\n`;
       message += `-----------------------------------\n`;
       message += `Aguardo retorno com a cotação!`;
 
-      const encodedMsg = encodeURIComponent(message);
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`, '_blank');
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    /* ----------------------------------------------------
-       6. LOGO INTERATIVA E MOVÍVEL
-       ---------------------------------------------------- */
+    /* 7. LOGO MOVÍVEL E ARRASTÁVEL */
     function makeLogoDraggable() {
       const logo = document.getElementById("draggableLogo");
       let isDragging = false;
@@ -1260,12 +1315,8 @@
           }
           xOffset = currentX;
           yOffset = currentY;
-          setTranslate(currentX, currentY, logo);
+          logo.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
         }
-      }
-
-      function setTranslate(xPos, yPos, el) {
-        el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
       }
     }
   </script>
