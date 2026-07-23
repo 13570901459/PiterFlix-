@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Estudo, Teste e Prova - Plataforma Premium</title>
+    <title>Plataforma de Estudos Premium</title>
     <style>
         :root {
             --bg-main: #0b1329;
@@ -36,7 +36,6 @@
             overflow-x: hidden;
         }
 
-        /* Top Bar & Menu */
         header {
             background-color: var(--bg-card);
             padding: 15px 20px;
@@ -66,10 +65,7 @@
         /* Drawer Hambúrguer */
         .drawer-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7);
             backdrop-filter: blur(4px);
             z-index: 200;
@@ -78,22 +74,15 @@
             transition: opacity 0.3s ease;
         }
 
-        .drawer-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .drawer-overlay.active { opacity: 1; pointer-events: auto; }
 
         .drawer {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 300px;
-            height: 100%;
+            position: fixed; top: 0; left: -320px;
+            width: 300px; height: 100%;
             background: var(--bg-card);
             z-index: 201;
             transition: left 0.3s ease;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             box-shadow: 4px 0 20px rgba(0,0,0,0.5);
         }
 
@@ -102,139 +91,77 @@
         .drawer-header {
             padding: 20px;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             font-weight: bold;
         }
 
-        .drawer-content {
-            padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
+        .drawer-content { padding: 20px; overflow-y: auto; flex: 1; }
         .menu-section { margin-bottom: 25px; }
-
         .menu-section h4 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-sub);
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+            font-size: 0.75rem; text-transform: uppercase;
+            color: var(--text-sub); margin-bottom: 10px; letter-spacing: 1px;
         }
 
         .menu-item {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            text-align: left;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            width: 100%; padding: 12px;
+            background: var(--bg-input); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 8px; margin-bottom: 8px;
+            text-align: left; cursor: pointer; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between;
             transition: background 0.2s;
         }
 
         .menu-item:hover { background: var(--accent); }
 
-        /* Container Principal */
+        /* Layout Container */
         .container {
-            padding: 20px;
-            max-width: 1100px;
-            margin: 0 auto;
-            width: 100%;
-            flex: 1;
+            padding: 20px; max-width: 1100px;
+            margin: 0 auto; width: 100%; flex: 1;
         }
 
         .section-title {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 1rem; margin-bottom: 12px;
+            color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         .grid-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 25px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px; margin-bottom: 25px;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 15px; text-align: center;
         }
 
-        .stat-card h5 {
-            color: var(--text-sub);
-            font-size: 0.75rem;
-            margin-bottom: 6px;
-        }
-
-        .stat-card .num {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
+        .stat-card h5 { color: var(--text-sub); font-size: 0.75rem; margin-bottom: 6px; }
+        .stat-card .num { font-size: 1.5rem; font-weight: bold; }
 
         .text-success { color: var(--success); }
         .text-danger { color: var(--danger); }
         .text-accent { color: var(--accent); }
         .text-warning { color: var(--warning); }
 
-        /* Cards & Forms */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px; margin-bottom: 20px;
         }
 
         .form-group { margin-bottom: 15px; }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 6px;
-        }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 6px; }
 
         .form-control {
-            width: 100%;
-            padding: 10px;
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.95rem;
+            width: 100%; padding: 10px;
+            background: var(--bg-main); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-main); font-size: 0.95rem;
         }
 
-        textarea.form-control {
-            resize: vertical;
-            min-height: 90px;
-        }
+        textarea.form-control { resize: vertical; min-height: 100px; }
 
         .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
+            padding: 10px 16px; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem;
         }
 
         .btn-primary { background: var(--accent); color: white; }
@@ -243,135 +170,74 @@
         .btn-warning { background: var(--warning); color: #0b1329; }
         .btn-secondary { background: var(--bg-input); color: var(--text-main); }
 
-        /* Edital e Barra de Progresso */
         .progress-bar-bg {
-            background: var(--bg-main);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 8px 0 15px;
+            background: var(--bg-main); height: 8px;
+            border-radius: 4px; overflow: hidden; margin: 8px 0 15px;
         }
 
         .progress-bar-fill {
-            background: var(--success);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
+            background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease;
         }
 
-        .edital-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
+        .topic-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.2s;
         }
+
+        .topic-item:hover { border-color: var(--accent); transform: translateX(4px); }
 
         .hidden { display: none !important; }
 
-        /* Cronômetro Widget */
         .timer-box {
-            text-align: center;
-            padding: 10px;
-            background: var(--bg-main);
-            border-radius: 8px;
-            margin-bottom: 15px;
+            text-align: center; padding: 10px; background: var(--bg-main);
+            border-radius: 8px; margin-bottom: 15px;
         }
 
-        .timer-display {
-            font-size: 1.8rem;
-            font-family: monospace;
-            font-weight: bold;
-            color: var(--warning);
-        }
+        .timer-display { font-size: 1.8rem; font-family: monospace; font-weight: bold; color: var(--warning); }
 
-        /* --- TELA DE QUESTÕES E LOUSA --- */
+        /* QUIZ OVERLAY */
         #quiz-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: var(--bg-main);
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-main); z-index: 300; display: flex; flex-direction: column;
         }
 
         .quiz-top-bar {
-            background: var(--bg-card);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
+            background: var(--bg-card); padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);
         }
 
-        .quiz-body {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
-        }
+        .quiz-body { flex: 1; padding: 20px; overflow-y: auto; position: relative; }
 
-        .options-list {
-            list-style: none;
-            margin-top: 20px;
-        }
+        .options-list { list-style: none; margin-top: 20px; }
 
         .option-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: 0.2s;
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 14px; border-radius: 8px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s; font-size: 0.95rem; line-height: 1.4;
         }
 
         .option-card.selected { border-color: var(--accent); background: rgba(58, 134, 255, 0.15); }
         .option-card.correct { border-color: var(--success); background: rgba(6, 214, 160, 0.15); }
         .option-card.wrong { border-color: var(--danger); background: rgba(239, 71, 111, 0.15); }
 
-        /* Canvas / Lousa Overlay */
         #scratch-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
         }
 
-        #scratch-canvas.active {
-            pointer-events: auto;
-            cursor: crosshair;
-        }
+        #scratch-canvas.active { pointer-events: auto; cursor: crosshair; }
 
         .canvas-tools {
-            position: fixed;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 8px 15px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 20;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 8px 15px; border-radius: 30px; display: flex; align-items: center; gap: 10px;
+            z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
 
         .color-dot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
+            width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
         }
 
         .color-dot.active { border-color: white; transform: scale(1.1); }
@@ -386,7 +252,7 @@
         <div></div>
     </header>
 
-    <!-- Drawer Lateral / Menu Hambúrguer -->
+    <!-- Menu Hambúrguer -->
     <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
     <div class="drawer" id="drawer">
         <div class="drawer-header">
@@ -394,7 +260,6 @@
             <button class="menu-btn" onclick="toggleDrawer()">✕</button>
         </div>
         <div class="drawer-content">
-            <!-- Cronômetro -->
             <div class="menu-section">
                 <h4>⏱️ Cronômetro de Estudo</h4>
                 <div class="timer-box">
@@ -407,35 +272,32 @@
                 </div>
             </div>
 
-            <!-- Navegação -->
             <div class="menu-section">
                 <h4>Navegação</h4>
                 <button class="menu-item" onclick="navigate('dashboard')">📊 Dashboard Principal</button>
                 <button class="menu-item" onclick="navigate('add-subject')">➕ Cadastrar Disciplina</button>
             </div>
 
-            <!-- Lista de Disciplinas -->
             <div class="menu-section">
                 <h4>Disciplinas</h4>
                 <div id="drawer-subjects-list"></div>
             </div>
 
-            <!-- Backup -->
             <div class="menu-section">
                 <h4>Backup & Dados</h4>
                 <button class="menu-item" onclick="exportData('global')">📥 Exportar Banco Geral (JSON)</button>
                 <label class="menu-item" style="cursor: pointer;">
                     📤 Importar Banco Geral (JSON)
-                    <input type="file" id="import-file" accept=".json" onchange="importData(event, 'global')" style="display: none;">
+                    <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display: none;">
                 </label>
             </div>
         </div>
     </div>
 
-    <!-- Conteúdo Principal -->
+    <!-- Container Principal -->
     <div class="container">
         
-        <!-- VIEW: DASHBOARD -->
+        <!-- DASHBOARD -->
         <div id="view-dashboard">
             <div class="section-title">Desempenho de Hoje</div>
             <div class="grid-stats">
@@ -473,72 +335,89 @@
                 </div>
             </div>
 
-            <div class="section-title">Aproveitamento por Edital</div>
+            <div class="section-title">Aproveitamento por Disciplina</div>
             <div id="dash-subjects-progress"></div>
         </div>
 
-        <!-- VIEW: CADASTRAR DISCIPLINA -->
+        <!-- NOVA DISCIPLINA -->
         <div id="view-add-subject" class="hidden">
             <div class="card">
-                <h3 style="margin-bottom: 15px;">Cadastrar Disciplina</h3>
+                <h3 style="margin-bottom: 15px;">Cadastrar Nova Disciplina</h3>
                 <div class="form-group">
                     <label>Nome da Disciplina</label>
-                    <input type="text" id="input-subject-name" class="form-control" placeholder="Ex: Raciocínio Lógico">
+                    <input type="text" id="input-subject-name" class="form-control" placeholder="Ex: Língua Portuguesa">
                 </div>
                 <button class="btn btn-primary" onclick="saveSubject()">Salvar Disciplina</button>
             </div>
         </div>
 
-        <!-- VIEW: DETALHES DA DISCIPLINA -->
+        <!-- VISTA DA DISCIPLINA -->
         <div id="view-subject-detail" class="hidden">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 id="subject-detail-name">Disciplina</h3>
-                    <div style="display: flex; gap: 5px;">
-                        <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="exportData('subject')">📤 Exportar</button>
-                        <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="editCurrentSubject()">✏️ Editar</button>
-                        <button class="btn btn-danger" style="padding: 5px 8px;" onclick="deleteCurrentSubject()">🗑️ Excluir</button>
-                    </div>
+                    <button class="btn btn-danger" style="padding: 5px 8px;" onclick="deleteCurrentSubject()">🗑️ Excluir</button>
                 </div>
 
-                <!-- Edital Verticalizado -->
-                <h4 style="margin-bottom: 10px; color: var(--text-sub);">Edital Verticalizado</h4>
+                <h4 style="margin-bottom: 5px; color: var(--text-sub);">Progresso no Edital Verticalizado</h4>
                 <div class="progress-bar-bg">
                     <div class="progress-bar-fill" id="subject-edital-progress"></div>
                 </div>
-                <div id="subject-edital-list"></div>
 
                 <div class="form-group" style="margin-top: 15px;">
-                    <label>Alimentar/Atualizar Edital (JSON Array)</label>
-                    <textarea id="input-edital-json" class="form-control" placeholder='["Item 1: Lógica Proposicional", "Item 2: Equivalências"]'></textarea>
+                    <label>Cadastrar Assunto / Tópico</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="input-topic-name" class="form-control" placeholder="Ex: Sintaxe da Oração">
+                        <button class="btn btn-primary" onclick="addTopic()">Adicionar</button>
+                    </div>
                 </div>
-                <button class="btn btn-secondary" onclick="saveEditalJson()">Carregar Edital JSON</button>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Configuração do Edital em Lote (JSON Array)</label>
+                    <textarea id="input-edital-json" class="form-control" placeholder='["1. Ortografia", "2. Acentuação", "3. Morfologia"]'></textarea>
+                    <button class="btn btn-secondary" style="margin-top: 8px;" onclick="saveEditalJson()">Carregar Vários Assuntos (JSON)</button>
+                </div>
             </div>
 
-            <!-- Cadastro de Lotes de Questões -->
             <div class="card">
-                <h4 style="margin-bottom: 10px;">Cadastrar Lote de Questões (JSON)</h4>
-                <div class="form-group">
-                    <label>Nome do Lote</label>
-                    <input type="text" id="input-batch-name" class="form-control" placeholder="Ex: Lote 1 - CESPE 2026">
+                <h4 style="margin-bottom: 15px;">Assuntos para Estudo (Clique para Acessar os Lotes)</h4>
+                <div id="topics-list-container"></div>
+            </div>
+        </div>
+
+        <!-- VISTA DO ASSUNTO -->
+        <div id="view-topic-detail" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; margin-bottom: 6px;" onclick="backToSubject()">← Voltar para Disciplina</button>
+                        <h3 id="topic-detail-name">Assunto</h3>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Array JSON de Questões</label>
-                    <textarea id="input-batch-json" class="form-control" placeholder='[{"pergunta": "2+2=4?", "opcoes": ["Certo", "Errado"], "resposta": 0}]'></textarea>
+
+                <div style="display:flex; gap:10px; margin-bottom: 15px;" id="topic-resume-actions">
+                    <button class="btn btn-warning" id="btn-resume-topic" onclick="resumeTopicProgress()">▶️ Continuar Onde Parei</button>
+                    <button class="btn btn-secondary" onclick="startTopicFromScratch()">🔄 Começar do Zero</button>
                 </div>
-                <button class="btn btn-success" onclick="saveBatchJson()">Adicionar Lote</button>
+
+                <!-- Cadastro de Lote de Questões (com suporte a 5 alternativas) -->
+                <div class="form-group">
+                    <label>Cadastrar Lote de Questões em JSON (5 Alternativas A, B, C, D, E)</label>
+                    <input type="text" id="input-batch-name" class="form-control" placeholder="Nome do Lote (Ex: Lote 1 - Bamba)" style="margin-bottom: 8px;">
+                    <textarea id="input-batch-json" class="form-control" placeholder='[{"pergunta": "Qual a alternativa correta?", "opcoes": ["A) Opção 1", "B) Opção 2", "C) Opção 3", "D) Opção 4", "E) Opção 5"], "resposta": 0}]'></textarea>
+                    <button class="btn btn-success" style="margin-top: 8px;" onclick="saveBatchJson()">Colar Lote de Questões (JSON)</button>
+                </div>
             </div>
 
-            <!-- Lotes e Início do Simulado -->
             <div class="card">
-                <h4 style="margin-bottom: 15px;">Lotes para Treino</h4>
+                <h4 style="margin-bottom: 15px;">Lotes de Questões Cadastrados</h4>
                 <div id="batches-container"></div>
             </div>
         </div>
 
     </div>
 
-    <!-- VIEW: RESOLUÇÃO DE QUESTÕES E LOUSA (FULLSCREEN) -->
+    <!-- RESOLUÇÃO DE QUESTÕES E LOUSA -->
     <div id="quiz-overlay" class="hidden">
         <canvas id="scratch-canvas"></canvas>
 
@@ -567,7 +446,6 @@
             </div>
         </div>
 
-        <!-- Barra de Ferramentas da Lousa -->
         <div class="canvas-tools">
             <button class="btn btn-secondary" id="btn-toggle-scratch" style="padding: 4px 8px;" onclick="toggleScratchpad()">✏️ Lousa</button>
             <div class="color-dot active" style="background: #ffd166;" onclick="setColor('#ffd166', this)"></div>
@@ -576,28 +454,30 @@
             <div class="color-dot" style="background: #3a86ff;" onclick="setColor('#3a86ff', this)"></div>
             <div class="color-dot" style="background: #ffffff;" onclick="setColor('#ffffff', this)"></div>
             <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="setEraser()">🧹 Borracha</button>
-            <button class="btn btn-danger" style="padding: 4px 8px;" onclick="clearCanvas()">🗑️ Limpar</button>
+            <button class="btn btn-danger" style="padding: 4px 8px;" onclick="clearCanvas()">🗑️ Limpar Total</button>
         </div>
     </div>
 
     <script>
-        /* --- ESTADO GLOBAL DO SISTEMA --- */
         let appState = {
             subjects: [],
             stats: {
                 today: { date: '', total: 0, correct: 0, wrong: 0 },
                 global: { total: 0, correct: 0, wrong: 0 },
-                batchLastScores: {} // { batchId: { correct, wrong } }
+                batchLastScores: {}
             },
-            activeSession: null // Salva estado ativo caso a página seja recarregada
+            topicProgress: {},
+            activeSession: null
         };
 
         let currentSubjectId = null;
+        let currentTopicId = null;
         let currentQuiz = null;
         let timerInterval = null;
         let timerSeconds = 0;
 
-        /* --- INICIALIZAÇÃO --- */
+        const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
         window.onload = () => {
             loadStorage();
             checkTodayDate();
@@ -605,9 +485,8 @@
             renderDrawerSubjects();
             initCanvas();
 
-            // Retoma automaticamente se houver uma sessão pausada no LocalStorage
             if (appState.activeSession) {
-                if (confirm("Você possui um treino pausado. Deseja continuar exatamente onde parou?")) {
+                if (confirm("Você tem um treino pausado. Deseja retornar onde parou?")) {
                     currentQuiz = appState.activeSession;
                     openQuizView();
                 }
@@ -623,15 +502,14 @@
         }
 
         function saveStorage() {
-            localStorage.setItem('estudo_pro_v3_data', JSON.stringify(appState));
+            localStorage.setItem('estudo_pro_v5_data', JSON.stringify(appState));
         }
 
         function loadStorage() {
-            const data = localStorage.getItem('estudo_pro_v3_data');
+            const data = localStorage.getItem('estudo_pro_v5_data');
             if (data) appState = JSON.parse(data);
         }
 
-        /* --- MENU HAMBÚRGUER --- */
         function toggleDrawer() {
             document.getElementById('drawer').classList.toggle('active');
             document.getElementById('drawer-overlay').classList.toggle('active');
@@ -640,30 +518,15 @@
         function navigate(viewName) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            
-            const titles = {
-                'dashboard': 'Dashboard',
-                'add-subject': 'Nova Disciplina',
-                'subject-detail': 'Disciplina'
-            };
-            document.getElementById('top-title').innerText = titles[viewName] || 'Estudos';
-            
             if (viewName === 'dashboard') renderDashboard();
             toggleDrawer();
         }
 
-        /* --- GERENCIAMENTO DE DISCIPLINAS --- */
         function saveSubject() {
             const name = document.getElementById('input-subject-name').value.trim();
-            if (!name) return alert('Insira o nome da disciplina.');
+            if (!name) return alert('Informe o nome da disciplina.');
 
-            const newSub = {
-                id: 'sub_' + Date.now(),
-                name: name,
-                edital: [],
-                batches: []
-            };
-
+            const newSub = { id: 'sub_' + Date.now(), name: name, topics: [] };
             appState.subjects.push(newSub);
             saveStorage();
             document.getElementById('input-subject-name').value = '';
@@ -678,10 +541,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'menu-item';
                 btn.innerHTML = `<span>📖 ${sub.name}</span>`;
-                btn.onclick = () => {
-                    openSubjectDetail(sub.id);
-                    toggleDrawer();
-                };
+                btn.onclick = () => { openSubjectDetail(sub.id); toggleDrawer(); };
                 container.appendChild(btn);
             });
         }
@@ -696,23 +556,11 @@
             document.getElementById('view-subject-detail').classList.remove('hidden');
             document.getElementById('top-title').innerText = sub.name;
 
-            renderEdital(sub);
-            renderBatches(sub);
-        }
-
-        function editCurrentSubject() {
-            const sub = appState.subjects.find(s => s.id === currentSubjectId);
-            const newName = prompt('Novo nome da disciplina:', sub.name);
-            if (newName && newName.trim() !== '') {
-                sub.name = newName.trim();
-                saveStorage();
-                renderDrawerSubjects();
-                openSubjectDetail(currentSubjectId);
-            }
+            renderTopics(sub);
         }
 
         function deleteCurrentSubject() {
-            if (confirm('Deseja realmente excluir esta disciplina?')) {
+            if (confirm('Deseja excluir esta disciplina?')) {
                 appState.subjects = appState.subjects.filter(s => s.id !== currentSubjectId);
                 saveStorage();
                 renderDrawerSubjects();
@@ -720,7 +568,17 @@
             }
         }
 
-        /* --- EDITAL VERTICALIZADO --- */
+        function addTopic() {
+            const name = document.getElementById('input-topic-name').value.trim();
+            if (!name) return alert('Digite o nome do assunto.');
+
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            sub.topics.push({ id: 'top_' + Date.now(), title: name, done: false, batches: [] });
+            saveStorage();
+            document.getElementById('input-topic-name').value = '';
+            renderTopics(sub);
+        }
+
         function saveEditalJson() {
             const jsonText = document.getElementById('input-edital-json').value.trim();
             if (!jsonText) return;
@@ -730,64 +588,100 @@
                 if (!Array.isArray(parsed)) throw new Error('O JSON deve ser um array.');
 
                 const sub = appState.subjects.find(s => s.id === currentSubjectId);
-                sub.edital = parsed.map(item => ({
-                    title: typeof item === 'string' ? item : item.title,
-                    done: false
-                }));
+                parsed.forEach(item => {
+                    sub.topics.push({
+                        id: 'top_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        title: typeof item === 'string' ? item : item.title,
+                        done: false,
+                        batches: []
+                    });
+                });
 
                 saveStorage();
                 document.getElementById('input-edital-json').value = '';
-                renderEdital(sub);
+                renderTopics(sub);
             } catch (e) {
                 alert('Erro no JSON do Edital: ' + e.message);
             }
         }
 
-        function renderEdital(sub) {
-            const container = document.getElementById('subject-edital-list');
+        function renderTopics(sub) {
+            const container = document.getElementById('topics-list-container');
             container.innerHTML = '';
 
-            if (!sub.edital || sub.edital.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-sub); font-size:0.85rem;">Nenhum edital cadastrado.</p>';
+            let doneCount = 0;
+            if (sub.topics.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-sub); font-size:0.85rem;">Nenhum assunto cadastrado ainda.</p>';
                 document.getElementById('subject-edital-progress').style.width = '0%';
                 return;
             }
 
-            let doneCount = 0;
-            sub.edital.forEach((item, idx) => {
-                if (item.done) doneCount++;
+            sub.topics.forEach((top) => {
+                if (top.done) doneCount++;
+
+                let qCount = 0;
+                top.batches.forEach(b => qCount += b.questions.length);
+
                 const div = document.createElement('div');
-                div.className = 'edital-item';
+                div.className = 'topic-item';
                 div.innerHTML = `
-                    <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleEditalItem(${idx})">
-                    <span style="${item.done ? 'text-decoration: line-through; color: var(--text-sub);' : ''}">${item.title}</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" ${top.done ? 'checked' : ''} onclick="event.stopPropagation(); toggleTopicDone('${top.id}')">
+                        <div>
+                            <strong style="${top.done ? 'text-decoration: line-through; color: var(--text-sub);' : ''}">${top.title}</strong>
+                            <div style="font-size:0.75rem; color: var(--text-sub);">${qCount} questões em lotes</div>
+                        </div>
+                    </div>
+                    <span>➔</span>
                 `;
+                div.onclick = () => openTopicDetail(top.id);
                 container.appendChild(div);
             });
 
-            const pct = Math.round((doneCount / sub.edital.length) * 100);
+            const pct = Math.round((doneCount / sub.topics.length) * 100);
             document.getElementById('subject-edital-progress').style.width = pct + '%';
         }
 
-        function toggleEditalItem(idx) {
+        function toggleTopicDone(topicId) {
             const sub = appState.subjects.find(s => s.id === currentSubjectId);
-            sub.edital[idx].done = !sub.edital[idx].done;
+            const top = sub.topics.find(t => t.id === topicId);
+            if (top) top.done = !top.done;
             saveStorage();
-            renderEdital(sub);
+            renderTopics(sub);
         }
 
-        /* --- LOTES DE QUESTÕES --- */
+        function openTopicDetail(topicId) {
+            currentTopicId = topicId;
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            const topic = sub.topics.find(t => t.id === topicId);
+
+            document.getElementById('topic-detail-name').innerText = topic.title;
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById('view-topic-detail').classList.remove('hidden');
+
+            const hasSaved = appState.topicProgress[topicId];
+            document.getElementById('btn-resume-topic').style.display = hasSaved ? 'inline-flex' : 'none';
+
+            renderBatches(topic);
+        }
+
+        function backToSubject() {
+            if (currentSubjectId) openSubjectDetail(currentSubjectId);
+        }
+
         function saveBatchJson() {
             const name = document.getElementById('input-batch-name').value.trim() || 'Lote Regular';
             const jsonText = document.getElementById('input-batch-json').value.trim();
 
-            if (!jsonText) return alert('Insira o JSON contendo as questões.');
+            if (!jsonText) return alert('Insira as questões no formato JSON.');
 
             try {
                 const parsed = JSON.parse(jsonText);
-                if (!Array.isArray(parsed)) throw new Error('O JSON deve ser um array.');
+                if (!Array.isArray(parsed)) throw new Error('O JSON precisa ser um array.');
 
                 const sub = appState.subjects.find(s => s.id === currentSubjectId);
+                const topic = sub.topics.find(t => t.id === currentTopicId);
+
                 const newBatch = {
                     id: 'batch_' + Date.now(),
                     name: name,
@@ -799,24 +693,23 @@
                     }))
                 };
 
-                sub.batches.push(newBatch);
+                topic.batches.push(newBatch);
                 saveStorage();
                 document.getElementById('input-batch-name').value = '';
                 document.getElementById('input-batch-json').value = '';
-                renderBatches(sub);
+                renderBatches(topic);
             } catch (e) {
-                alert('Erro no JSON das questões: ' + e.message);
+                alert('Erro na estrutura JSON: ' + e.message);
             }
         }
 
-        function renderBatches(sub) {
+        function renderBatches(topic) {
             const container = document.getElementById('batches-container');
             container.innerHTML = '';
 
             let totalQuestions = 0;
-            sub.batches.forEach(b => totalQuestions += b.questions.length);
+            topic.batches.forEach(b => totalQuestions += b.questions.length);
 
-            // Lote Geral
             const generalDiv = document.createElement('div');
             generalDiv.style.marginBottom = '12px';
             generalDiv.style.padding = '12px';
@@ -825,17 +718,16 @@
             generalDiv.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <strong>🔥 Lote Geral (Todas)</strong>
-                        <div style="font-size:0.8rem; color:var(--text-sub);">${totalQuestions} questões acumuladas</div>
+                        <strong>🔥 Lote Geral do Assunto</strong>
+                        <div style="font-size:0.8rem; color:var(--text-sub);">${totalQuestions} questões agrupadas</div>
                     </div>
-                    <button class="btn btn-primary" onclick="startQuiz('all')">Iniciar Geral</button>
+                    <button class="btn btn-primary" onclick="startQuiz('all')">Iniciar Lote Geral</button>
                 </div>
             `;
             container.appendChild(generalDiv);
 
-            // Lotes Individuais
-            sub.batches.forEach(b => {
-                const lastScore = appState.stats.batchLastScores[b.id] || { correct: 0, wrong: 0 };
+            topic.batches.forEach(b => {
+                const score = appState.stats.batchLastScores[b.id] || { correct: 0, wrong: 0 };
                 const div = document.createElement('div');
                 div.style.padding = '10px 0';
                 div.style.borderBottom = '1px solid var(--border)';
@@ -844,7 +736,7 @@
                         <div>
                             <strong>${b.name}</strong> (${b.questions.length} q)
                             <div style="font-size:0.8rem; margin-top:3px;">
-                                Última Pontuação: <span class="text-success">${lastScore.correct} acertos</span> / <span class="text-danger">${lastScore.wrong} erros</span>
+                                Desempenho: <span class="text-success">${score.correct} acertos</span> / <span class="text-danger">${score.wrong} erros</span>
                             </div>
                         </div>
                         <button class="btn btn-secondary" onclick="startQuiz('${b.id}')">Iniciar Lote</button>
@@ -854,22 +746,23 @@
             });
         }
 
-        /* --- MOTOR DE RESOLUÇÃO DE QUESTÕES --- */
         function startQuiz(batchScope) {
             const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            const topic = sub.topics.find(t => t.id === currentTopicId);
             let questionsList = [];
 
             if (batchScope === 'all') {
-                sub.batches.forEach(b => questionsList.push(...b.questions));
+                topic.batches.forEach(b => questionsList.push(...b.questions));
             } else {
-                const batch = sub.batches.find(b => b.id === batchScope);
+                const batch = topic.batches.find(b => b.id === batchScope);
                 if (batch) questionsList = [...batch.questions];
             }
 
-            if (questionsList.length === 0) return alert('Não há questões para responder neste lote.');
+            if (questionsList.length === 0) return alert('Nenhuma questão cadastrada neste lote.');
 
             currentQuiz = {
                 subjectId: currentSubjectId,
+                topicId: currentTopicId,
                 batchScope: batchScope,
                 questions: questionsList,
                 currentIndex: 0,
@@ -881,11 +774,26 @@
             openQuizView();
         }
 
+        function resumeTopicProgress() {
+            const saved = appState.topicProgress[currentTopicId];
+            if (saved) {
+                currentQuiz = saved;
+                openQuizView();
+            }
+        }
+
+        function startTopicFromScratch() {
+            delete appState.topicProgress[currentTopicId];
+            saveStorage();
+            startQuiz('all');
+        }
+
         function openQuizView() {
             document.getElementById('quiz-overlay').classList.remove('hidden');
             renderCurrentQuestion();
         }
 
+        /* SUPORTE A 5 OU MAIS ALTERNATIVAS (A, B, C, D, E...) */
         function renderCurrentQuestion() {
             const q = currentQuiz.questions[currentQuiz.currentIndex];
             document.getElementById('quiz-progress-num').innerText = `Questão ${currentQuiz.currentIndex + 1} de ${currentQuiz.questions.length}`;
@@ -911,12 +819,19 @@
                     if (currentQuiz.userAnswers[currentQuiz.currentIndex] === idx && idx !== q.resposta) li.classList.add('wrong');
                 }
 
-                li.innerText = `${String.fromCharCode(65 + idx)}) ${optText}`;
+                // Trata caso a string já venha com 'A)', 'B)', etc.
+                let displayText = optText;
+                const prefix = labels[idx] ? `${labels[idx]}) ` : '';
+                if (!optText.trim().match(/^[A-Ea-e][\)\.\-]/)) {
+                    displayText = prefix + optText;
+                }
+
+                li.innerText = displayText;
                 li.onclick = () => { if (!answered) selectOption(idx); };
                 optionsContainer.appendChild(li);
             });
 
-            // Salva a sessão ativa no localStorage para pausa persistente
+            appState.topicProgress[currentQuiz.topicId] = currentQuiz;
             appState.activeSession = currentQuiz;
             saveStorage();
         }
@@ -930,7 +845,7 @@
             const currentIdx = currentQuiz.currentIndex;
             const selectedOpt = currentQuiz.userAnswers[currentIdx];
 
-            if (selectedOpt === undefined) return alert('Selecione uma opção.');
+            if (selectedOpt === undefined) return alert('Escolha uma alternativa.');
 
             const q = currentQuiz.questions[currentIdx];
             const isCorrect = selectedOpt === q.resposta;
@@ -949,7 +864,6 @@
                 appState.stats.global.wrong++;
             }
 
-            // Atualiza o registro da última pontuação do lote
             if (currentQuiz.batchScope !== 'all') {
                 appState.stats.batchLastScores[currentQuiz.batchScope] = {
                     correct: currentQuiz.correctCount,
@@ -973,15 +887,17 @@
         function pauseQuiz() {
             saveStorage();
             document.getElementById('quiz-overlay').classList.add('hidden');
-            if (currentSubjectId) openSubjectDetail(currentSubjectId);
+            if (currentTopicId) openTopicDetail(currentTopicId);
         }
 
         function deleteCurrentQuestion() {
-            if (confirm("Excluir esta questão permanentemente do banco?")) {
+            if (confirm("Excluir esta questão permanentemente do lote?")) {
                 const qId = currentQuiz.questions[currentQuiz.currentIndex].id;
 
                 const sub = appState.subjects.find(s => s.id === currentQuiz.subjectId);
-                sub.batches.forEach(b => {
+                const topic = sub.topics.find(t => t.id === currentQuiz.topicId);
+
+                topic.batches.forEach(b => {
                     b.questions = b.questions.filter(q => q.id !== qId);
                 });
 
@@ -989,7 +905,7 @@
                 saveStorage();
 
                 if (currentQuiz.questions.length === 0) {
-                    alert('Nenhuma questão restante no lote.');
+                    alert('Nenhuma questão restante.');
                     pauseQuiz();
                 } else {
                     if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
@@ -1000,7 +916,6 @@
             }
         }
 
-        /* --- DASHBOARD --- */
         function renderDashboard() {
             document.getElementById('dash-today-total').innerText = appState.stats.today.total;
             document.getElementById('dash-today-correct').innerText = appState.stats.today.correct;
@@ -1011,16 +926,16 @@
             document.getElementById('dash-global-wrong').innerText = appState.stats.global.wrong;
 
             let bankTotal = 0;
-            appState.subjects.forEach(s => s.batches.forEach(b => bankTotal += b.questions.length));
+            appState.subjects.forEach(s => s.topics.forEach(t => t.batches.forEach(b => bankTotal += b.questions.length)));
             document.getElementById('dash-global-bank').innerText = bankTotal;
 
             const container = document.getElementById('dash-subjects-progress');
             container.innerHTML = '';
 
             appState.subjects.forEach(sub => {
-                let totalEdital = sub.edital ? sub.edital.length : 0;
-                let doneEdital = sub.edital ? sub.edital.filter(i => i.done).length : 0;
-                let pct = totalEdital > 0 ? Math.round((doneEdital / totalEdital) * 100) : 0;
+                let totalTopics = sub.topics ? sub.topics.length : 0;
+                let doneTopics = sub.topics ? sub.topics.filter(i => i.done).length : 0;
+                let pct = totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : 0;
 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -1028,7 +943,7 @@
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                         <strong>${sub.name}</strong>
-                        <span style="font-size:0.85rem; color:var(--text-sub);">${pct}% concluído</span>
+                        <span style="font-size:0.85rem; color:var(--text-sub);">${pct}% do edital concluído</span>
                     </div>
                     <div class="progress-bar-bg" style="margin: 0;">
                         <div class="progress-bar-fill" style="width: ${pct}%;"></div>
@@ -1038,7 +953,7 @@
             });
         }
 
-        /* --- LOUSA E RASCUNHO (CANVAS TOUCH & MOUSE) --- */
+        /* LOUSA TOUCH/MOUSE */
         let canvas, ctx;
         let isDrawing = false;
         let isScratchActive = false;
@@ -1087,7 +1002,6 @@
         }
 
         function setEraser() { isEraser = true; }
-
         function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
         function startDrawing(e) {
@@ -1129,7 +1043,7 @@
             else if (e.type === 'touchmove') draw(e);
         }
 
-        /* --- CRONÔMETRO --- */
+        /* CRONÔMETRO */
         function startTimer() {
             if (!timerInterval) {
                 timerInterval = setInterval(() => {
@@ -1153,16 +1067,9 @@
             document.getElementById('timer-display').innerText = '00:00:00';
         }
 
-        /* --- EXPORTAR E IMPORTAR (GERAL E POR DISCIPLINA) --- */
         function exportData(type) {
             let dataObj = appState;
             let fileName = `backup_estudos_geral_${new Date().toISOString().split('T')[0]}.json`;
-
-            if (type === 'subject') {
-                const sub = appState.subjects.find(s => s.id === currentSubjectId);
-                dataObj = sub;
-                fileName = `materia_${sub.name.toLowerCase().replace(/\s+/g, '_')}.json`;
-            }
 
             const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1172,22 +1079,19 @@
             a.click();
         }
 
-        function importData(e, type) {
+        function importData(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    const imported = JSON.parse(event.target.result);
-                    if (type === 'global') {
-                        appState = imported;
-                    }
+                    appState = JSON.parse(event.target.result);
                     saveStorage();
-                    alert('Dados carregados com sucesso!');
+                    alert('Dados importados com sucesso!');
                     location.reload();
                 } catch (err) {
-                    alert('Erro ao importar arquivo JSON.');
+                    alert('Erro ao carregar o arquivo JSON.');
                 }
             };
             reader.readAsText(file);
