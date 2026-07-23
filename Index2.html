@@ -1,690 +1,1102 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>StudyMaster - Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Estudos & Banco de Questões</title>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --bg-body: #f8fafc;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --success: #10b981;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        /* Header Padrão */
-        header {
-            background: #0f172a;
-            color: white;
-            padding: 14px 18px;
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar & Navigation */
+        #sidebar {
+            width: 260px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
             z-index: 100;
         }
 
-        header h1 { font-size: 1.2rem; color: #fbbf24; font-weight: 800; cursor: pointer; }
-        .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-
-        /* Drawer / Menu Lateral */
-        aside {
-            position: fixed;
-            top: 0; left: 0;
-            width: 280px; height: 100%;
-            background: #0f172a;
-            color: white;
-            z-index: 1000;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0;
-        }
-
-        aside.open { transform: translateX(0); }
-        #menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
-
-        .timer-container { background: #1e293b; color: #fbbf24; padding: 12px; border-radius: 12px; text-align: center; margin: 10px 16px; border: 1px solid #334155; }
-        #timer-display { font-family: monospace; font-size: 1.5rem; font-weight: bold; }
-
-        .nav-list { flex-grow: 1; overflow-y: auto; list-style: none; margin-top: 10px; }
-        .nav-item { padding: 14px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #94a3b8; font-weight: 500; }
-        .nav-item.active { background: #1e293b; color: white; border-left: 4px solid var(--primary); }
-
-        main { flex: 1; padding: 16px; max-width: 800px; margin: 0 auto; width: 100%; }
-
-        /* Structural Cards */
-        .content-card { background: white; border-radius: 16px; padding: 18px; box-shadow: var(--card-shadow); border: 1px solid #e2e8f0; margin-bottom: 16px; position: relative; }
-        
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-        .stat-card { background: white; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; border-left: 4px solid var(--primary); box-shadow: var(--card-shadow); }
-        .stat-card.success { border-left-color: var(--success); }
-        .stat-card.danger { border-left-color: var(--danger); }
-        .stat-card.warning { border-left-color: var(--warning); }
-        .stat-card h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
-        .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; margin-top: 4px; }
-
-        /* Controls & Buttons */
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: #fee2e2; color: var(--danger); }
-        .btn-ghost { background: #f1f5f9; color: #475569; }
-
-        /* Alternativas e Eliminação */
-        .option-wrapper { display: flex; align-items: stretch; gap: 8px; margin: 10px 0; }
-        .option { flex-grow: 1; padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; text-align: left; background: white; font-size: 0.95rem; font-weight: 500; transition: all 0.2s; }
-        .option.correct { background: #ecfdf5; border-color: var(--success); color: #065f46; font-weight: 700; }
-        .option.wrong { background: #fef2f2; border-color: var(--danger); color: #991b1b; font-weight: 700; }
-        
-        .option-wrapper.eliminated .option { opacity: 0.35; text-decoration: line-through; pointer-events: none; background: #f1f5f9; }
-        .btn-eliminate { padding: 0 14px; border-radius: 10px; border: 2px solid #e2e8f0; background: #f8fafc; color: var(--danger); font-weight: bold; font-size: 1.1rem; }
-
-        /* Estrutura Isolada da Lousa / Canvas */
-        .quiz-container-box { position: relative; }
-
-        .lousa-toolbar {
+        .sidebar-header {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #1e293b;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 10px;
-            margin-bottom: 14px;
         }
 
-        #lousa-canvas {
+        .sidebar-menu {
+            list-style: none;
+            padding: 10px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background-color: var(--bg-card);
+            color: var(--text);
+            border-left: 4px solid var(--accent);
+        }
+
+        .menu-title {
+            padding: 10px 20px 5px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        /* Main Content Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        header {
+            background-color: var(--bg-secondary);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Dashboard Components */
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card-stat {
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .card-stat h4 {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .card-stat .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-accent { color: var(--accent); }
+        .text-warning { color: var(--warning); }
+
+        /* UI Blocks & Cards */
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        /* Forms & Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background-color: var(--accent); color: white; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-warning { background-color: var(--warning); color: white; }
+        .btn-secondary { background-color: var(--bg-card); color: var(--text); }
+
+        /* Edital Verticalizado */
+        .edital-list {
+            list-style: none;
+        }
+
+        .edital-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Interface de Questões */
+        #quiz-view {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 80;
-            pointer-events: none; /* Inativo por padrão: deixa clicar em tudo abaixo */
-            border-radius: 16px;
-            touch-action: none;
+            background-color: var(--bg-primary);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
         }
 
-        #lousa-canvas.active {
-            pointer-events: auto; /* Ativo: captura todos os toques do dedo/mouse */
-            background: rgba(255, 255, 255, 0.05);
+        .quiz-header {
+            background-color: var(--bg-secondary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quiz-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .option-item {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: var(--success);
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+
+        .option-item.wrong {
+            border-color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Canvas / Lousa de Rascunho */
+        #scratchpad {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #scratchpad.active {
+            pointer-events: auto;
+            cursor: crosshair;
+        }
+
+        .canvas-toolbar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .hidden { display: none !important; }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
-        .badge-info { background: #eeebff; color: var(--primary); }
 
-        .item-row { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .item-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        /* Cronômetro */
+        .timer-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
 
-    <div id="menu-overlay" onclick="toggleMenu()"></div>
-
-    <header>
-        <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <h1 id="header-title" onclick="goHome()">StudyMaster</h1>
-        <span style="font-size:0.8rem; color:#94a3b8;">v2.0</span>
-    </header>
-
-    <aside id="sidebar">
-        <div style="padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="color: #fbbf24; font-size: 1.3rem;">Menu</h2>
-            <button class="menu-btn" onclick="toggleMenu()">✕</button>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <span>📚 EstudoPro</span>
         </div>
-        
-        <div class="timer-container">
-            <div id="timer-display">00:00:00</div>
-            <div style="margin-top: 8px; display: flex; gap: 6px;">
-                <button class="btn btn-primary" style="padding: 6px;" onclick="toggleTimer()" id="timer-btn">INICIAR</button>
-                <button class="btn btn-danger" style="padding: 6px;" onclick="resetTimer()">ZERAR</button>
-            </div>
-        </div>
-        
-        <ul class="nav-list" id="sidebar-disciplines"></ul>
-        
-        <div style="padding: 16px; border-top: 1px solid #1e293b;">
-            <button class="btn btn-primary" onclick="addDiscipline()">+ Disciplina</button>
-        </div>
-    </aside>
+        <ul class="sidebar-menu">
+            <li><a onclick="showView('dashboard')" class="active">📊 Dashboard</a></li>
+            <li><a onclick="showView('add-subject')">➕ Nova Disciplina</a></li>
+            <li><a onclick="showView('timer')">⏱️ Cronômetro</a></li>
+            <li><a onclick="showView('backup')">💾 Exportar/Importar</a></li>
+            <li class="menu-title">Disciplinas</li>
+            <div id="sidebar-subjects-list"></div>
+        </ul>
+    </div>
 
-    <main>
-        <!-- DASHBOARD -->
-        <div id="view-dashboard">
-            <div style="margin-bottom: 16px;">
-                <h2 style="font-size: 1.4rem;">Painel de Desempenho</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Acompanhe suas métricas de estudo.</p>
-            </div>
+    <!-- Main Area -->
+    <div id="main-content">
+        <header>
+            <h2 id="page-title">Dashboard</h2>
+            <div id="header-actions"></div>
+        </header>
 
-            <div class="stats-grid">
-                <div class="stat-card warning">
-                    <h4>Feitas Hoje</h4>
-                    <div class="stat-value" id="stat-today" style="color: var(--warning);">0</div>
+        <div class="container">
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard">
+                <h3 style="margin-bottom: 15px;">Desempenho de Hoje</h3>
+                <div class="grid-stats">
+                    <div class="card-stat">
+                        <h4>Questões Feitas</h4>
+                        <div class="value" id="dash-today-total">0</div>
+                    </div>
+                    <div class="card-stat">
+                        <h4>Acertos</h4>
+                        <div class="value text-success" id="dash-today-correct">0</div>
+                    </div>
+                    <div class="card-stat">
+                        <h4>Erros</h4>
+                        <div class="value text-danger" id="dash-today-wrong">0</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h4>Total Resolvidas</h4>
-                    <div class="stat-value" id="stat-solved">0</div>
-                </div>
-                <div class="stat-card success">
-                    <h4>Acertos</h4>
-                    <div class="stat-value" id="dash-hits-count" style="color: var(--success);">0</div>
-                </div>
-                <div class="stat-card danger">
-                    <h4>Erros</h4>
-                    <div class="stat-value" id="dash-misses-count" style="color: var(--danger);">0</div>
-                </div>
-            </div>
 
-            <div class="content-card">
-                <h4 style="margin-bottom: 8px;">Aproveitamento Geral</h4>
-                <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary);" id="stat-percent">0%</div>
-            </div>
-        </div>
-
-        <!-- VISÃO DA MATÉRIA / ASSUNTOS -->
-        <div id="view-subjects" class="hidden">
-            <h2 id="view-title" style="margin-bottom: 12px;">Matéria</h2>
-            
-            <div class="stats-grid">
-                <div class="stat-card warning">
-                    <h4>Hoje na Matéria</h4>
-                    <div class="stat-value" id="disc-today-count" style="color: var(--warning);">0</div>
+                <h3 style="margin-bottom: 15px;">Desempenho Geral</h3>
+                <div class="grid-stats">
+                    <div class="card-stat">
+                        <h4>Total Resolvido</h4>
+                        <div class="value" id="dash-global-total">0</div>
+                    </div>
+                    <div class="card-stat">
+                        <h4>Acertos Gerais</h4>
+                        <div class="value text-success" id="dash-global-correct">0</div>
+                    </div>
+                    <div class="card-stat">
+                        <h4>Erros Gerais</h4>
+                        <div class="value text-danger" id="dash-global-wrong">0</div>
+                    </div>
+                    <div class="card-stat">
+                        <h4>Banco de Questões</h4>
+                        <div class="value text-accent" id="dash-global-bank">0</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h4>Total Matéria</h4>
-                    <div class="stat-value" id="disc-total-count">0</div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Edital Verticalizado Unificado</h3>
+                    </div>
+                    <div id="dash-edital-container">
+                        <!-- Renderizado via JS -->
+                    </div>
                 </div>
             </div>
 
-            <button class="btn btn-primary" onclick="addSubject()">+ Novo Assunto</button>
-            <h3 style="margin: 16px 0 10px 0; font-size: 1rem;">Meus Assuntos</h3>
-            <div id="subject-list"></div>
-        </div>
-
-        <!-- VISÃO DE LOTES / QUESTÕES -->
-        <div id="view-details" class="hidden">
-            <button class="btn btn-ghost" onclick="showSubjects()" style="margin-bottom: 12px;">← Voltar para Matéria</button>
-            
-            <div class="content-card">
-                <h3 id="subj-name-display">Assunto</h3>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
-                    Resolvidas Hoje: <strong id="subj-today-count" style="color: var(--primary);">0</strong>
-                </p>
-
-                <div style="margin: 16px 0;">
-                    <label style="font-size: 0.85rem; font-weight: 600;">Importar Questões (JSON):</label>
-                    <textarea id="json-input" rows="3" style="width:100%; padding:10px; margin-top:6px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 0.8rem;" placeholder='[{"q":"Pergunta","a":"Opção A","correct":"a"}]'></textarea>
-                    <button class="btn btn-primary" onclick="importBatch()">Salvar Lote</button>
+            <!-- VIEW: CADASTRAR DISCIPLINA -->
+            <div id="view-add-subject" class="hidden">
+                <div class="card">
+                    <h3 style="margin-bottom: 15px;">Nova Disciplina</h3>
+                    <div class="form-group">
+                        <label>Nome da Disciplina</label>
+                        <input type="text" id="subject-name-input" class="form-control" placeholder="Ex: Raciocínio Lógico">
+                    </div>
+                    <div class="form-group">
+                        <label>Tópicos do Edital (um por linha)</label>
+                        <textarea id="subject-topics-input" class="form-control" placeholder="Proposições&#10;Tabelas Verdade&#10;Equivalências"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSubject()">Salvar Disciplina</button>
                 </div>
-
-                <h4 style="margin-bottom: 8px; font-size: 0.9rem;">Lotes Disponíveis:</h4>
-                <div id="batch-list"></div>
-                
-                <button class="btn btn-success" style="padding: 14px; margin-top: 16px;" onclick="startQuiz(false, -1)">🚀 INICIAR TODOS OS LOTES</button>
             </div>
-        </div>
 
-        <!-- SIMULADO COM LOUSA FLUTUANTE -->
-        <div id="view-quiz" class="hidden">
-            <div class="content-card quiz-container-box" id="quiz-card">
-                <!-- Canvas da Lousa Flutuante -->
-                <canvas id="lousa-canvas"></canvas>
-
-                <div id="quiz-active">
-                    <!-- Barra de Ferramentas da Lousa -->
-                    <div class="lousa-toolbar">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.8rem; width: auto; margin:0;" onclick="toggleLousa()" id="lousa-toggle-btn">🖌️ Ativar Lousa</button>
-                            <input type="color" id="lousa-color" value="#ef4444" style="border:none; width:28px; height:28px; background:none; cursor:pointer;">
+            <!-- VIEW: DETALHES DA DISCIPLINA -->
+            <div id="view-subject-detail" class="hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="subject-detail-title">Disciplina</h3>
+                        <div>
+                            <button class="btn btn-secondary" onclick="exportSingleSubject()">📤 Exportar Esta Disciplina</button>
+                            <button class="btn btn-danger" onclick="deleteCurrentSubject()">🗑️ Excluir Disciplina</button>
                         </div>
-                        <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.8rem; width: auto; margin:0; background:#334155; color:white;" onclick="clearLousa()">Limpar Rascunho</button>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
-                        <span id="quiz-progress" style="font-weight: 700; color: var(--primary); font-size: 0.95rem;"></span>
-                        <button class="btn btn-ghost" style="width:auto; padding: 4px 10px; font-size: 0.8rem; color: var(--danger); margin:0;" onclick="showSubjects()">Sair</button>
-                    </div>
+                    <!-- Edital Verticalizado da Matéria -->
+                    <h4 style="margin-bottom: 10px;">Edital Verticalizado</h4>
+                    <ul class="edital-list" id="subject-edital-list" style="margin-bottom: 20px;"></ul>
 
-                    <h3 id="q-text" style="margin: 16px 0; font-size: 1.05rem; line-height: 1.5;"></h3>
-                    <div id="options-container"></div>
-                    
-                    <div id="commentary" class="hidden" style="margin-top:16px; padding:14px; background:#f0fdf4; border-left:4px solid var(--success); border-radius: 8px; font-size: 0.9rem;"></div>
-                    
-                    <button id="next-btn" class="btn btn-primary hidden" style="margin-top:16px; padding: 14px;" onclick="nextQuestion()">Próxima Questão →</button>
+                    <hr style="border-color: var(--border); margin: 20px 0;">
+
+                    <!-- Importação de Questões JSON -->
+                    <h4 style="margin-bottom: 10px;">Alimentar Banco de Questões (JSON)</h4>
+                    <div class="form-group">
+                        <label>Nome do Lote</label>
+                        <input type="text" id="batch-name-input" class="form-control" placeholder="Ex: Lote 1 - CESPE 2025">
+                    </div>
+                    <div class="form-group">
+                        <label>Cole o Array JSON de Questões</label>
+                        <textarea id="batch-json-input" class="form-control" placeholder='[{"pergunta": "2+2=4?", "opcoes": ["Certo", "Errado"], "resposta": 0}]'></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="importQuestionsBatch()">Carregar Lote</button>
                 </div>
 
-                <div id="quiz-results" class="hidden" style="text-align:center; padding: 20px 0;">
-                    <h2>Resultado Final: <span id="res-perc" style="color: var(--primary);">0%</span></h2>
-                    <p style="margin:12px 0; font-size: 0.95rem;">Acertos: <strong id="res-hits" style="color: var(--success);">0</strong> | Erros: <strong id="res-miss" style="color: var(--danger);">0</strong></p>
-                    <button class="btn btn-primary" onclick="closeAndSaveQuizState()">Salvar e Concluir</button>
+                <!-- Lotes Salvos -->
+                <div class="card">
+                    <h3>Lotes e Início de Treino</h3>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="startQuiz('all')">🚀 Iniciar Lote Geral (Todas as Questões)</button>
+                    </div>
+                    <div id="batches-list" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- VIEW: CRONÔMETRO -->
+            <div id="view-timer" class="hidden">
+                <div class="card" style="text-align: center;">
+                    <h3>Cronômetro de Estudos</h3>
+                    <div class="timer-display" id="timer-display">00:00:00</div>
+                    <div style="display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn btn-success" onclick="startTimer()">Iniciar</button>
+                        <button class="btn btn-warning" onclick="pauseTimer()">Pausar</button>
+                        <button class="btn btn-danger" onclick="resetTimer()">Zerar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: BACKUP & IMPORT/EXPORT -->
+            <div id="view-backup" class="hidden">
+                <div class="card">
+                    <h3>Exportar / Importar Dados Globais</h3>
+                    <p style="color: var(--text-muted); margin: 10px 0;">Salve todo o seu banco de questões e progresso em um arquivo ou transfira para outro dispositivo.</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="exportGlobalData()">📥 Exportar Banco Completo</button>
+                        <label class="btn btn-secondary">
+                            📤 Importar Arquivo JSON
+                            <input type="file" id="import-file" accept=".json" onchange="importGlobalData(event)" style="display: none;">
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-<script>
-    let db = JSON.parse(localStorage.getItem('studyDB_v2')) || { 
-        disciplines: [], 
-        stats: { hits: 0, misses: 0, solved: 0, daily: {} }
-    };
-
-    let curDisc = -1, curSubj = -1, curQuest = 0;
-    let activeQs = [], sHits = 0, sMiss = 0;
-    let timerVal = 0, timerInt = null;
-
-    /* Lousa Vars */
-    let canvas, ctx, isDrawing = false, lousaActive = false;
-
-    window.onload = function() {
-        checkDailyReset();
-        renderSidebar();
-        updateDashboard();
-        initLousa();
-    };
-
-    function getTodayKey() {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
-
-    function checkDailyReset() {
-        if(!db.stats.daily) db.stats.daily = {};
-        const today = getTodayKey();
-        if(!db.stats.daily[today]) db.stats.daily[today] = { solved: 0, hits: 0, misses: 0 };
-    }
-
-    function toggleMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('menu-overlay');
-        sidebar.classList.toggle('open');
-        overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
-    }
-
-    function hideAll() {
-        ['view-dashboard', 'view-subjects', 'view-details', 'view-quiz'].forEach(id => {
-            document.getElementById(id).classList.add('hidden');
-        });
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('menu-overlay').style.display = 'none';
-    }
-
-    function goHome() {
-        curDisc = -1;
-        hideAll();
-        document.getElementById('header-title').innerText = "StudyMaster";
-        document.getElementById('view-dashboard').classList.remove('hidden');
-        updateDashboard();
-    }
-
-    function selectDiscipline(i) {
-        curDisc = i;
-        hideAll();
-        document.getElementById('header-title').innerText = db.disciplines[i].name;
-        document.getElementById('view-subjects').classList.remove('hidden');
-        document.getElementById('view-title').innerText = db.disciplines[i].name;
-
-        const today = getTodayKey();
-        let discToday = 0, discTotal = 0;
-        db.disciplines[i].subjects.forEach(s => {
-            discTotal += (s.solved || 0);
-            if(s.daily && s.daily[today]) discToday += s.daily[today].solved || 0;
-        });
-
-        document.getElementById('disc-today-count').innerText = discToday;
-        document.getElementById('disc-total-count').innerText = discTotal;
-
-        renderSubjects();
-    }
-
-    function showSubjects() {
-        if(curDisc !== -1) selectDiscipline(curDisc);
-        else goHome();
-    }
-
-    function renderSidebar() {
-        const list = document.getElementById('sidebar-disciplines');
-        list.innerHTML = '';
-        db.disciplines.forEach((d, i) => {
-            let active = i === curDisc ? 'active' : '';
-            list.innerHTML += `
-                <li class="nav-item ${active}" onclick="selectDiscipline(${i})">
-                    <span>${d.name}</span>
-                    <span style="color:#ef4444;" onclick="event.stopPropagation(); deleteDiscipline(${i})">✕</span>
-                </li>`;
-        });
-    }
-
-    function addDiscipline() {
-        let n = prompt("Nome da Disciplina:");
-        if(n) {
-            db.disciplines.push({ name: n, subjects: [] });
-            save();
-            renderSidebar();
-        }
-    }
-
-    function deleteDiscipline(i) {
-        if(confirm("Deseja excluir esta disciplina?")) {
-            db.disciplines.splice(i, 1);
-            save();
-            goHome();
-        }
-    }
-
-    function toggleTimer() {
-        const btn = document.getElementById('timer-btn');
-        if(timerInt) {
-            clearInterval(timerInt); timerInt = null;
-            btn.innerText = "INICIAR";
-        } else {
-            btn.innerText = "PAUSAR";
-            timerInt = setInterval(() => {
-                timerVal++;
-                let h = Math.floor(timerVal/3600), m = Math.floor((timerVal%3600)/60), s = timerVal%60;
-                document.getElementById('timer-display').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            }, 1000);
-        }
-    }
-
-    function resetTimer() { 
-        clearInterval(timerInt); timerInt = null; timerVal = 0; 
-        document.getElementById('timer-display').innerText = "00:00:00"; 
-        document.getElementById('timer-btn').innerText = "INICIAR"; 
-    }
-
-    function save() { 
-        localStorage.setItem('studyDB_v2', JSON.stringify(db)); 
-        renderSidebar(); 
-        updateDashboard(); 
-    }
-
-    function updateDashboard() {
-        checkDailyReset();
-        const today = getTodayKey();
+    <!-- VIEW: RESOLUÇÃO DE QUESTÕES (MODAL FULLSCREEN) -->
+    <div id="quiz-view">
+        <canvas id="scratchpad"></canvas>
         
-        document.getElementById('stat-today').innerText = db.stats.daily[today] ? db.stats.daily[today].solved : 0;
-        document.getElementById('stat-solved').innerText = db.stats.solved || 0;
-        document.getElementById('dash-hits-count').innerText = db.stats.hits || 0;
-        document.getElementById('dash-misses-count').innerText = db.stats.misses || 0;
-        
-        let p = db.stats.solved > 0 ? Math.round((db.stats.hits / db.stats.solved) * 100) : 0;
-        document.getElementById('stat-percent').innerText = p + "%";
-    }
+        <div class="quiz-header">
+            <div>
+                <span id="quiz-progress-text" style="font-weight: bold;">Questão 1/10</span>
+                <span style="margin: 0 10px;">|</span>
+                <span class="text-success">Acertos: <b id="quiz-stat-correct">0</b></span>
+                <span style="margin: 0 5px;">-</span>
+                <span class="text-danger">Erros: <b id="quiz-stat-wrong">0</b></span>
+            </div>
+            <div>
+                <button class="btn btn-warning" onclick="pauseQuiz()">⏸️ Pausar e Sair</button>
+                <button class="btn btn-danger" onclick="deleteCurrentQuestion()">🗑️ Excluir Questão</button>
+            </div>
+        </div>
 
-    function renderSubjects() {
-        const list = document.getElementById('subject-list'); list.innerHTML = '';
-        if(db.disciplines[curDisc].subjects.length === 0) {
-            list.innerHTML = '<p style="color:gray; font-size:0.85rem;">Nenhum assunto cadastrado.</p>';
-            return;
-        }
+        <div class="quiz-body">
+            <div class="card">
+                <p id="quiz-question-text" style="font-size: 1.1rem; line-height: 1.6;"></p>
+                <ul class="options-list" id="quiz-options-container"></ul>
+            </div>
 
-        const today = getTodayKey();
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <button class="btn btn-secondary" id="btn-prev-q" onclick="navigateQuestion(-1)">Anterior</button>
+                <button class="btn btn-primary" id="btn-confirm-q" onclick="confirmAnswer()">Confirmar Resposta</button>
+                <button class="btn btn-secondary" id="btn-next-q" onclick="navigateQuestion(1)">Próxima</button>
+            </div>
+        </div>
 
-        db.disciplines[curDisc].subjects.forEach((s, i) => {
-            let qCount = s.batches.reduce((acc, curr) => acc + curr.questions.length, 0);
-            let sToday = (s.daily && s.daily[today]) ? s.daily[today].solved || 0 : 0;
-            let sPercent = (s.solved || 0) > 0 ? Math.round(((s.hits || 0) / s.solved) * 100) : 0;
+        <!-- Barra de Ferramentas da Lousa -->
+        <div class="canvas-toolbar">
+            <button class="btn btn-secondary" id="btn-toggle-scratch" onclick="toggleScratchpad()">✏️ Lousa: OFF</button>
+            <button class="btn btn-secondary" onclick="setEraser(false)">🖌️ Pincel</button>
+            <button class="btn btn-secondary" onclick="setEraser(true)">🧹 Borracha</button>
+            <button class="btn btn-secondary" onclick="undoCanvas()">↩️ Voltar</button>
+            <button class="btn btn-danger" onclick="clearCanvas()">🗑️ Limpar</button>
+        </div>
+    </div>
 
-            list.innerHTML += `
-                <div class="item-row">
-                    <div class="item-row-header" onclick="openSubject(${i})">
-                        <strong>${s.name}</strong> 
-                        <span class="badge badge-info">${qCount} quest.</span>
-                    </div>
-                    <div style="font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:6px;">
-                        <span>Hoje: <strong style="color:var(--warning);">${sToday}</strong></span>
-                        <span>Total: ${s.solved || 0}</span>
-                        <span>Acertos: ${sPercent}%</span>
-                    </div>
-                </div>`;
-        });
-    }
-
-    function addSubject() { 
-        let n = prompt("Nome do Assunto:"); 
-        if(n){ db.disciplines[curDisc].subjects.push({name:n, batches:[], solved:0, hits:0, misses:0, daily:{}}); save(); renderSubjects(); }
-    }
-
-    function openSubject(i) { 
-        curSubj = i; 
-        hideAll(); 
-        document.getElementById('view-details').classList.remove('hidden'); 
-        document.getElementById('subj-name-display').innerText = db.disciplines[curDisc].subjects[i].name; 
-        
-        const today = getTodayKey();
-        const subject = db.disciplines[curDisc].subjects[curSubj];
-        document.getElementById('subj-today-count').innerText = (subject.daily && subject.daily[today]) ? subject.daily[today].solved || 0 : 0;
-
-        renderBatches(); 
-    }
-
-    function renderBatches() { 
-        const list = document.getElementById('batch-list'); list.innerHTML = ''; 
-        const batches = db.disciplines[curDisc].subjects[curSubj].batches;
-        if(batches.length === 0) { 
-            list.innerHTML = '<p style="color:gray; font-size:0.85rem;">Nenhum lote importado.</p>'; 
-            return; 
-        } 
-        batches.forEach((b, i) => { 
-            list.innerHTML += `
-                <div class="item-row" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.9rem; font-weight:600;">📦 Lote #${i+1} (${b.questions.length} qts)</span> 
-                    <button class="btn btn-primary" style="width:auto; padding:8px 12px; font-size:0.8rem; margin:0;" onclick="startQuiz(false, ${i})">Iniciar Lote #${i+1}</button>
-                </div>`; 
-        }); 
-    }
-
-    function importBatch() {
-        const area = document.getElementById('json-input');
-        try {
-            const data = JSON.parse(area.value);
-            let qs = Array.isArray(data) ? data : [data];
-            let fmt = qs.map(q => ({ q: q.q || q.p, a: q.a, b: q.b, c: q.c, d: q.d, correct: (q.correct || q.r).toLowerCase(), comment: q.comment || "Sem comentário." }));
-            db.disciplines[curDisc].subjects[curSubj].batches.push({ questions: fmt });
-            save(); area.value = ''; renderBatches(); alert("Lote importado com sucesso!");
-        } catch(e) { alert("Formato JSON inválido."); }
-    }
-
-    function startQuiz(isResume, batchIndex) {
-        const subject = db.disciplines[curDisc].subjects[curSubj];
-        if(batchIndex >= 0) activeQs = [...subject.batches[batchIndex].questions];
-        else activeQs = subject.batches.flatMap(b => b.questions);
-
-        if(activeQs.length === 0) return alert("Insira questões para iniciar.");
-
-        curQuest = 0; sHits = 0; sMiss = 0;
-        hideAll();
-        document.getElementById('view-quiz').classList.remove('hidden');
-        document.getElementById('quiz-active').classList.remove('hidden');
-        document.getElementById('quiz-results').classList.add('hidden');
-        
-        setTimeout(() => { resizeLousa(); clearLousa(); }, 100);
-        renderQuestion();
-    }
-
-    function renderQuestion() {
-        clearLousa();
-        if(curQuest >= activeQs.length) { finishQuiz(); return; }
-
-        const q = activeQs[curQuest];
-        document.getElementById('quiz-progress').innerText = `Questão ${curQuest + 1} de ${activeQs.length}`;
-        document.getElementById('q-text').innerText = q.q;
-        
-        const optsContainer = document.getElementById('options-container');
-        optsContainer.innerHTML = '';
-        document.getElementById('commentary').classList.add('hidden');
-        document.getElementById('next-btn').classList.add('hidden');
-
-        ['a', 'b', 'c', 'd'].forEach(k => {
-            if(q[k]) {
-                optsContainer.innerHTML += `
-                    <div class="option-wrapper" id="wrap-${k}">
-                        <button class="option" id="opt-${k}" onclick="checkAnswer('${k}')">
-                            <strong>${k.toUpperCase()})</strong> ${q[k]}
-                        </button>
-                        <button class="btn-eliminate" onclick="toggleEliminate(event, '${k}')">❌</button>
-                    </div>`;
-            }
-        });
-        
-        // Atualiza a altura do canvas para cobrir a questão adequadamente
-        setTimeout(resizeLousa, 50);
-    }
-
-    function toggleEliminate(e, key) {
-        e.stopPropagation();
-        const wrap = document.getElementById(`wrap-${key}`);
-        if(wrap) wrap.classList.toggle('eliminated');
-    }
-
-    function checkAnswer(selectedKey) {
-        const q = activeQs[curQuest];
-        document.querySelectorAll('.option, .btn-eliminate').forEach(b => b.disabled = true);
-
-        const isCorrect = selectedKey.toLowerCase() === q.correct.toLowerCase();
-        if(isCorrect) {
-            document.getElementById(`opt-${selectedKey}`)?.classList.add('correct');
-            sHits++;
-        } else {
-            document.getElementById(`opt-${selectedKey}`)?.classList.add('wrong');
-            document.getElementById(`opt-${q.correct.toLowerCase()}`)?.classList.add('correct');
-            sMiss++;
-        }
-
-        const comm = document.getElementById('commentary');
-        comm.innerHTML = `<strong>Comentário:</strong> ${q.comment}`;
-        comm.classList.remove('hidden');
-        document.getElementById('next-btn').classList.remove('hidden');
-        
-        setTimeout(resizeLousa, 50);
-    }
-
-    function nextQuestion() { curQuest++; renderQuestion(); }
-
-    function finishQuiz() {
-        document.getElementById('quiz-active').classList.add('hidden');
-        document.getElementById('quiz-results').classList.remove('hidden');
-        let total = sHits + sMiss;
-        document.getElementById('res-perc').innerText = `${total > 0 ? Math.round((sHits/total)*100) : 0}%`;
-        document.getElementById('res-hits').innerText = sHits;
-        document.getElementById('res-miss').innerText = sMiss;
-    }
-
-    function closeAndSaveQuizState() {
-        const totalRound = sHits + sMiss;
-        const today = getTodayKey();
-
-        db.stats.hits = (db.stats.hits || 0) + sHits;
-        db.stats.misses = (db.stats.misses || 0) + sMiss;
-        db.stats.solved = (db.stats.solved || 0) + totalRound;
-
-        if(!db.stats.daily[today]) db.stats.daily[today] = { solved: 0, hits: 0, misses: 0 };
-        db.stats.daily[today].solved += totalRound;
-
-        const subject = db.disciplines[curDisc].subjects[curSubj];
-        subject.hits = (subject.hits || 0) + sHits;
-        subject.misses = (subject.misses || 0) + sMiss;
-        subject.solved = (subject.solved || 0) + totalRound;
-
-        if(!subject.daily) subject.daily = {};
-        if(!subject.daily[today]) subject.daily[today] = { solved: 0, hits: 0, misses: 0 };
-        subject.daily[today].solved += totalRound;
-
-        save();
-        openSubject(curSubj);
-    }
-
-    /* SISTEMA DE LOUSA FLUTUANTE (CANVAS) */
-    function initLousa() {
-        canvas = document.getElementById('lousa-canvas');
-        ctx = canvas.getContext('2d');
-
-        // Eventos Touch / Mobile
-        canvas.addEventListener('touchstart', handleDrawStart, { passive: false });
-        canvas.addEventListener('touchmove', handleDrawMove, { passive: false });
-        canvas.addEventListener('touchend', stopDrawing);
-
-        // Eventos Mouse / PC
-        canvas.addEventListener('mousedown', handleDrawStart);
-        canvas.addEventListener('mousemove', handleDrawMove);
-        canvas.addEventListener('mouseup', stopDrawing);
-
-        window.addEventListener('resize', resizeLousa);
-    }
-
-    function resizeLousa() {
-        if(!canvas) return;
-        const card = document.getElementById('quiz-card');
-        canvas.width = card.clientWidth;
-        canvas.height = card.clientHeight;
-    }
-
-    function toggleLousa() {
-        lousaActive = !lousaActive;
-        const btn = document.getElementById('lousa-toggle-btn');
-        if(lousaActive) {
-            canvas.classList.add('active');
-            btn.innerText = "✕ Desativar";
-            btn.style.background = "var(--danger)";
-        } else {
-            canvas.classList.remove('active');
-            btn.innerText = "🖌️ Ativar Lousa";
-            btn.style.background = "var(--primary)";
-        }
-    }
-
-    function clearLousa() {
-        if(ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function getCoords(e) {
-        const rect = canvas.getBoundingClientRect();
-        if(e.touches && e.touches[0]) {
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top
-            };
-        }
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+    <script>
+        /* --- ESTADO GLOBAL DA APLICAÇÃO --- */
+        let state = {
+            subjects: [], // { id, name, topics: [{title, done}], batches: [{id, name, questions: [{id, pergunta, opcoes, resposta}]}] }
+            stats: {
+                today: { date: '', total: 0, correct: 0, wrong: 0 },
+                global: { total: 0, correct: 0, wrong: 0 },
+                batchStats: {} // { batchId: { correct, wrong, total } }
+            },
+            activeQuizSession: null // Salva estado ativo se o usuário pausar
         };
-    }
 
-    function handleDrawStart(e) {
-        if(!lousaActive) return;
-        if(e.cancelable) e.preventDefault();
-        isDrawing = true;
-        const pos = getCoords(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    }
+        let currentSubjectId = null;
+        let currentQuiz = null; // Instância da sessão rodando
+        let timerInterval = null;
+        let timerSeconds = 0;
 
-    function handleDrawMove(e) {
-        if(!lousaActive || !isDrawing) return;
-        if(e.cancelable) e.preventDefault();
-        const pos = getCoords(e);
-        ctx.strokeStyle = document.getElementById('lousa-color').value;
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-    }
+        /* --- INICIALIZAÇÃO --- */
+        window.onload = () => {
+            loadFromLocalStorage();
+            checkTodayDate();
+            renderSidebar();
+            renderDashboard();
+            initCanvas();
 
-    function stopDrawing() { isDrawing = false; }
-</script>
+            // Restaura sessão de questão ativa se existir
+            if (state.activeQuizSession) {
+                if (confirm("Você tem uma sessão de questões pausada. Deseja continuar?")) {
+                    currentQuiz = state.activeQuizSession;
+                    openQuizView();
+                }
+            }
+        };
+
+        function checkTodayDate() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (state.stats.today.date !== todayStr) {
+                state.stats.today = { date: todayStr, total: 0, correct: 0, wrong: 0 };
+                saveToLocalStorage();
+            }
+        }
+
+        /* --- PERSISTÊNCIA (LOCAL STORAGE) --- */
+        function saveToLocalStorage() {
+            localStorage.setItem('estudo_pro_data', JSON.stringify(state));
+        }
+
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('estudo_pro_data');
+            if (data) {
+                state = JSON.parse(data);
+            }
+        }
+
+        /* --- NAVEGAÇÃO E VIEWS --- */
+        function showView(viewName) {
+            document.querySelectorAll('#main-content .container > div').forEach(div => div.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            const titles = {
+                'dashboard': 'Dashboard',
+                'add-subject': 'Nova Disciplina',
+                'timer': 'Cronômetro',
+                'backup': 'Exportar / Importar',
+                'subject-detail': 'Detalhes da Disciplina'
+            };
+            document.getElementById('page-title').innerText = titles[viewName] || 'Estudos';
+
+            if (viewName === 'dashboard') renderDashboard();
+        }
+
+        /* --- GERENCIAMENTO DE DISCIPLINAS --- */
+        function saveSubject() {
+            const name = document.getElementById('subject-name-input').value.trim();
+            const topicsRaw = document.getElementById('subject-topics-input').value.trim();
+
+            if (!name) return alert('Digite o nome da disciplina!');
+
+            const topics = topicsRaw.split('\n').filter(t => t.trim() !== '').map(t => ({ title: t.trim(), done: false }));
+
+            const newSubject = {
+                id: 'sub_' + Date.now(),
+                name: name,
+                topics: topics,
+                batches: []
+            };
+
+            state.subjects.push(newSubject);
+            saveToLocalStorage();
+
+            document.getElementById('subject-name-input').value = '';
+            document.getElementById('subject-topics-input').value = '';
+
+            renderSidebar();
+            openSubjectDetail(newSubject.id);
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById('sidebar-subjects-list');
+            container.innerHTML = '';
+            state.subjects.forEach(sub => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a onclick="openSubjectDetail('${sub.id}')">📖 ${sub.name}</a>`;
+                container.appendChild(li);
+            });
+        }
+
+        function openSubjectDetail(id) {
+            currentSubjectId = id;
+            const subject = state.subjects.find(s => s.id === id);
+            if (!subject) return;
+
+            document.getElementById('subject-detail-title').innerText = subject.name;
+
+            // Render Edital
+            const editalList = document.getElementById('subject-edital-list');
+            editalList.innerHTML = '';
+            subject.topics.forEach((topico, idx) => {
+                const li = document.createElement('li');
+                li.className = 'edital-item';
+                li.innerHTML = `
+                    <input type="checkbox" ${topico.done ? 'checked' : ''} onchange="toggleTopic('${id}', ${idx})">
+                    <span style="${topico.done ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${topico.title}</span>
+                `;
+                editalList.appendChild(li);
+            });
+
+            // Render Lotes
+            renderBatchesList(subject);
+            showView('subject-detail');
+        }
+
+        function toggleTopic(subjectId, topicIdx) {
+            const subject = state.subjects.find(s => s.id === subjectId);
+            if (subject) {
+                subject.topics[topicIdx].done = !subject.topics[topicIdx].done;
+                saveToLocalStorage();
+                openSubjectDetail(subjectId);
+            }
+        }
+
+        function deleteCurrentSubject() {
+            if (confirm("Tem certeza que deseja excluir esta disciplina e todas as suas questões?")) {
+                state.subjects = state.subjects.filter(s => s.id !== currentSubjectId);
+                saveToLocalStorage();
+                renderSidebar();
+                showView('dashboard');
+            }
+        }
+
+        /* --- IMPORTAÇÃO DE LOTES DE QUESTÕES --- */
+        function importQuestionsBatch() {
+            const batchName = document.getElementById('batch-name-input').value.trim() || 'Lote sem nome';
+            const jsonText = document.getElementById('batch-json-input').value.trim();
+
+            if (!jsonText) return alert('Insira o JSON contendo as questões.');
+
+            try {
+                const questionsArray = JSON.parse(jsonText);
+                if (!Array.isArray(questionsArray)) throw new Error('O JSON deve ser uma lista (Array) de objetos.');
+
+                const subject = state.subjects.find(s => s.id === currentSubjectId);
+                
+                const newBatch = {
+                    id: 'batch_' + Date.now(),
+                    name: batchName,
+                    questions: questionsArray.map((q, i) => ({
+                        id: 'q_' + Date.now() + '_' + i,
+                        pergunta: q.pergunta || q.question || 'Sem enunciado',
+                        opcoes: q.opcoes || q.options || [],
+                        resposta: q.resposta !== undefined ? q.resposta : q.answer
+                    }))
+                };
+
+                subject.batches.push(newBatch);
+                saveToLocalStorage();
+
+                document.getElementById('batch-name-input').value = '';
+                document.getElementById('batch-json-input').value = '';
+
+                alert(`Lote "${batchName}" importado com sucesso! (${newBatch.questions.length} questões)`);
+                openSubjectDetail(currentSubjectId);
+
+            } catch (err) {
+                alert('Erro ao processar o JSON: ' + err.message);
+            }
+        }
+
+        function renderBatchesList(subject) {
+            const container = document.getElementById('batches-list');
+            container.innerHTML = '';
+
+            if (subject.batches.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted)">Nenhum lote importado ainda.</p>';
+                return;
+            }
+
+            subject.batches.forEach(b => {
+                const bStat = state.stats.batchStats[b.id] || { correct: 0, wrong: 0, total: 0 };
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '10px';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${b.name}</strong> (${b.questions.length} questões)
+                            <div style="font-size:0.85rem; color: var(--text-muted); margin-top:5px;">
+                                Última Pontuação: <span class="text-success">${bStat.correct} acertos</span> / <span class="text-danger">${bStat.wrong} erros</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="startQuiz('${b.id}')">▶ Retomar Lote</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        /* --- MOTOR DE RESOLUÇÃO DE QUESTÕES (QUIZ) --- */
+        function startQuiz(batchScope) {
+            const subject = state.subjects.find(s => s.id === currentSubjectId);
+            let questionsToRun = [];
+
+            if (batchScope === 'all') {
+                subject.batches.forEach(b => questionsToRun.push(...b.questions));
+            } else {
+                const batch = subject.batches.find(b => b.id === batchScope);
+                if (batch) questionsToRun = [...batch.questions];
+            }
+
+            if (questionsToRun.length === 0) return alert('Não há questões para responder neste lote!');
+
+            currentQuiz = {
+                subjectId: currentSubjectId,
+                batchScope: batchScope,
+                questions: questionsToRun,
+                currentIndex: 0,
+                correctCount: 0,
+                wrongCount: 0,
+                userAnswers: {} // index: selectedOption
+            };
+
+            openQuizView();
+        }
+
+        function openQuizView() {
+            document.getElementById('quiz-view').style.display = 'flex';
+            renderCurrentQuestion();
+        }
+
+        function renderCurrentQuestion() {
+            const q = currentQuiz.questions[currentQuiz.currentIndex];
+            document.getElementById('quiz-progress-text').innerText = `Questão ${currentQuiz.currentIndex + 1} de ${currentQuiz.questions.length}`;
+            document.getElementById('quiz-stat-correct').innerText = currentQuiz.correctCount;
+            document.getElementById('quiz-stat-wrong').innerText = currentQuiz.wrongCount;
+            document.getElementById('quiz-question-text').innerText = q.pergunta;
+
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = '';
+
+            const answered = currentQuiz.userAnswers[currentQuiz.currentIndex] !== undefined;
+
+            q.opcoes.forEach((optText, idx) => {
+                const li = document.createElement('li');
+                li.className = 'option-item';
+                
+                if (currentQuiz.userAnswers[currentQuiz.currentIndex] === idx) {
+                    li.classList.add('selected');
+                }
+
+                if (answered) {
+                    if (idx === q.resposta) li.classList.add('correct');
+                    if (currentQuiz.userAnswers[currentQuiz.currentIndex] === idx && idx !== q.resposta) li.classList.add('wrong');
+                }
+
+                li.innerText = `${String.fromCharCode(65 + idx)}) ${optText}`;
+                li.onclick = () => {
+                    if (!answered) selectOption(idx);
+                };
+                optionsContainer.appendChild(li);
+            });
+
+            // Salva estado da sessão no localStorage para evitar perdas
+            state.activeQuizSession = currentQuiz;
+            saveToLocalStorage();
+        }
+
+        function selectOption(idx) {
+            currentQuiz.userAnswers[currentQuiz.currentIndex] = idx;
+            renderCurrentQuestion();
+        }
+
+        function confirmAnswer() {
+            const currentIdx = currentQuiz.currentIndex;
+            const selectedOpt = currentQuiz.userAnswers[currentIdx];
+
+            if (selectedOpt === undefined) return alert('Selecione uma opção!');
+
+            const q = currentQuiz.questions[currentIdx];
+            const isCorrect = selectedOpt === q.resposta;
+
+            if (isCorrect) currentQuiz.correctCount++;
+            else currentQuiz.wrongCount++;
+
+            // Atualiza estatísticas globais e diárias
+            state.stats.today.total++;
+            state.stats.global.total++;
+
+            if (isCorrect) {
+                state.stats.today.correct++;
+                state.stats.global.correct++;
+            } else {
+                state.stats.today.wrong++;
+                state.stats.global.wrong++;
+            }
+
+            // Atualiza estatística do lote
+            if (currentQuiz.batchScope !== 'all') {
+                if (!state.stats.batchStats[currentQuiz.batchScope]) {
+                    state.stats.batchStats[currentQuiz.batchScope] = { correct: 0, wrong: 0 };
+                }
+                if (isCorrect) state.stats.batchStats[currentQuiz.batchScope].correct++;
+                else state.stats.batchStats[currentQuiz.batchScope].wrong++;
+            }
+
+            saveToLocalStorage();
+            renderCurrentQuestion();
+        }
+
+        function navigateQuestion(direction) {
+            const newIdx = currentQuiz.currentIndex + direction;
+            if (newIdx >= 0 && newIdx < currentQuiz.questions.length) {
+                currentQuiz.currentIndex = newIdx;
+                clearCanvas();
+                renderCurrentQuestion();
+            }
+        }
+
+        function pauseQuiz() {
+            saveToLocalStorage();
+            document.getElementById('quiz-view').style.display = 'none';
+            if (currentSubjectId) openSubjectDetail(currentSubjectId);
+        }
+
+        function deleteCurrentQuestion() {
+            if (confirm("Deseja realmente apagar esta questão do banco de dados?")) {
+                const qId = currentQuiz.questions[currentQuiz.currentIndex].id;
+                
+                // Remove da disciplina atual
+                const subject = state.subjects.find(s => s.id === currentQuiz.subjectId);
+                subject.batches.forEach(b => {
+                    b.questions = b.questions.filter(q => q.id !== qId);
+                });
+
+                currentQuiz.questions.splice(currentQuiz.currentIndex, 1);
+                saveToLocalStorage();
+
+                if (currentQuiz.questions.length === 0) {
+                    alert('Lote sem mais questões.');
+                    pauseQuiz();
+                } else {
+                    if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
+                        currentQuiz.currentIndex = currentQuiz.questions.length - 1;
+                    }
+                    renderCurrentQuestion();
+                }
+            }
+        }
+
+        /* --- DASHBOARD --- */
+        function renderDashboard() {
+            document.getElementById('dash-today-total').innerText = state.stats.today.total;
+            document.getElementById('dash-today-correct').innerText = state.stats.today.correct;
+            document.getElementById('dash-today-wrong').innerText = state.stats.today.wrong;
+
+            document.getElementById('dash-global-total').innerText = state.stats.global.total;
+            document.getElementById('dash-global-correct').innerText = state.stats.global.correct;
+            document.getElementById('dash-global-wrong').innerText = state.stats.global.wrong;
+
+            let totalBankQuestions = 0;
+            state.subjects.forEach(s => {
+                s.batches.forEach(b => totalBankQuestions += b.questions.length);
+            });
+            document.getElementById('dash-global-bank').innerText = totalBankQuestions;
+
+            // Render Edital Unificado
+            const container = document.getElementById('dash-edital-container');
+            container.innerHTML = '';
+
+            state.subjects.forEach(s => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '15px';
+                div.innerHTML = `<strong>📖 ${s.name}</strong>`;
+                const ul = document.createElement('ul');
+                ul.className = 'edital-list';
+                s.topics.forEach(t => {
+                    ul.innerHTML += `
+                        <li class="edital-item">
+                            <span>${t.done ? '✅' : '⏳'}</span>
+                            <span style="${t.done ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${t.title}</span>
+                        </li>
+                    `;
+                });
+                div.appendChild(ul);
+                container.appendChild(div);
+            });
+        }
+
+        /* --- LOUSA / RASCUNHO (CANVAS) --- */
+        let canvas, ctx;
+        let isDrawing = false;
+        let isScratchpadActive = false;
+        let isEraser = false;
+        let canvasHistory = [];
+
+        function initCanvas() {
+            canvas = document.getElementById('scratchpad');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function toggleScratchpad() {
+            isScratchpadActive = !isScratchpadActive;
+            const btn = document.getElementById('btn-toggle-scratch');
+            if (isScratchpadActive) {
+                canvas.classList.add('active');
+                btn.innerText = '✏️ Lousa: ON';
+                btn.classList.replace('btn-secondary', 'btn-primary');
+            } else {
+                canvas.classList.remove('active');
+                btn.innerText = '✏️ Lousa: OFF';
+                btn.classList.replace('btn-primary', 'btn-secondary');
+            }
+        }
+
+        function setEraser(eraserMode) {
+            isEraser = eraserMode;
+        }
+
+        function saveCanvasState() {
+            if (canvasHistory.length > 10) canvasHistory.shift();
+            canvasHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        }
+
+        function undoCanvas() {
+            if (canvasHistory.length > 0) {
+                ctx.putImageData(canvasHistory.pop(), 0, 0);
+            }
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvasHistory = [];
+        }
+
+        function startDrawing(e) {
+            if (!isScratchpadActive) return;
+            saveCanvasState();
+            isDrawing = true;
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!isDrawing || !isScratchpadActive) return;
+            ctx.lineWidth = isEraser ? 20 : 3;
+            ctx.lineCap = 'round';
+
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = '#f59e0b';
+            }
+
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function handleTouch(e) {
+            if (!isScratchpadActive) return;
+            e.preventDefault();
+            if (e.type === 'touchstart') startDrawing(e);
+            else if (e.type === 'touchmove') draw(e);
+        }
+
+        /* --- CRONÔMETRO --- */
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 0;
+            document.getElementById('timer-display').innerText = '00:00:00';
+        }
+
+        /* --- IMPORTAÇÃO / EXPORTAÇÃO GLOBAL E POR DISCIPLINA --- */
+        function exportGlobalData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `estudos_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importGlobalData(e) {
+            const fileReader = new FileReader();
+            fileReader.onload = function (event) {
+                try {
+                    const importedState = JSON.parse(event.target.result);
+                    state = importedState;
+                    saveToLocalStorage();
+                    alert('Dados importados com sucesso!');
+                    location.reload();
+                } catch (err) {
+                    alert('Erro ao carregar o arquivo JSON.');
+                }
+            };
+            fileReader.readAsText(e.target.files[0]);
+        }
+
+        function exportSingleSubject() {
+            const subject = state.subjects.find(s => s.id === currentSubjectId);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(subject));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `materia_${subject.name.toLowerCase().replace(/\s+/g, '_')}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+    </script>
 </body>
 </html>
