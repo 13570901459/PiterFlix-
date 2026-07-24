@@ -72,7 +72,6 @@
       gap: 20px;
     }
 
-    /* Logo Ajustada: Ícone Azul DS + Store */
     .logo {
       display: flex;
       align-items: center;
@@ -114,7 +113,6 @@
       color: var(--text-light);
     }
 
-    /* Busca de Produtos */
     .search-box {
       flex: 1;
       max-width: 500px;
@@ -138,7 +136,6 @@
       box-shadow: 0 0 12px rgba(0, 210, 255, 0.3);
     }
 
-    /* Menu Nav de Categorias */
     nav {
       background-color: var(--bg-card);
       border-bottom: 1px solid var(--border-color);
@@ -186,7 +183,7 @@
     }
 
     /* ==========================================
-       3. SEÇÕES DE CONTEÚDO (PRODUTOS / ASSISTÊNCIA)
+       3. SEÇÕES DE CONTEÚDO
        ========================================== */
     .page-section {
       display: none;
@@ -211,7 +208,6 @@
       background-color: var(--border-color);
     }
 
-    /* Vitrine de Produtos Grid */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -287,7 +283,6 @@
       margin-bottom: 14px;
     }
 
-    /* ALTERAÇÃO: Botões em coluna (Carrinho em cima, Comprar embaixo) */
     .product-actions {
       display: flex;
       flex-direction: column;
@@ -326,7 +321,6 @@
       opacity: 0.9;
     }
 
-    /* Página da Assistência Técnica */
     .maintenance-container {
       max-width: 700px;
       margin: 20px auto;
@@ -396,7 +390,7 @@
     }
 
     /* ==========================================
-       4. CARRINHO FLUTUANTE SOFISTICADO
+       4. CARRINHO FLUTUANTE
        ========================================== */
     .floating-cart-btn {
       position: fixed;
@@ -425,7 +419,6 @@
       font-size: 1.6rem;
     }
 
-    /* Badge Contador Dinâmico */
     .cart-badge {
       position: absolute;
       top: -2px;
@@ -451,7 +444,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Modal do Carrinho Lateral */
     .cart-modal {
       position: fixed;
       top: 0;
@@ -658,7 +650,6 @@
       font-size: 0.85rem;
     }
 
-    /* Alerta Toaster Flutuante */
     #toast {
       visibility: hidden;
       min-width: 250px;
@@ -683,7 +674,6 @@
       bottom: 40px;
     }
 
-    /* Dispositivos Móveis */
     @media (max-width: 600px) {
       .header-content {
         flex-direction: column;
@@ -709,49 +699,33 @@
 </head>
 <body>
 
-  <!-- ==========================================
-       CABEÇALHO DA LOJA
-       ========================================== -->
   <header>
     <div class="container header-content">
-      <!-- Logo Ajustada: Somente DS no ícone azul + Store -->
       <div class="logo" id="draggableLogo" title="Clique e arraste a logo!">
         <div class="logo-icon">DS</div>
         <div class="logo-text">Store</div>
       </div>
 
-      <!-- Buscar Produtos -->
       <div class="search-box">
         <input type="text" id="searchInput" placeholder="Buscar produtos por nome ou categoria..." onkeyup="filterProducts()" />
       </div>
     </div>
   </header>
 
-  <!-- ==========================================
-       MENU DE CATEGORIAS E ASSISTÊNCIA TÉCNICA
-       ========================================== -->
   <nav>
     <div class="container">
       <ul class="nav-categories" id="categoriesMenu">
-        <!-- Renderizado via JS -->
       </ul>
     </div>
   </nav>
 
   <main class="container">
-    <!-- ==========================================
-         PÁGINA 1: CATÁLOGO DE PRODUTOS
-         ========================================== -->
     <section id="productsSection" class="page-section active">
       <h2 class="section-title" id="currentCategoryTitle">Todos os Produtos</h2>
       <div class="products-grid" id="productsGrid">
-        <!-- Produtos injetados via JS -->
       </div>
     </section>
 
-    <!-- ==========================================
-         PÁGINA 2: FORMULÁRIO DE ASSISTÊNCIA TÉCNICA
-         ========================================== -->
     <section id="maintenanceSection" class="page-section">
       <div class="maintenance-container">
         <div class="maintenance-header">
@@ -785,15 +759,11 @@
     </section>
   </main>
 
-  <!-- ==========================================
-       CARRINHO FLUTUANTE SOFISTICADO
-       ========================================== -->
   <div class="floating-cart-btn" onclick="toggleCart()">
     <span class="floating-cart-icon">🛒</span>
     <span class="cart-badge" id="cartCount">0</span>
   </div>
 
-  <!-- Modal do Carrinho Lateral -->
   <div class="cart-modal" id="cartModal">
     <div class="cart-content">
       <div class="cart-header">
@@ -802,17 +772,14 @@
       </div>
 
       <div class="cart-items" id="cartItemsContainer">
-        <!-- Itens injetados via JS -->
       </div>
 
       <div class="cart-summary">
-        <!-- Cupom -->
         <div class="coupon-box">
           <input type="text" id="couponInput" placeholder="Cupom de desconto (Ex: DS10)" />
           <button onclick="applyCoupon()">Aplicar</button>
         </div>
 
-        <!-- Dados de Entrega -->
         <div class="checkout-form">
           <input type="text" id="custName" placeholder="Seu Nome Completo" />
           <input type="text" id="custAddress" placeholder="Endereço / Rua" />
@@ -823,7 +790,6 @@
           <input type="text" id="custCity" placeholder="Cidade" />
         </div>
 
-        <!-- Totais -->
         <div class="cart-total-details">
           <div class="cart-total-row">
             <span>Subtotal:</span>
@@ -839,7 +805,6 @@
           </div>
         </div>
 
-        <!-- Botões -->
         <div class="cart-actions-footer">
           <button class="btn-finish" onclick="finishCheckoutWhatsApp()">Finalizar Compra via WhatsApp</button>
           <button class="btn-clear" onclick="clearCart()">Limpar Carrinho</button>
@@ -848,14 +813,10 @@
     </div>
   </div>
 
-  <!-- Alerta Toast -->
   <div id="toast">Produto adicionado ao carrinho!</div>
 
-  <!-- ==========================================
-       LÓGICA JAVASCRIPT
-       ========================================== -->
   <script>
-    /* 1. DADOS DOS PRODUTOS (JSON) */
+    /* 1. DADOS DOS PRODUTOS COM CAMINHO RELATIVO DO REPOSITÓRIO (PASTA images/) */
     const initialProductsJSON = [
       {
         "id": 1,
@@ -871,7 +832,7 @@
         "category": "carregador",
         "price": 59.90,
         "description": "Carregamento turbo seguro para Android e iPhone.",
-        "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=400&q=80"
+        "image": "images/carregador.jpg"
       },
       {
         "id": 3,
@@ -879,7 +840,7 @@
         "category": "capinha",
         "price": 35.00,
         "description": "Proteção máxima com toque suave. Diversas cores.",
-        "image": "https://images.unsplash.com/photo-1601593378480-e53a5c1b6953?auto=format&fit=crop&w=400&q=80"
+        "image": "images/capinha.jpg"
       },
       {
         "id": 4,
@@ -887,7 +848,7 @@
         "category": "película",
         "price": 25.00,
         "description": "Cobertura total da tela com alta transparência.",
-        "image": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=400&q=80"
+        "image": "images/pelicula.jpg"
       },
       {
         "id": 5,
@@ -895,7 +856,7 @@
         "category": "bateria portátil",
         "price": 110.00,
         "description": "Até 3 cargas completas no seu smartphone de onde estiver.",
-        "image": "https://images.unsplash.com/photo-1609592424109-dd9892f1b177?auto=format&fit=crop&w=400&q=80"
+        "image": "images/powerbank.jpg"
       },
       {
         "id": 6,
@@ -903,7 +864,7 @@
         "category": "cabo USB",
         "price": 29.90,
         "description": "Nylon trançado de alta durabilidade e transferência de dados.",
-        "images/cabo-usb.jpg"
+        "image": "images/cabo-usb.jpg"
       },
       {
         "id": 7,
@@ -911,7 +872,7 @@
         "category": "celular seminovo novo",
         "price": 1850.00,
         "description": "Seminovo revisado, saúde da bateria 88%, garantia de 3 meses.",
-        "image": "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=400&q=80"
+        "image": "images/iphone11.jpg"
       },
       {
         "id": 8,
@@ -919,7 +880,7 @@
         "category": "celular novo",
         "price": 1699.00,
         "description": "Aparelho novo, lacrado na caixa com 1 ano de garantia de fábrica.",
-        "image": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=400&q=80"
+        "image": "images/galaxy-a54.jpg"
       }
     ];
 
@@ -935,22 +896,16 @@
       "celular novo"
     ];
 
-    // Estados da Aplicação
     let products = [];
     let cart = [];
     let currentCategory = "todas";
     let activeDiscount = 0;
     const WHATSAPP_NUMBER = "5581991152441";
 
-    /* 2. INICIALIZAÇÃO */
     document.addEventListener("DOMContentLoaded", () => {
-      const savedProducts = localStorage.getItem("dsstore_products");
-      if (savedProducts) {
-        products = JSON.parse(savedProducts);
-      } else {
-        products = initialProductsJSON;
-        localStorage.setItem("dsstore_products", JSON.stringify(products));
-      }
+      // Força a atualização no localStorage para pegar as novas URLs de imagem locais
+      localStorage.setItem("dsstore_products", JSON.stringify(initialProductsJSON));
+      products = initialProductsJSON;
 
       const savedCart = localStorage.getItem("dsstore_cart");
       if (savedCart) {
@@ -967,7 +922,6 @@
       localStorage.setItem("dsstore_cart", JSON.stringify(cart));
     }
 
-    /* 3. MENU DE CATEGORIAS E NAVEGAÇÃO ENTRE PÁGINAS */
     function renderCategoriesMenu() {
       const container = document.getElementById("categoriesMenu");
       
@@ -981,7 +935,6 @@
         </li>
       `).join('');
 
-      // Botão especial da Assistência Técnica no Menu
       html += `
         <li>
           <button 
@@ -1019,7 +972,6 @@
       renderCategoriesMenu();
     }
 
-    /* 4. RENDERIZAÇÃO E FILTRO DE PRODUTOS */
     function renderProducts(filteredList = null) {
       const container = document.getElementById("productsGrid");
       const listToRender = filteredList || getProductsByCategory();
@@ -1061,7 +1013,7 @@
     }
 
     function filterProducts() {
-      showProductsPage(); // Garante que volta para os produtos ao digitar na busca
+      showProductsPage();
       const term = document.getElementById("searchInput").value.toLowerCase();
       const filtered = products.filter(p => 
         p.name.toLowerCase().includes(term) || 
@@ -1071,7 +1023,6 @@
       renderProducts(filtered);
     }
 
-    /* 5. SISTEMA DO CARRINHO (ACUMULATIVO E FLUTUANTE) */
     function addToCart(productId, directBuy = false) {
       const product = products.find(p => p.id === productId);
       const obsInput = document.getElementById(`obs-${productId}`);
@@ -1103,12 +1054,10 @@
     }
 
     function updateCartUI() {
-      // Soma dinâmica acumulativa de produtos (1, 2, 3...)
       const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
       const badge = document.getElementById("cartCount");
       badge.innerText = totalCount;
 
-      // Renderiza os itens no modal
       const container = document.getElementById("cartItemsContainer");
       
       if (cart.length === 0) {
@@ -1133,7 +1082,6 @@
         `).join('');
       }
 
-      // Cálculo de Totais
       const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
       const discount = subtotal * activeDiscount;
       const total = subtotal - discount;
@@ -1206,7 +1154,6 @@
       }, 2500);
     }
 
-    /* 6. INTEGRAÇÃO WHATSAPP */
     function finishCheckoutWhatsApp() {
       if (cart.length === 0) {
         alert("Seu carrinho está vazio!");
@@ -1274,7 +1221,6 @@
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     }
 
-    /* 7. LOGO MOVÍVEL E ARRASTÁVEL */
     function makeLogoDraggable() {
       const logo = document.getElementById("draggableLogo");
       let isDragging = false;
