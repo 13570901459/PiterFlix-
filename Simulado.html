@@ -3,249 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Simulados Pro</title>
+    <title>Dashboard de Simulados - Acompanhamento de Estudos</title>
     <style>
         :root {
             --bg: #0f172a;
-            --card: #1e293b;
+            --card-bg: #1e293b;
             --accent: #3b82f6;
-            --accent-hover: #2563eb;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --success: #22c55e;
             --danger: #ef4444;
             --border: #334155;
-            --input-bg: #0f172a;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            padding: 24px 12px;
+            padding: 20px;
             display: flex;
             justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 900px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
 
         header {
             text-align: center;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 16px;
-        }
-
-        header h1 {
-            font-size: 1.8rem;
-            color: var(--text);
-        }
-
-        header span {
-            color: var(--accent);
         }
 
         .card {
-            background-color: var(--card);
-            padding: 24px;
-            border-radius: 12px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
             color: var(--accent);
-            font-size: 1.25rem;
+            font-size: 1.2rem;
+        }
+
+        /* Configuração Inicial */
+        .subject-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .subject-input-group {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            background: var(--bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        input, select {
-            background-color: var(--input-bg);
+        .subject-input-group input {
+            width: 60px;
+            padding: 4px;
+            background: var(--card-bg);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--accent);
-        }
-
-        .subject-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
+            border-radius: 4px;
+            text-align: center;
         }
 
         .btn {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 10px 15px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.2s;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
+            font-weight: bold;
+            width: 100%;
+            transition: opacity 0.2s;
         }
 
         .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border);
+            opacity: 0.9;
         }
 
         .btn-danger {
             background-color: var(--danger);
         }
 
-        .btn-danger:hover {
-            opacity: 0.9;
-        }
-
-        /* Dashboard de Métricas */
-        .metrics-grid {
+        /* Dashboard Topo */
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-        }
-
-        .metric-card {
-            background: var(--bg);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             text-align: center;
         }
 
-        .metric-card .title {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .metric-card .value {
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-top: 6px;
-        }
-
-        /* Tracker */
-        .tracker-subject {
+        .stat-box {
             background: var(--bg);
-            padding: 16px;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 6px;
             border: 1px solid var(--border);
-            margin-bottom: 12px;
+        }
+
+        .stat-box .number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Execução do Simulado */
+        .tracker-subject {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: 6px;
+            border: 1px solid var(--border);
         }
 
         .tracker-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-weight: bold;
         }
 
-        .questions-grid {
+        .questions-list {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
 
         .q-btn {
-            width: 40px;
-            height: 40px;
+            padding: 6px 12px;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--card);
+            border-radius: 4px;
+            background: var(--card-bg);
             color: var(--text);
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
         }
 
         .q-btn.hit {
             background-color: var(--success);
-            border-color: var(--success);
             color: white;
         }
 
         .q-btn.miss {
             background-color: var(--danger);
-            border-color: var(--danger);
             color: white;
         }
 
-        /* Filtros e Histórico */
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .history-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .history-header {
+        /* Histórico */
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 8px;
-            margin-bottom: 8px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
         }
 
         .hidden {
@@ -257,152 +189,106 @@
 
 <div class="container">
     <header>
-        <h1>Simulados<span>Pro</span></h1>
+        <h1>Painel de Simulados</h1>
     </header>
 
     <section id="config-section" class="card">
-        <h2> Criar Novo Simulado</h2>
+        <h2> Configurar Novo Simulado</h2>
+        <p style="margin-bottom: 15px; color: var(--text-muted);">Defina a quantidade de questões para cada assunto:</p>
         
-        <div class="form-group">
-            <label for="discipline-input">Disciplina</label>
-            <input type="text" id="discipline-input" placeholder="Ex: Língua Portuguesa, Direito Constitucional">
+        <div id="subject-selector-list" class="subject-selector"></div>
+
+        <div style="margin-top: 10px;">
+            <strong>Total alocado: <span id="allocated-count">0</span> questões</strong>
         </div>
-
-        <label>Assuntos e Quantidade de Questões</label>
-        <div id="subject-rows-container" style="margin-top: 8px;"></div>
-
-        <button class="btn btn-secondary" onclick="addSubjectRow()" style="margin-bottom: 20px;">+ Adicionar Assunto</button>
-
-        <button class="btn" style="width: 100%;" onclick="startQuiz()">Iniciar Simulado</button>
+        
+        <button class="btn" style="margin-top: 15px;" onclick="startQuiz()">Iniciar Simulado</button>
     </section>
 
     <section id="dashboard-section" class="card hidden">
-        <h2> Desempenho do Simulado</h2>
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="title">Progresso</div>
-                <div class="value" id="stat-progress">0 / 0</div>
+        <h2> Desempenho em Tempo Real</h2>
+        <div class="dashboard-grid">
+            <div class="stat-box">
+                <div>Progresso</div>
+                <div class="number" id="stat-progress">0 / 0</div>
             </div>
-            <div class="metric-card">
-                <div class="title">Acertos</div>
-                <div class="value" id="stat-hits" style="color: var(--success);">0</div>
+            <div class="stat-box">
+                <div>Acertos / Erros</div>
+                <div class="number"><span id="stat-hits" style="color:var(--success)">0</span> / <span id="stat-misses" style="color:var(--danger)">0</span></div>
             </div>
-            <div class="metric-card">
-                <div class="title">Erros</div>
-                <div class="value" id="stat-misses" style="color: var(--danger);">0</div>
-            </div>
-            <div class="metric-card">
-                <div class="title">Aproveitamento</div>
-                <div class="value" id="stat-percentage" style="color: var(--accent);">0%</div>
+            <div class="stat-box">
+                <div>Aproveitamento</div>
+                <div class="number" id="stat-percentage" style="color:var(--accent)">0%</div>
             </div>
         </div>
     </section>
 
     <section id="tracker-section" class="card hidden">
-        <h2> Questões</h2>
-        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
-            Clique nos botões para alternar o status: <strong>Cinza (Pendente) &rarr; Verde (Acerto) &rarr; Vermelho (Erro)</strong>
-        </p>
-
+        <h2> Resolução do Simulado</h2>
+        <p style="margin-bottom: 15px; color: var(--text-muted);">Clique no botão de cada questão para alternar entre: <strong>Pendente &rarr; Acerto &rarr; Erro</strong></p>
+        
         <div id="tracker-list"></div>
 
-        <button class="btn" style="margin-top: 16px; width: 100%;" onclick="finishQuiz()">Finalizar e Salvar Simulado</button>
+        <button class="btn" style="margin-top: 20px;" onclick="finishQuiz()">Finalizar e Salvar Simulado</button>
     </section>
 
     <section class="card">
-        <h2> Histórico e Filtros de Busca</h2>
-        
-        <div class="filter-grid">
-            <div class="form-group" style="margin: 0;">
-                <label for="filter-discipline">Filtrar por Disciplina</label>
-                <input type="text" id="filter-discipline" placeholder="Todas as disciplinas" oninput="applyFilters()">
-            </div>
-            <div class="form-group" style="margin: 0;">
-                <label for="filter-date">Filtrar por Data</label>
-                <input type="date" id="filter-date" onchange="applyFilters()">
-            </div>
-        </div>
-
-        <div class="metrics-grid" style="margin-bottom: 20px;">
-            <div class="metric-card">
-                <div class="title">Simulados Feitos</div>
-                <div class="value" id="hist-total-quizzes">0</div>
-            </div>
-            <div class="metric-card">
-                <div class="title">Total de Questões</div>
-                <div class="value" id="hist-total-questions">0</div>
-            </div>
-            <div class="metric-card">
-                <div class="title">Acertos Gerais</div>
-                <div class="value" id="hist-total-hits" style="color: var(--success);">0</div>
-            </div>
-            <div class="metric-card">
-                <div class="title">Erros Gerais</div>
-                <div class="value" id="hist-total-misses" style="color: var(--danger);">0</div>
-            </div>
-            <div class="metric-card">
-                <div class="title">Aproveitamento Geral</div>
-                <div class="value" id="hist-overall-pct" style="color: var(--accent);">0%</div>
-            </div>
-        </div>
-
-        <div id="history-container" class="history-list"></div>
-
-        <button class="btn btn-danger" style="margin-top: 20px;" onclick="clearHistory()">Limpar Todo o Histórico</button>
+        <h2> Histórico de Simulados</h2>
+        <div id="history-list"></div>
+        <button class="btn btn-danger" style="margin-top: 15px; width: auto;" onclick="clearHistory()">Limpar Histórico</button>
     </section>
 </div>
 
 <script>
-    let activeQuiz = {
-        discipline: '',
-        subjects: {}
-    };
+    // Lista de assuntos padrão fornecida
+    const defaultSubjects = [
+        "Coerência", "Coesão", "Acentuação", "Conjunção", 
+        "Crase", "Anáfora e Catáfora", "Ortografia"
+    ];
 
-    // Inicializa adicionando uma linha de assunto por padrão
-    function init() {
-        document.getElementById('subject-rows-container').innerHTML = '';
-        addSubjectRow();
-        applyFilters();
+    let currentQuizData = {};
+
+    // Inicializa a interface de seleção
+    function initConfig() {
+        const container = document.getElementById('subject-selector-list');
+        container.innerHTML = '';
+        
+        defaultSubjects.forEach((subject, index) => {
+            container.innerHTML += `
+                <div class="subject-input-group">
+                    <label for="subj-${index}">${subject}</label>
+                    <input type="number" id="subj-${index}" data-subject="${subject}" class="qty-input" min="0" value="0" onchange="updateTotalAllocated()">
+                </div>
+            `;
+        });
+        updateTotalAllocated();
+        renderHistory();
     }
 
-    function addSubjectRow() {
-        const container = document.getElementById('subject-rows-container');
-        const row = document.createElement('div');
-        row.className = 'subject-row';
-        row.innerHTML = `
-            <input type="text" class="subj-name" placeholder="Nome do Assunto (Ex: Crase)">
-            <input type="number" class="subj-qty" min="1" value="1" placeholder="Qtd">
-            <button class="btn btn-danger" onclick="this.parentElement.remove()" style="padding: 10px 12px;">&times;</button>
-        `;
-        container.appendChild(row);
+    function updateTotalAllocated() {
+        const inputs = document.querySelectorAll('.qty-input');
+        let total = 0;
+        inputs.forEach(input => total += parseInt(input.value) || 0);
+        document.getElementById('allocated-count').innerText = total;
     }
 
     function startQuiz() {
-        const discipline = document.getElementById('discipline-input').value.trim();
-        const names = document.querySelectorAll('.subj-name');
-        const qtys = document.querySelectorAll('.subj-qty');
-
-        if (!discipline) {
-            alert('Informe a disciplina antes de iniciar.');
-            return;
-        }
-
-        activeQuiz = { discipline: discipline, subjects: {} };
+        const inputs = document.querySelectorAll('.qty-input');
+        currentQuizData = {};
         let totalQuestions = 0;
 
-        names.forEach((input, i) => {
-            const name = input.value.trim();
-            const qty = parseInt(qtys[i].value) || 0;
-
-            if (name && qty > 0) {
-                // Estado individual: 'neutral', 'hit', 'miss'
-                activeQuiz.subjects[name] = Array(qty).fill('neutral');
+        inputs.forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                const subject = input.getAttribute('data-subject');
+                // Status das questões: 'neutral', 'hit', 'miss'
+                currentQuizData[subject] = Array(qty).fill('neutral');
                 totalQuestions += qty;
             }
         });
 
         if (totalQuestions === 0) {
-            alert('Adicione pelo menos um assunto com quantidade de questões maior que zero.');
+            alert('Por favor, adicione pelo menos 1 questão em algum assunto.');
             return;
         }
 
@@ -418,15 +304,16 @@
         const container = document.getElementById('tracker-list');
         container.innerHTML = '';
 
-        for (const [subject, statusArray] of Object.entries(activeQuiz.subjects)) {
+        for (const [subject, statusArray] of Object.entries(currentQuizData)) {
             let buttonsHTML = '';
-            let hits = 0;
+            statusArray.forEach((status, index) => {
+                let statusClass = '';
+                if (status === 'hit') statusClass = 'hit';
+                if (status === 'miss') statusClass = 'miss';
 
-            statusArray.forEach((status, i) => {
-                if (status === 'hit') hits++;
                 buttonsHTML += `
-                    <button class="q-btn ${status}" onclick="toggleQuestion('${subject}', ${i})">
-                        ${i + 1}
+                    <button class="q-btn ${statusClass}" onclick="toggleQuestion('${subject}', ${index})">
+                        Q${index + 1}
                     </button>
                 `;
             });
@@ -435,34 +322,48 @@
                 <div class="tracker-subject">
                     <div class="tracker-header">
                         <span>${subject}</span>
-                        <span>${hits} / ${statusArray.length} acertos</span>
+                        <span id="subject-stat-${subject}">0/${statusArray.length}</span>
                     </div>
-                    <div class="questions-grid">${buttonsHTML}</div>
+                    <div class="questions-list">${buttonsHTML}</div>
                 </div>
             `;
         }
     }
 
     function toggleQuestion(subject, index) {
-        const current = activeQuiz.subjects[subject][index];
-        if (current === 'neutral') activeQuiz.subjects[subject][index] = 'hit';
-        else if (current === 'hit') activeQuiz.subjects[subject][index] = 'miss';
-        else activeQuiz.subjects[subject][index] = 'neutral';
+        const currentStatus = currentQuizData[subject][index];
+        if (currentStatus === 'neutral') {
+            currentQuizData[subject][index] = 'hit';
+        } else if (currentStatus === 'hit') {
+            currentQuizData[subject][index] = 'miss';
+        } else {
+            currentQuizData[subject][index] = 'neutral';
+        }
 
         renderTracker();
         updateDashboard();
     }
 
     function updateDashboard() {
-        let total = 0, answered = 0, hits = 0, misses = 0;
+        let total = 0;
+        let answered = 0;
+        let hits = 0;
+        let misses = 0;
 
-        for (const statusArray of Object.values(activeQuiz.subjects)) {
+        for (const [subject, statusArray] of Object.entries(currentQuizData)) {
+            let subjHits = 0;
             statusArray.forEach(status => {
                 total++;
                 if (status !== 'neutral') answered++;
-                if (status === 'hit') hits++;
+                if (status === 'hit') { hits++; subjHits++; }
                 if (status === 'miss') misses++;
             });
+
+            // Atualiza estatística individual do assunto no tracker
+            const subjStatEl = document.getElementById(`subject-stat-${subject}`);
+            if (subjStatEl) {
+                subjStatEl.innerText = `${subjHits}/${statusArray.length} acertos`;
+            }
         }
 
         const percentage = answered > 0 ? ((hits / answered) * 100).toFixed(1) : 0;
@@ -474,9 +375,11 @@
     }
 
     function finishQuiz() {
-        let total = 0, hits = 0, misses = 0;
+        let total = 0;
+        let hits = 0;
+        let misses = 0;
 
-        for (const statusArray of Object.values(activeQuiz.subjects)) {
+        for (const statusArray of Object.values(currentQuizData)) {
             statusArray.forEach(status => {
                 total++;
                 if (status === 'hit') hits++;
@@ -484,104 +387,64 @@
             });
         }
 
-        const now = new Date();
-        const quizRecord = {
-            id: Date.now(),
-            discipline: activeQuiz.discipline,
-            subjects: activeQuiz.subjects,
-            dateISO: now.toISOString().split('T')[0],
-            dateFormatted: now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
+        const percentage = total > 0 ? ((hits / total) * 100).toFixed(1) : 0;
+        const date = new Date().toLocaleDateString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const historyItem = {
+            date,
             total,
             hits,
             misses,
-            percentage: total > 0 ? ((hits / total) * 100).toFixed(1) : 0
+            percentage
         };
 
-        const history = JSON.parse(localStorage.getItem('pro_quiz_history') || '[]');
-        history.unshift(quizRecord);
-        localStorage.setItem('pro_quiz_history', JSON.stringify(history));
+        let history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+        history.unshift(historyItem);
+        localStorage.setItem('quiz_history', JSON.stringify(history));
 
-        // Reseta interface
+        // Reseta telas
         document.getElementById('config-section').classList.remove('hidden');
         document.getElementById('dashboard-section').classList.add('hidden');
         document.getElementById('tracker-section').classList.add('hidden');
-        document.getElementById('discipline-input').value = '';
         
-        init();
-        alert('Simulado finalizado e gravado com sucesso!');
+        initConfig();
+        renderHistory();
+        alert('Simulado finalizado e gravado no histórico!');
     }
 
-    function applyFilters() {
-        const discFilter = document.getElementById('filter-discipline').value.toLowerCase().trim();
-        const dateFilter = document.getElementById('filter-date').value;
+    function renderHistory() {
+        const container = document.getElementById('history-list');
+        const history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
 
-        const history = JSON.parse(localStorage.getItem('pro_quiz_history') || '[]');
-
-        const filtered = history.filter(item => {
-            const matchDisc = item.discipline.toLowerCase().includes(discFilter);
-            const matchDate = dateFilter ? item.dateISO === dateFilter : true;
-            return matchDisc && matchDate;
-        });
-
-        renderFilteredMetrics(filtered);
-        renderHistoryList(filtered);
-    }
-
-    function renderFilteredMetrics(data) {
-        let totalQuizzes = data.length;
-        let totalQuestions = 0;
-        let totalHits = 0;
-        let totalMisses = 0;
-
-        data.forEach(item => {
-            totalQuestions += item.total;
-            totalHits += item.hits;
-            totalMisses += item.misses;
-        });
-
-        const overallPct = totalQuestions > 0 ? ((totalHits / totalQuestions) * 100).toFixed(1) : 0;
-
-        document.getElementById('hist-total-quizzes').innerText = totalQuizzes;
-        document.getElementById('hist-total-questions').innerText = totalQuestions;
-        document.getElementById('hist-total-hits').innerText = totalHits;
-        document.getElementById('hist-total-misses').innerText = totalMisses;
-        document.getElementById('hist-overall-pct').innerText = `${overallPct}%`;
-    }
-
-    function renderHistoryList(data) {
-        const container = document.getElementById('history-container');
-
-        if (data.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 12px;">Nenhum simulado encontrado para os filtros selecionados.</p>';
+        if (history.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted);">Nenhum simulado registrado no histórico.</p>';
             return;
         }
 
-        container.innerHTML = data.map(item => `
-            <div class="history-card">
-                <div class="history-header">
-                    <div>
-                        <strong>${item.discipline}</strong>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">${item.dateFormatted}</div>
-                    </div>
-                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">
-                        ${item.percentage}%
-                    </div>
+        container.innerHTML = history.map(item => `
+            <div class="history-item">
+                <div>
+                    <strong>Simulado em ${item.date}</strong><br>
+                    <small style="color: var(--text-muted)">Questões: ${item.total} | Acertos: ${item.hits} | Erros: ${item.misses}</small>
                 </div>
-                <div style="font-size: 0.9rem; color: var(--text-muted);">
-                    Questões: ${item.total} | Acertos: <span style="color:var(--success)">${item.hits}</span> | Erros: <span style="color:var(--danger)">${item.misses}</span>
+                <div style="font-weight: bold; color: var(--accent); align-self: center;">
+                    ${item.percentage}%
                 </div>
             </div>
         `).join('');
     }
 
     function clearHistory() {
-        if (confirm('Tem certeza que deseja apagar todo o histórico de simulados?')) {
-            localStorage.removeItem('pro_quiz_history');
-            applyFilters();
+        if (confirm('Deseja realmente apagar todo o histórico de simulados?')) {
+            localStorage.removeItem('quiz_history');
+            renderHistory();
         }
     }
 
-    init();
+    // Executa ao carregar a página
+    initConfig();
 </script>
 </body>
 </html>
