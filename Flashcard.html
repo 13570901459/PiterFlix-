@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemorizaConcurso - Flashcards & Mnemônicos Pro</title>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --bg-hover: #334155;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #22c55e;
+      --success-hover: #16a34a;
+      --border: #334155;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Navigation */
+    aside {
+      width: 320px;
+      background-color: #0b1120;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .tree-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 1rem;
+      padding-right: 4px;
+    }
+
+    .tree-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .tree-container::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .discipline-item {
+      margin-bottom: 0.75rem;
+    }
+
+    .discipline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.7rem 0.9rem;
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .discipline-header:hover {
+      background-color: var(--bg-hover);
+      border-color: var(--accent);
+    }
+
+    .subject-list {
+      margin-left: 1rem;
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .subject-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      background-color: rgba(255,255,255,0.02);
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .subject-item:hover {
+      background-color: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .subject-item.active {
+      background-color: var(--accent);
+      color: white;
+      border-color: var(--accent-hover);
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--bg-card);
+      padding: 1.2rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      color: white;
+      background-color: var(--bg-hover);
+    }
+
+    .btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary { background-color: var(--accent); }
+    .btn-primary:hover { background-color: var(--accent-hover); }
+    .btn-danger { background-color: var(--danger); }
+    .btn-danger:hover { background-color: var(--danger-hover); }
+    .btn-success { background-color: var(--success); }
+    .btn-success:hover { background-color: var(--success-hover); }
+    .btn-small { padding: 0.25rem 0.5rem; font-size: 0.75rem; border-radius: 4px; }
+    .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background-color: var(--bg-hover); }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-main);
+      margin-top: 0.4rem;
+      margin-bottom: 1rem;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Flashcard Studio / Deck Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card-item {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card-item:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+
+    .card-item-front { 
+      font-weight: 700; 
+      margin-bottom: 0.75rem; 
+      color: var(--accent);
+      font-size: 1.05rem;
+      line-height: 1.4;
+    }
+    
+    .card-item-back { 
+      color: var(--text-muted); 
+      font-size: 0.95rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Quiz / Study View Container */
+    .study-container {
+      max-width: 680px;
+      margin: 2rem auto;
+      width: 100%;
+      text-align: center;
+    }
+
+    .flashcard-3d {
+      perspective: 1000px;
+      height: 360px;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+
+    .flashcard-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .flashcard-3d.flipped .flashcard-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      background-color: var(--bg-card);
+      overflow-y: auto;
+    }
+
+    .card-face h3 {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      font-weight: 600;
+      white-space: pre-wrap;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      border-color: var(--accent);
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 520px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+    }
+
+    .empty-state h3 {
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-count {
+      background-color: var(--bg-hover);
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <aside>
+    <div class="brand">
+      🧠 <span>MemorizaConcurso</span>
+    </div>
+
+    <button class="btn btn-primary" onclick="openModal('modal-discipline')" style="width: 100%; justify-content: center;">
+      <span>+</span> Nova Disciplina
+    </button>
+
+    <div class="tree-container" id="tree-container">
+      <!-- Árvore renderizada via JavaScript -->
+    </div>
+
+    <!-- Backup & Import / Export Options -->
+    <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600; text-transform: uppercase;">
+        Gestão de Dados
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-outline btn-small" onclick="exportData()" style="flex: 1; justify-content: center;">
+          💾 Exportar JSON
+        </button>
+        <button class="btn btn-outline btn-small" onclick="triggerImport()" style="flex: 1; justify-content: center;">
+          📂 Importar JSON
+        </button>
+      </div>
+      <input type="file" id="file-input-json" accept=".json" style="display: none;" onchange="importData(event)">
+    </div>
+  </aside>
+
+  <!-- Main Work Area -->
+  <main>
+    <div class="top-bar">
+      <div>
+        <h2 id="current-title">Selecione um Assunto</h2>
+        <p id="current-subtitle" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">
+          Selecione uma disciplina e assunto na barra lateral para começar.
+        </p>
+      </div>
+      <div id="action-buttons" style="display: none; gap: 0.5rem; flex-wrap: wrap;">
+        <button class="btn btn-success" onclick="startStudyMode()">🧠 Estudar (Quiz)</button>
+        <button class="btn btn-primary" onclick="openModal('modal-card')">+ Novo Flashcard</button>
+        <button class="btn btn-outline" onclick="openBatchModal()">⚡ Importar Lote CSV/TXT</button>
+        <button class="btn btn-danger" onclick="deleteCurrentSubject()">Excluir Assunto</button>
+      </div>
+    </div>
+
+    <!-- Management View: Cards Display -->
+    <div id="management-view">
+      <div class="cards-grid" id="cards-grid">
+        <!-- Flashcards aparecerão aqui -->
+      </div>
+    </div>
+
+    <!-- Interactive Study View (Quiz Mode) -->
+    <div id="study-view" class="study-container" style="display: none;">
+      <div class="flashcard-3d" id="flashcard-element" onclick="flipCard()">
+        <div class="flashcard-inner">
+          <div class="card-face card-front">
+            <span style="font-size:0.8rem; letter-spacing: 1px; color:var(--text-muted); position:absolute; top:20px; font-weight:700;">PERGUNTA / MNEMÔNICO</span>
+            <h3 id="study-front-text">Texto da Pergunta</h3>
+            <span style="font-size:0.75rem; color:var(--accent); position:absolute; bottom:20px;">Clique para virar 🔄</span>
+          </div>
+          <div class="card-face card-back">
+            <span style="font-size:0.8rem; letter-spacing: 1px; color:var(--accent); position:absolute; top:20px; font-weight:700;">RESPOSTA / CONCEITO</span>
+            <h3 id="study-back-text">Texto da Resposta</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted); position:absolute; bottom:20px;">Clique para virar 🔄</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-outline" onclick="nextCard(-1)">⬅️ Anterior</button>
+        <span id="study-progress" style="font-weight: 700; color: var(--accent); font-size: 1.1rem;">1 / 5</span>
+        <button class="btn btn-primary" onclick="nextCard(1)">Próximo ➡️</button>
+      </div>
+      <button class="btn btn-outline" onclick="exitStudyMode()" style="margin-top: 1.5rem;">← Voltar para o Painel</button>
+    </div>
+  </main>
+
+  <!-- MODAL: Criar Disciplina -->
+  <div class="modal-backdrop" id="modal-discipline">
+    <div class="modal-content">
+      <h3>Nova Disciplina</h3>
+      <input type="text" id="input-discipline-name" placeholder="Ex: Direito Constitucional">
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-outline" onclick="closeModal('modal-discipline')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveDiscipline()">Salvar Disciplina</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Criar Assunto -->
+  <div class="modal-backdrop" id="modal-subject">
+    <div class="modal-content">
+      <h3>Novo Assunto</h3>
+      <input type="text" id="input-subject-name" placeholder="Ex: Direitos Fundamentais (LIMPE)">
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-outline" onclick="closeModal('modal-subject')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveSubject()">Salvar Assunto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Cadastrar / Editar Flashcard -->
+  <div class="modal-backdrop" id="modal-card">
+    <div class="modal-content">
+      <h3 id="modal-card-title">Novo Flashcard</h3>
+      <input type="hidden" id="edit-card-index">
+      
+      <label style="font-size:0.85rem; color:var(--text-muted);">Mnemônico / Pergunta (Frente):</label>
+      <textarea id="input-card-front" rows="3" placeholder="Ex: Quais são os princípios explícitos da Adm. Pública? (LIMPE)"></textarea>
+      
+      <label style="font-size:0.85rem; color:var(--text-muted);">Resposta / Conceito (Verso):</label>
+      <textarea id="input-card-back" rows="3" placeholder="Ex: Legalidade, Impessoalidade, Moralidade, Publicidade, Eficiência."></textarea>
+      
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-outline" onclick="closeModal('modal-card')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveFlashcard()">Salvar Flashcard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Importação em Lote (CSV/TXT) -->
+  <div class="modal-backdrop" id="modal-batch">
+    <div class="modal-content" style="max-width: 600px;">
+      <h3>⚡ Importação em Lote de Flashcards</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; margin-bottom: 1rem;">
+        Cole suas perguntas e respostas separadas por ponto e vírgula (<code>;</code>) ou tabulação. Cada linha representará um flashcard.
+      </p>
+      
+      <label style="font-size:0.85rem; color:var(--text-muted);">Formato: Pergunta; Resposta</label>
+      <textarea id="input-batch-text" rows="8" placeholder="O que é SOCOFINU?; Sobrevivência, Compensação, Pessoalidade...&#10;LIMPE; Legalidade, Impessoalidade, Moralidade..."></textarea>
+      
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-outline" onclick="closeModal('modal-batch')">Cancelar</button>
+        <button class="btn btn-success" onclick="processBatchImport()">Importar Lote</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Application
+    let appData = JSON.parse(localStorage.getItem('memoriza_data')) || [
+      {
+        name: "Direito Administrativo",
+        subjects: [
+          {
+            name: "Princípios Expressos (LIMPE)",
+            cards: [
+              { front: "Quais são os princípios expressos da Administração Pública?", back: "L - Legalidade\nI - Impessoalidade\nM - Moralidade\nP - Publicidade\nE - Eficiência" },
+              { front: "O princípio da Eficiência foi incluído por qual EC?", back: "Emenda Constitucional nº 19/1998 (Reforma Administrativa)." }
+            ]
+          }
+        ]
+      }
+    ];
+
+    let selectedDisciplineIdx = null;
+    let selectedSubjectIdx = null;
+    let studyCardIndex = 0;
+
+    function saveData() {
+      localStorage.setItem('memoriza_data', JSON.stringify(appData));
+      renderTree();
+    }
+
+    /* Modal Handlers */
+    function openModal(id) { 
+      document.getElementById(id).style.display = 'flex'; 
+    }
+    function closeModal(id) { 
+      document.getElementById(id).style.display = 'none'; 
+    }
+
+    function openBatchModal() {
+      document.getElementById('input-batch-text').value = '';
+      openModal('modal-batch');
+    }
+
+    /* CRUD Operations: Disciplines & Subjects */
+    function saveDiscipline() {
+      const name = document.getElementById('input-discipline-name').value.trim();
+      if (!name) return;
+      appData.push({ name: name, subjects: [] });
+      document.getElementById('input-discipline-name').value = '';
+      closeModal('modal-discipline');
+      saveData();
+    }
+
+    function openAddSubjectModal(discIndex, event) {
+      if(event) event.stopPropagation();
+      selectedDisciplineIdx = discIndex;
+      openModal('modal-subject');
+    }
+
+    function saveSubject() {
+      const name = document.getElementById('input-subject-name').value.trim();
+      if (!name || selectedDisciplineIdx === null) return;
+      appData[selectedDisciplineIdx].subjects.push({ name: name, cards: [] });
+      document.getElementById('input-subject-name').value = '';
+      closeModal('modal-subject');
+      saveData();
+      
+      selectSubject(selectedDisciplineIdx, appData[selectedDisciplineIdx].subjects.length - 1);
+    }
+
+    function deleteDiscipline(discIdx, event) {
+      if(event) event.stopPropagation();
+      if (confirm("Deseja realmente excluir esta disciplina e todos os seus assuntos?")) {
+        appData.splice(discIdx, 1);
+        selectedDisciplineIdx = null;
+        selectedSubjectIdx = null;
+        resetMainView();
+        saveData();
+      }
+    }
+
+    function deleteCurrentSubject() {
+      if (selectedDisciplineIdx !== null && selectedSubjectIdx !== null) {
+        if (confirm("Excluir este assunto e todos os seus flashcards?")) {
+          appData[selectedDisciplineIdx].subjects.splice(selectedSubjectIdx, 1);
+          selectedSubjectIdx = null;
+          resetMainView();
+          saveData();
+        }
+      }
+    }
+
+    /* Render Navigation Sidebar Tree */
+    function renderTree() {
+      const container = document.getElementById('tree-container');
+      container.innerHTML = '';
+
+      if (appData.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); margin-top: 2rem; font-size: 0.85rem;">
+            Nenhuma disciplina cadastrada ainda.
+          </div>
+        `;
+        return;
+      }
+
+      appData.forEach((discipline, dIdx) => {
+        const discEl = document.createElement('div');
+        discEl.className = 'discipline-item';
+        
+        discEl.innerHTML = `
+          <div class="discipline-header">
+            <span style="display:flex; align-items:center; gap:0.4rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              📚 ${discipline.name}
+            </span>
+            <div style="display:flex; gap:0.25rem; flex-shrink: 0;">
+              <button class="btn btn-primary btn-small" title="Adicionar Assunto" onclick="openAddSubjectModal(${dIdx}, event)">+</button>
+              <button class="btn btn-danger btn-small" title="Excluir Disciplina" onclick="deleteDiscipline(${dIdx}, event)">✕</button>
+            </div>
+          </div>
+          <div class="subject-list">
+            ${discipline.subjects.map((subj, sIdx) => `
+              <div class="subject-item ${selectedDisciplineIdx === dIdx && selectedSubjectIdx === sIdx ? 'active' : ''}" 
+                   onclick="selectSubject(${dIdx}, ${sIdx})">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ${subj.name}</span>
+                <span class="badge-count">${subj.cards.length}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(discEl);
+      });
+    }
+
+    /* Selection & Cards Management */
+    function selectSubject(dIdx, sIdx) {
+      selectedDisciplineIdx = dIdx;
+      selectedSubjectIdx = sIdx;
+      renderTree();
+      
+      const subject = appData[dIdx].subjects[sIdx];
+      document.getElementById('current-title').innerText = subject.name;
+      document.getElementById('current-subtitle').innerText = `Disciplina: ${appData[dIdx].name}`;
+      document.getElementById('action-buttons').style.display = 'flex';
+      
+      exitStudyMode();
+      renderCards();
+    }
+
+    function resetMainView() {
+      document.getElementById('current-title').innerText = "Selecione um Assunto";
+      document.getElementById('current-subtitle').innerText = "Selecione uma disciplina e assunto na barra lateral para começar.";
+      document.getElementById('action-buttons').style.display = 'none';
+      document.getElementById('cards-grid').innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <h3>Nenhum assunto selecionado</h3>
+          <p>Cadastre uma disciplina e um assunto para começar a criar seus flashcards.</p>
+        </div>
+      `;
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('cards-grid');
+      grid.innerHTML = '';
+      
+      const cards = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards;
+      
+      if (cards.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <h3>Nenhum flashcard cadastrado neste lote</h3>
+            <p style="margin-bottom: 1rem;">Comece adicionando flashcards individualmente ou importando em lote via TXT/CSV.</p>
+            <button class="btn btn-primary" onclick="openModal('modal-card')">+ Criar Primeiro Flashcard</button>
+          </div>
+        `;
+        return;
+      }
+
+      cards.forEach((card, cIdx) => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'card-item';
+        cardEl.innerHTML = `
+          <div>
+            <div class="card-item-front">${escapeHtml(card.front)}</div>
+            <div class="card-item-back">${escapeHtml(card.back)}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-outline btn-small" onclick="editCard(${cIdx})">✏️ Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deleteCard(${cIdx})">🗑️ Excluir</button>
+          </div>
+        `;
+        grid.appendChild(cardEl);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    /* CRUD Operations: Flashcards */
+    function saveFlashcard() {
+      const front = document.getElementById('input-card-front').value.trim();
+      const back = document.getElementById('input-card-back').value.trim();
+      const editIdx = document.getElementById('edit-card-index').value;
+
+      if (!front || !back) return;
+
+      const cardsArr = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards;
+
+      if (editIdx !== '') {
+        cardsArr[editIdx] = { front, back };
+      } else {
+        cardsArr.push({ front, back });
+      }
+
+      document.getElementById('input-card-front').value = '';
+      document.getElementById('input-card-back').value = '';
+      document.getElementById('edit-card-index').value = '';
+      closeModal('modal-card');
+      saveData();
+      renderCards();
+    }
+
+    function editCard(cIdx) {
+      const card = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards[cIdx];
+      document.getElementById('modal-card-title').innerText = "Editar Flashcard";
+      document.getElementById('input-card-front').value = card.front;
+      document.getElementById('input-card-back').value = card.back;
+      document.getElementById('edit-card-index').value = cIdx;
+      openModal('modal-card');
+    }
+
+    function deleteCard(cIdx) {
+      if (confirm("Excluir este flashcard?")) {
+        appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards.splice(cIdx, 1);
+        saveData();
+        renderCards();
+      }
+    }
+
+    /* Batch Import (CSV/TXT) */
+    function processBatchImport() {
+      const rawText = document.getElementById('input-batch-text').value.trim();
+      if (!rawText) return;
+
+      const lines = rawText.split('\n');
+      let importedCount = 0;
+
+      lines.forEach(line => {
+        let parts = line.split(';');
+        if (parts.length < 2) parts = line.split('\t');
+
+        if (parts.length >= 2) {
+          const front = parts[0].trim();
+          const back = parts.slice(1).join(';').trim();
+          if (front && back) {
+            appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards.push({ front, back });
+            importedCount++;
+          }
+        }
+      });
+
+      closeModal('modal-batch');
+      saveData();
+      renderCards();
+      alert(`${importedCount} flashcard(s) importado(s) com sucesso!`);
+    }
+
+    /* Export & Import Full App Data (JSON) */
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `memoriza_concurso_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function triggerImport() {
+      document.getElementById('file-input-json').click();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedJson = JSON.parse(e.target.result);
+          if (Array.isArray(importedJson)) {
+            if (confirm("Deseja substituir seus dados atuais pelos dados do arquivo importado?")) {
+              appData = importedJson;
+              selectedDisciplineIdx = null;
+              selectedSubjectIdx = null;
+              saveData();
+              resetMainView();
+              alert("Dados importados com sucesso!");
+            }
+          } else {
+            alert("O arquivo selecionado possui um formato inválido.");
+          }
+        } catch (err) {
+          alert("Erro ao ler o arquivo JSON. Certifique-se de que é um backup válido.");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    /* Interactive Quiz Engine */
+    function startStudyMode() {
+      const cards = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards;
+      if (cards.length === 0) {
+        alert("Cadastre ao menos um flashcard para iniciar os estudos.");
+        return;
+      }
+      studyCardIndex = 0;
+      document.getElementById('management-view').style.display = 'none';
+      document.getElementById('study-view').style.display = 'block';
+      updateStudyCard();
+    }
+
+    function exitStudyMode() {
+      document.getElementById('management-view').style.display = 'block';
+      document.getElementById('study-view').style.display = 'none';
+    }
+
+    function flipCard() {
+      document.getElementById('flashcard-element').classList.toggle('flipped');
+    }
+
+    function updateStudyCard() {
+      document.getElementById('flashcard-element').classList.remove('flipped');
+      const cards = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards;
+      const card = cards[studyCardIndex];
+      
+      setTimeout(() => {
+        document.getElementById('study-front-text').innerText = card.front;
+        document.getElementById('study-back-text').innerText = card.back;
+        document.getElementById('study-progress').innerText = `${studyCardIndex + 1} / ${cards.length}`;
+      }, 150);
+    }
+
+    function nextCard(direction) {
+      const cards = appData[selectedDisciplineIdx].subjects[selectedSubjectIdx].cards;
+      studyCardIndex += direction;
+      
+      if (studyCardIndex < 0) studyCardIndex = cards.length - 1;
+      if (studyCardIndex >= cards.length) studyCardIndex = 0;
+      
+      updateStudyCard();
+    }
+
+    // Keyboard support for Flashcard Mode
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('study-view').style.display === 'block') {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          flipCard();
+        } else if (e.code === 'ArrowRight') {
+          nextCard(1);
+        } else if (e.code === 'ArrowLeft') {
+          nextCard(-1);
+        }
+      }
+    });
+
+    // Inicialização da interface
+    renderTree();
+  </script>
+</body>
+</html>
