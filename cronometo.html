@@ -151,7 +151,7 @@
       color: var(--tactical-yellow);
     }
 
-    /* Formulários e Inputs */
+    /* Inputs */
     .config-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -221,6 +221,17 @@
       background-color: #c0392b;
     }
 
+    .btn-ops.fullscreen {
+      background-color: transparent;
+      border: 1px solid var(--tactical-yellow);
+      color: var(--tactical-yellow);
+      grid-column: span 2;
+    }
+
+    .btn-ops.fullscreen:hover {
+      background-color: rgba(241, 196, 15, 0.1);
+    }
+
     .btn-ops.reset {
       background-color: transparent;
       border: 1px solid var(--border-military);
@@ -231,6 +242,36 @@
     .btn-ops.reset:hover {
       border-color: var(--ops-red);
       color: var(--ops-red);
+    }
+
+    /* --- ESTILOS PARA MODO TELA CHEIA (FULLSCREEN) --- */
+    .card-ops:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--bg-dark);
+      padding: 40px;
+    }
+
+    .card-ops:fullscreen .timer-display {
+      font-size: 15vw;
+      margin: 30px 0;
+    }
+
+    .card-ops:fullscreen .card-title {
+      font-size: 2rem;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .card-ops:fullscreen .controls-grid {
+      width: 100%;
+      max-width: 600px;
     }
 
     /* Responsividade */
@@ -254,7 +295,7 @@
   <div class="container">
     
     <!-- Painel Principal do Cronômetro -->
-    <div class="card-ops">
+    <div class="card-ops" id="timerCard">
       <div class="card-title">
         <span>Ciclo Operacional</span>
         <span class="status-badge" id="statusBadge">Aguardando</span>
@@ -265,6 +306,7 @@
       <div class="controls-grid">
         <button class="btn-ops" id="startBtn" onclick="iniciarCronometro()">Iniciar Missão</button>
         <button class="btn-ops pause" id="pauseBtn" onclick="pausarCronometro()" disabled>Pausar / Intervalo</button>
+        <button class="btn-ops fullscreen" onclick="toggleFullscreen()">🔲 Tela Cheia</button>
         <button class="btn-ops reset" onclick="zerarSessao()">Zerar Sessão Atual</button>
       </div>
     </div>
@@ -294,16 +336,12 @@
 
       <div class="config-grid">
         <div class="input-group">
-          <label for="inputMetaTotal">Meta Total (Horas)</label>
-          <input type="number" id="inputMetaTotal" value="2" min="0.5" step="0.5">
+          <label for="inputBlocoEstudo">Estudo (Minutos)</label>
+          <input type="number" id="inputBlocoEstudo" value="30" min="1" onchange="salvarConfiguracoes()">
         </div>
         <div class="input-group">
-          <label for="inputBlocoEstudo">Estudo (Minutos)</label>
-          <input type="number" id="inputBlocoEstudo" value="30" min="1">
-        </div>
-        <div class="input-group" style="grid-column: span 2;">
           <label for="inputBlocoDescanso">Descanso (Minutos)</label>
-          <input type="number" id="inputBlocoDescanso" value="15" min="1">
+          <input type="number" id="inputBlocoDescanso" value="15" min="1" onchange="salvarConfiguracoes()">
         </div>
       </div>
     </div>
@@ -323,6 +361,7 @@
     let intervalTotal = null;
 
     // Elementos DOM
+    const timerCard = document.getElementById('timerCard');
     const timerDisplay = document.getElementById('timerDisplay');
     const statusBadge = document.getElementById('statusBadge');
     const horasLiquidasDisplay = document.getElementById('horasLiquidasDisplay');
@@ -330,18 +369,34 @@
     const startBtn = document.getElementById('startBtn');
     const pauseBtn = document.getElementById('pauseBtn');
 
+    // --- MODO TELA CHEIA ---
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        if (timerCard.requestFullscreen) {
+          timerCard.requestFullscreen();
+        } else if (timerCard.webkitRequestFullscreen) { /* Safari */
+          timerCard.webkitRequestFullscreen();
+        } else if (timerCard.msRequestFullscreen) { /* IE11 */
+          timerCard.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
     // --- SINTETIZADOR DE ÁUDIO (ALARME MILITAR) ---
     function tocarAlarmeMilitar() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Emite 3 beeps táticos de alerta
         [0, 0.25, 0.5].forEach(delay => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
 
-          osc.type = 'sawtooth'; // Tom agudo tático
-          osc.frequency.setValueAtTime(880, audioCtx.currentTime + delay); // Nota A5
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime + delay);
           
           gain.gain.setValueAtTime(0.3, audioCtx.currentTime + delay);
           gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.15);
@@ -375,14 +430,12 @@
       startBtn.disabled = true;
       pauseBtn.disabled = false;
 
-      // Se for a primeira inicialização ou fim de bloco, carrega o tempo do bloco
       if (tempoRestanteBloco <= 0) {
         configurarNovoBloco(modoAtual);
       }
 
       atualizarInterface();
 
-      // Intervalo do bloco atual + tempo líquido
       intervalBloco = setInterval(() => {
         tempoRestanteBloco--;
 
@@ -399,7 +452,6 @@
         }
       }, 1000);
 
-      // Intervalo do Tempo Total (contínuo enquanto o cronômetro roda)
       intervalTotal = setInterval(() => {
         tempoTotalSegundos++;
         horasTotaisDisplay.innerText = formatarTempo(tempoTotalSegundos);
@@ -419,6 +471,8 @@
 
       statusBadge.innerText = 'Pausado';
       statusBadge.className = 'status-badge';
+      
+      salvarDados();
     }
 
     function configurarNovoBloco(modo) {
@@ -480,14 +534,26 @@
       }
     }
 
-    // --- PERSISTÊNCIA (LOCALSTORAGE) ---
+    // --- PERSISTÊNCIA COMPLETA EM LOCALSTORAGE ---
     function salvarDados() {
       const dados = {
         tempoLiquidoSegundos,
         tempoTotalSegundos,
+        tempoRestanteBloco,
+        modoAtual,
+        estudoMins: document.getElementById('inputBlocoEstudo').value,
+        descansoMins: document.getElementById('inputBlocoDescanso').value,
         data: new Date().toLocaleDateString()
       };
       localStorage.setItem('qg_estudos_dados', JSON.stringify(dados));
+    }
+
+    function salvarConfiguracoes() {
+      salvarDados();
+      if (!emExecucao) {
+        configurarNovoBloco(modoAtual);
+        atualizarDisplays();
+      }
     }
 
     function carregarDados() {
@@ -495,10 +561,15 @@
       if (salvo) {
         try {
           const dados = JSON.parse(salvo);
-          // Reseta se mudar de dia
+          // Valida se o registro é do mesmo dia
           if (dados.data === new Date().toLocaleDateString()) {
             tempoLiquidoSegundos = dados.tempoLiquidoSegundos || 0;
             tempoTotalSegundos = dados.tempoTotalSegundos || 0;
+            tempoRestanteBloco = dados.tempoRestanteBloco || 0;
+            modoAtual = dados.modoAtual || 'estudo';
+
+            if (dados.estudoMins) document.getElementById('inputBlocoEstudo').value = dados.estudoMins;
+            if (dados.descansoMins) document.getElementById('inputBlocoDescanso').value = dados.descansoMins;
           }
         } catch (e) {
           console.error("Erro ao carregar do localStorage", e);
