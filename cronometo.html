@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QG de Estudos - Cronômetro Tático Concursos</title>
+  <style>
+    :root {
+      --bg-dark: #0a0c0e;
+      --panel-dark: #12161a;
+      --border-military: #2a323d;
+      --tactical-yellow: #f1c40f;
+      --tactical-yellow-hover: #d4ac0d;
+      --ops-green: #2ecc71;
+      --ops-red: #e74c3c;
+      --text-main: #e0e6ed;
+      --text-muted: #7f8c8d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Courier New', Courier, monospace, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 15px;
+    }
+
+    .header-ops {
+      text-align: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--tactical-yellow);
+      padding-bottom: 10px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .header-ops h1 {
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      color: var(--tactical-yellow);
+      text-transform: uppercase;
+    }
+
+    .header-ops p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card-ops {
+      background-color: var(--panel-dark);
+      border: 1px solid var(--border-military);
+      border-left: 4px solid var(--tactical-yellow);
+      border-radius: 6px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background-color: var(--border-military);
+      color: var(--text-main);
+      font-weight: bold;
+    }
+
+    .status-badge.estudo {
+      background-color: rgba(46, 204, 113, 0.2);
+      color: var(--ops-green);
+      border: 1px solid var(--ops-green);
+    }
+
+    .status-badge.descanso {
+      background-color: rgba(241, 196, 15, 0.2);
+      color: var(--tactical-yellow);
+      border: 1px solid var(--tactical-yellow);
+    }
+
+    /* Display do Cronômetro */
+    .timer-display {
+      font-size: 3.2rem;
+      font-weight: bold;
+      text-align: center;
+      color: var(--tactical-yellow);
+      letter-spacing: 3px;
+      margin: 10px 0;
+      text-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
+    }
+
+    /* Grid de Estatísticas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .stat-box {
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-military);
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-box h4 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .stat-box p {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .stat-box.liquido p {
+      color: var(--ops-green);
+    }
+
+    .stat-box.total p {
+      color: var(--tactical-yellow);
+    }
+
+    /* Formulários e Inputs */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .input-group input {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-military);
+      color: var(--text-main);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--tactical-yellow);
+    }
+
+    /* Botões */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-ops {
+      background-color: var(--tactical-yellow);
+      color: #000;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s;
+    }
+
+    .btn-ops:hover {
+      background-color: var(--tactical-yellow-hover);
+    }
+
+    .btn-ops.pause {
+      background-color: var(--ops-red);
+      color: #fff;
+    }
+
+    .btn-ops.pause:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-ops.reset {
+      background-color: transparent;
+      border: 1px solid var(--border-military);
+      color: var(--text-muted);
+      grid-column: span 2;
+    }
+
+    .btn-ops.reset:hover {
+      border-color: var(--ops-red);
+      color: var(--ops-red);
+    }
+
+    /* Responsividade */
+    @media (max-width: 480px) {
+      .timer-display {
+        font-size: 2.5rem;
+      }
+      .config-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-ops">
+    <h1>⚡ QG DE ESTUDOS - TÁTICO</h1>
+    <p>SISTEMA DE CRONOMETRAGEM E HORAS LÍQUIDAS</p>
+  </div>
+
+  <div class="container">
+    
+    <!-- Painel Principal do Cronômetro -->
+    <div class="card-ops">
+      <div class="card-title">
+        <span>Ciclo Operacional</span>
+        <span class="status-badge" id="statusBadge">Aguardando</span>
+      </div>
+
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+      <div class="controls-grid">
+        <button class="btn-ops" id="startBtn" onclick="iniciarCronometro()">Iniciar Missão</button>
+        <button class="btn-ops pause" id="pauseBtn" onclick="pausarCronometro()" disabled>Pausar / Intervalo</button>
+        <button class="btn-ops reset" onclick="zerarSessao()">Zerar Sessão Atual</button>
+      </div>
+    </div>
+
+    <!-- Estatísticas de Tempo -->
+    <div class="card-ops">
+      <div class="card-title">
+        <span>Relatório de Tempo do Dia</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box liquido">
+          <h4>Horas Líquidas</h4>
+          <p id="horasLiquidasDisplay">00:00:00</p>
+        </div>
+        <div class="stat-box total">
+          <h4>Tempo Total</h4>
+          <p id="horasTotaisDisplay">00:00:00</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuração de Ciclos -->
+    <div class="card-ops">
+      <div class="card-title">
+        <span>Parâmetros de Missão</span>
+      </div>
+
+      <div class="config-grid">
+        <div class="input-group">
+          <label for="inputMetaTotal">Meta Total (Horas)</label>
+          <input type="number" id="inputMetaTotal" value="2" min="0.5" step="0.5">
+        </div>
+        <div class="input-group">
+          <label for="inputBlocoEstudo">Estudo (Minutos)</label>
+          <input type="number" id="inputBlocoEstudo" value="30" min="1">
+        </div>
+        <div class="input-group" style="grid-column: span 2;">
+          <label for="inputBlocoDescanso">Descanso (Minutos)</label>
+          <input type="number" id="inputBlocoDescanso" value="15" min="1">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- ESTADO DO SISTEMA ---
+    let tempoLiquidoSegundos = 0;
+    let tempoTotalSegundos = 0;
+    
+    let tempoRestanteBloco = 0;
+    let modoAtual = 'estudo'; // 'estudo' ou 'descanso'
+    let emExecucao = false;
+    
+    let intervalBloco = null;
+    let intervalTotal = null;
+
+    // Elementos DOM
+    const timerDisplay = document.getElementById('timerDisplay');
+    const statusBadge = document.getElementById('statusBadge');
+    const horasLiquidasDisplay = document.getElementById('horasLiquidasDisplay');
+    const horasTotaisDisplay = document.getElementById('horasTotaisDisplay');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    // --- SINTETIZADOR DE ÁUDIO (ALARME MILITAR) ---
+    function tocarAlarmeMilitar() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Emite 3 beeps táticos de alerta
+        [0, 0.25, 0.5].forEach(delay => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sawtooth'; // Tom agudo tático
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime + delay); // Nota A5
+          
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.15);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(audioCtx.currentTime + delay);
+          osc.stop(audioCtx.currentTime + delay + 0.15);
+        });
+      } catch (e) {
+        console.log("Erro ao emitir áudio: " + e);
+      }
+    }
+
+    // --- FORMATAÇÃO DE TEMPO ---
+    function formatarTempo(segundos) {
+      const hrs = Math.floor(segundos / 3600);
+      const mins = Math.floor((segundos % 3600) / 60);
+      const segs = segundos % 60;
+
+      const pad = num => String(num).padStart(2, '0');
+      return `${pad(hrs)}:${pad(mins)}:${pad(segs)}`;
+    }
+
+    // --- CONTROLE DE CRONÔMETRO ---
+    function iniciarCronometro() {
+      if (emExecucao) return;
+
+      emExecucao = true;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+
+      // Se for a primeira inicialização ou fim de bloco, carrega o tempo do bloco
+      if (tempoRestanteBloco <= 0) {
+        configurarNovoBloco(modoAtual);
+      }
+
+      atualizarInterface();
+
+      // Intervalo do bloco atual + tempo líquido
+      intervalBloco = setInterval(() => {
+        tempoRestanteBloco--;
+
+        if (modoAtual === 'estudo') {
+          tempoLiquidoSegundos++;
+        }
+
+        atualizarDisplays();
+        salvarDados();
+
+        if (tempoRestanteBloco <= 0) {
+          tocarAlarmeMilitar();
+          alternarModo();
+        }
+      }, 1000);
+
+      // Intervalo do Tempo Total (contínuo enquanto o cronômetro roda)
+      intervalTotal = setInterval(() => {
+        tempoTotalSegundos++;
+        horasTotaisDisplay.innerText = formatarTempo(tempoTotalSegundos);
+        salvarDados();
+      }, 1000);
+    }
+
+    function pausarCronometro() {
+      if (!emExecucao) return;
+
+      emExecucao = false;
+      clearInterval(intervalBloco);
+      clearInterval(intervalTotal);
+
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+
+      statusBadge.innerText = 'Pausado';
+      statusBadge.className = 'status-badge';
+    }
+
+    function configurarNovoBloco(modo) {
+      modoAtual = modo;
+      if (modo === 'estudo') {
+        const mins = parseInt(document.getElementById('inputBlocoEstudo').value) || 30;
+        tempoRestanteBloco = mins * 60;
+      } else {
+        const mins = parseInt(document.getElementById('inputBlocoDescanso').value) || 15;
+        tempoRestanteBloco = mins * 60;
+      }
+    }
+
+    function alternarModo() {
+      pausarCronometro();
+      if (modoAtual === 'estudo') {
+        modoAtual = 'descanso';
+        alert("🚨 FIM DO BLOCO DE ESTUDO! Inicie seu descanso tático.");
+      } else {
+        modoAtual = 'estudo';
+        alert("⚡ FIM DO DESCANSO! Voltar para a missão de estudo.");
+      }
+      configurarNovoBloco(modoAtual);
+      atualizarInterface();
+      iniciarCronometro();
+    }
+
+    function zerarSessao() {
+      if (confirm("Deseja zerar os contadores da sessão atual?")) {
+        pausarCronometro();
+        tempoLiquidoSegundos = 0;
+        tempoTotalSegundos = 0;
+        tempoRestanteBloco = 0;
+        modoAtual = 'estudo';
+        
+        salvarDados();
+        atualizarDisplays();
+        
+        statusBadge.innerText = 'Aguardando';
+        statusBadge.className = 'status-badge';
+        timerDisplay.innerText = '00:00:00';
+      }
+    }
+
+    function atualizarDisplays() {
+      timerDisplay.innerText = formatarTempo(tempoRestanteBloco);
+      horasLiquidasDisplay.innerText = formatarTempo(tempoLiquidoSegundos);
+      horasTotaisDisplay.innerText = formatarTempo(tempoTotalSegundos);
+    }
+
+    function atualizarInterface() {
+      atualizarDisplays();
+      if (modoAtual === 'estudo') {
+        statusBadge.innerText = 'Em Estudo';
+        statusBadge.className = 'status-badge estudo';
+      } else {
+        statusBadge.innerText = 'Em Descanso';
+        statusBadge.className = 'status-badge descanso';
+      }
+    }
+
+    // --- PERSISTÊNCIA (LOCALSTORAGE) ---
+    function salvarDados() {
+      const dados = {
+        tempoLiquidoSegundos,
+        tempoTotalSegundos,
+        data: new Date().toLocaleDateString()
+      };
+      localStorage.setItem('qg_estudos_dados', JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+      const salvo = localStorage.getItem('qg_estudos_dados');
+      if (salvo) {
+        try {
+          const dados = JSON.parse(salvo);
+          // Reseta se mudar de dia
+          if (dados.data === new Date().toLocaleDateString()) {
+            tempoLiquidoSegundos = dados.tempoLiquidoSegundos || 0;
+            tempoTotalSegundos = dados.tempoTotalSegundos || 0;
+          }
+        } catch (e) {
+          console.error("Erro ao carregar do localStorage", e);
+        }
+      }
+      atualizarDisplays();
+    }
+
+    // Inicialização
+    carregarDados();
+  </script>
+</body>
+</html>
