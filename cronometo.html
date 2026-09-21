@@ -1,1365 +1,1194 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR" class="dark h-full">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QG Estudo - Plataforma de Estudos para Concursos</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              900: '#0c4a6e',
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QG do Estudo - Plataforma para Concursos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-
-  <!-- Font Awesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #475569;
-    }
-    /* Estilos do Canvas Overlay */
-    #canvas-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 40;
-      pointer-events: none;
-    }
-    #draw-canvas {
-      width: 100%;
-      height: 100%;
-      pointer-events: auto;
-    }
-  </style>
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        /* Canvas de Rabisco Sobreposto */
+        #drawingCanvas {
+            touch-action: none;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
 
-  <!-- Tela de Carregamento Inicial -->
-  <div id="loading-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-500 mb-4"></div>
-    <p class="text-slate-400 font-medium animate-pulse">Carregando ambiente de estudo...</p>
-  </div>
+    <!-- CANVAS FLUTUANTE DE RASCUNHO (Fixo sobre a viewport) -->
+    <canvas id="drawingCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
 
-  <!-- Tela de Login / Cadastro -->
-  <div id="auth-screen" class="hidden min-h-screen flex items-center justify-center p-4 bg-slate-950">
-    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 space-y-6">
-      <div class="text-center space-y-2">
-        <div class="inline-flex p-3 bg-brand-500/10 rounded-2xl text-brand-500 mb-2">
-          <i class="fa-solid fa-graduation-cap text-3xl"></i>
-        </div>
-        <h1 class="text-2xl font-bold tracking-tight text-white">QG Estudo Concursos</h1>
-        <p class="text-sm text-slate-400">Sua plataforma de alta performance para aprovação</p>
-      </div>
-
-      <form id="auth-form" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
-          <input type="email" id="auth-email" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" placeholder="seu@email.com">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
-          <input type="password" id="auth-password" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" placeholder="••••••••">
-        </div>
-
-        <div class="flex gap-3 pt-2">
-          <button type="submit" id="btn-login" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-brand-600/20 active:scale-[0.98]">
-            Entrar
-          </button>
-          <button type="button" id="btn-register" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-3 px-4 rounded-xl transition active:scale-[0.98]">
-            Cadastrar
-          </button>
-        </div>
-      </form>
-
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
-        <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-900 px-3 text-slate-500">Ou acesse com</span></div>
-      </div>
-
-      <button id="btn-google" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition active:scale-[0.98]">
-        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-        Entrar com Google
-      </button>
+    <!-- FERRAMENTAS DA LOUSA FLUTUANTE -->
+    <div id="scratchpadBar" class="fixed top-4 right-4 z-50 bg-slate-900/90 backdrop-blur border border-slate-700/80 rounded-full shadow-2xl px-3 py-1.5 flex items-center gap-2 text-xs">
+        <span class="text-slate-400 font-medium px-2 flex items-center gap-1.5"><i data-lucide="pen-tool" class="w-3.5 h-3.5"></i> Lousa</span>
+        <button id="toolPencil" class="p-1.5 rounded-full hover:bg-slate-800 text-brand-400 transition" title="Lápis"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+        <button id="toolEraser" class="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 transition" title="Borracha"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+        <input type="color" id="pencilColor" value="#38bdf8" class="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0">
+        <button id="toolClear" class="p-1.5 rounded-full hover:bg-red-500/20 text-red-400 transition" title="Limpar Lousa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        <button id="toggleCanvasPointer" class="p-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition" title="Ativar/Desativar Desenho">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+        </button>
     </div>
-  </div>
 
-  <!-- Layout Principal (App) -->
-  <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
-    
-    <!-- Sidebar / Navegação -->
-    <aside class="w-full md:w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0">
-      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-brand-500/10 text-brand-500 rounded-xl">
-            <i class="fa-solid fa-graduation-cap text-xl"></i>
-          </div>
-          <div>
-            <h2 class="font-bold text-white text-base leading-tight">QG Estudo</h2>
-            <span class="text-xs text-brand-500 font-medium">Concursos Públicos</span>
-          </div>
+    <!-- TELA DE AUTENTICAÇÃO / LOGIN -->
+    <div id="authScreen" class="fixed inset-0 z-40 bg-slate-950 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full shadow-2xl text-center space-y-6">
+            <div class="inline-flex p-3 bg-brand-500/10 text-brand-400 rounded-xl mb-2">
+                <i data-lucide="graduation-cap" class="w-10 h-10"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight text-white">QG do Estudo</h1>
+            <p class="text-sm text-slate-400">Plataforma Interativa de Questões, Edital e Horas Líquidas de Estudo.</p>
+            
+            <div id="authError" class="hidden text-xs bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-left"></div>
+
+            <form id="authForm" class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">E-mail</label>
+                    <input type="email" id="authEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition" placeholder="seu@email.com">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-1">Senha</label>
+                    <input type="password" id="authPassword" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500 transition" placeholder="••••••••">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" id="btnLogin" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-medium py-2.5 rounded-lg text-sm transition">Entrar</button>
+                    <button type="button" id="btnRegister" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-2.5 rounded-lg text-sm transition">Cadastrar</button>
+                </div>
+            </form>
         </div>
-      </div>
+    </div>
 
-      <nav class="p-4 space-y-1 flex-1">
-        <button data-tab="dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-brand-500 bg-brand-500/10">
-          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
-        </button>
-        <button data-tab="edital" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-list-check w-5"></i> Edital Verticalizado
-        </button>
-        <button data-tab="questoes" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-pen-to-square w-5"></i> Responder Questões
-        </button>
-        <button data-tab="revisoes" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-clock-rotate-left w-5"></i> Revisões
-          </div>
-          <span id="badge-revisoes" class="hidden bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-        </button>
-        <button data-tab="importador" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
-          <i class="fa-solid fa-file-import w-5"></i> Importar Questões
-        </button>
-      </nav>
-
-      <!-- Perfil do Usuário e Logout -->
-      <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-950/50">
-        <div class="flex items-center gap-3 min-w-0">
-          <div id="user-avatar" class="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-white text-sm shrink-0">U</div>
-          <div class="min-w-0">
-            <p id="user-name" class="text-sm font-medium text-white truncate">Usuário</p>
-            <p id="user-email" class="text-xs text-slate-500 truncate">usuario@email.com</p>
-          </div>
-        </div>
-        <button id="btn-logout" class="p-2 text-slate-400 hover:text-red-400 transition rounded-lg hover:bg-slate-800" title="Sair">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
-      </div>
-    </aside>
-
-    <!-- Conteúdo Principal -->
-    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-4 md:p-8">
-      
-      <!-- ABA 1: DASHBOARD -->
-      <section id="tab-dashboard" class="tab-content space-y-6">
-        <div>
-          <h1 class="text-2xl font-bold text-white">Painel de Desempenho</h1>
-          <p class="text-slate-400 text-sm">Acompanhe suas métricas de estudo em tempo real</p>
-        </div>
-
-        <!-- Métricas do Dia -->
-        <div class="space-y-3">
-          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Desempenho de Hoje</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-medium text-slate-400">Respondidas Hoje</p>
-                <p id="dash-hoje-total" class="text-3xl font-bold text-white mt-1">0</p>
-              </div>
-              <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fa-solid fa-list text-xl"></i></div>
+    <!-- MAIN APP WRAPPER -->
+    <div id="appContainer" class="hidden flex-1 flex flex-col min-h-screen">
+        
+        <!-- HEADER SUPERIOR -->
+        <header class="bg-slate-900 border-b border-slate-800 h-16 flex items-center justify-between px-4 sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <button id="btnOpenSidebar" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="graduation-cap" class="w-6 h-6 text-brand-500"></i>
+                    <span class="font-bold text-lg text-white tracking-wide">QG<span class="text-brand-500">Estudo</span></span>
+                </div>
             </div>
 
-            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-medium text-slate-400">Acertos Hoje</p>
-                <p id="dash-hoje-acertos" class="text-3xl font-bold text-emerald-400 mt-1">0</p>
-              </div>
-              <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl"><i class="fa-solid fa-circle-check text-xl"></i></div>
-            </div>
-
-            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-medium text-slate-400">Erros Hoje</p>
-                <p id="dash-hoje-erros" class="text-3xl font-bold text-rose-400 mt-1">0</p>
-              </div>
-              <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl"><i class="fa-solid fa-circle-xmark text-xl"></i></div>
-            </div>
-
-            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
-              <div>
-                <p class="text-xs font-medium text-slate-400">Taxa do Dia</p>
-                <p id="dash-hoje-taxa" class="text-3xl font-bold text-brand-400 mt-1">0%</p>
-              </div>
-              <div class="p-3 bg-brand-500/10 text-brand-400 rounded-xl"><i class="fa-solid fa-chart-line text-xl"></i></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Métricas Históricas Gerais -->
-        <div class="space-y-3">
-          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Histórico Geral Acumulado</h2>
-          <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="space-y-1">
-              <span class="text-xs text-slate-400">Total Histórico</span>
-              <p id="dash-geral-total" class="text-2xl font-bold text-white">0 questões</p>
-            </div>
-            <div class="space-y-1">
-              <span class="text-xs text-slate-400">Total de Acertos</span>
-              <p id="dash-geral-acertos" class="text-2xl font-bold text-emerald-400">0</p>
-            </div>
-            <div class="space-y-1">
-              <span class="text-xs text-slate-400">Total de Erros</span>
-              <p id="dash-geral-erros" class="text-2xl font-bold text-rose-400">0</p>
-            </div>
-            <div class="space-y-1">
-              <span class="text-xs text-slate-400">Aproveitamento Global</span>
-              <p id="dash-geral-taxa" class="text-2xl font-bold text-brand-400">0%</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Progresso das Disciplinas -->
-        <div class="space-y-3">
-          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progresso do Edital por Disciplina</h2>
-          <div id="dash-disciplinas-progress" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Renderizado dinamicamente via JS -->
-            <p class="text-slate-500 text-sm italic col-span-2">Nenhuma disciplina cadastrada ainda.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ABA 2: EDITAL VERTICALIZADO -->
-      <section id="tab-edital" class="tab-content hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-bold text-white">Edital Verticalizado</h1>
-            <p class="text-slate-400 text-sm">Gerencie suas matérias, tópicos, ordem de cobrança e resumos</p>
-          </div>
-          <button id="btn-add-disciplina" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-4 py-2.5 rounded-xl transition flex items-center gap-2 text-sm shadow-lg shadow-brand-600/20">
-            <i class="fa-solid fa-plus"></i> Nova Disciplina
-          </button>
-        </div>
-
-        <!-- Lista de Disciplinas -->
-        <div id="edital-container" class="space-y-4">
-          <!-- Renderizado via JS -->
-        </div>
-      </section>
-
-      <!-- ABA 3: RESPONDER QUESTÕES -->
-      <section id="tab-questoes" class="tab-content hidden space-y-6">
-        <div>
-          <h1 class="text-2xl font-bold text-white">Resolução de Questões</h1>
-          <p class="text-slate-400 text-sm">Filtre por tópicos ou escolha um lote de questões</p>
-        </div>
-
-        <!-- Filtros e Seleção -->
-        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Disciplina</label>
-              <select id="filtro-disciplina" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-                <option value="">Todas as Disciplinas</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Assunto / Tema</label>
-              <select id="filtro-assunto" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-                <option value="">Todos os Assuntos</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-400 mb-1">Modo de Resolução</label>
-              <select id="filtro-modo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-                <option value="geral">Lote Geral (Todas do Assunto)</option>
-                <option value="individual">Lote Específico Importado</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="container-lotes-especificos" class="hidden">
-            <label class="block text-xs font-medium text-slate-400 mb-1">Selecione o Lote</label>
-            <select id="select-lote-especifico" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-              <!-- Lotes carregados via JS -->
-            </select>
-          </div>
-
-          <div class="flex flex-wrap gap-3 pt-2">
-            <button id="btn-iniciar-zero" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-brand-600/20">
-              <i class="fa-solid fa-play mr-2"></i> Iniciar Lote do Zero
-            </button>
-            <button id="btn-continuar-parei" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition">
-              <i class="fa-solid fa-forward-step mr-2"></i> Continuar de Onde Parei
-            </button>
-          </div>
-        </div>
-
-        <!-- Área de Resolução da Questão -->
-        <div id="area-resolucao" class="hidden space-y-6">
-          
-          <!-- Top Bar da Questão: Timer, Progresso e Lousa -->
-          <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 sticky top-2 z-20 backdrop-blur-md">
             <div class="flex items-center gap-4">
-              <span id="questao-progresso" class="text-sm font-semibold text-brand-400 bg-brand-500/10 px-3 py-1 rounded-lg">Questão 1/1</span>
-              <div class="flex items-center gap-2 text-slate-300 font-mono text-sm bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
-                <i class="fa-regular fa-clock text-brand-500"></i>
-                <span id="timer-display">00:00</span>
-                <button id="btn-timer-toggle" class="text-xs text-slate-400 hover:text-white ml-1">
-                  <i class="fa-solid fa-pause"></i>
+                <span id="userEmailDisplay" class="text-xs text-slate-400 hidden sm:inline-block"></span>
+                <button id="btnLogout" class="p-2 text-slate-400 hover:text-red-400 rounded-lg hover:bg-slate-800 transition" title="Sair">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
                 </button>
-              </div>
             </div>
+        </header>
 
-            <!-- Contador de Desempenho em Tempo Real da Sessão -->
-            <div class="flex items-center gap-4 text-xs font-medium">
-              <span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> Acertos: <strong id="sessao-acertos">0</strong></span>
-              <span class="text-rose-400"><i class="fa-solid fa-circle-xmark"></i> Erros: <strong id="sessao-erros">0</strong></span>
-              <span class="text-slate-400">Aproveitamento: <strong id="sessao-taxa" class="text-white">0%</strong></span>
-            </div>
-
-            <!-- Botão de Ativar Lousa / Rascunho -->
-            <button id="btn-toggle-lousa" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
-              <i class="fa-solid fa-pen-ruler"></i> Lousa de Anotações
-            </button>
-          </div>
-
-          <!-- Card do Enunciado e Alternativas -->
-          <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
-            <div class="space-y-2">
-              <div class="flex items-center gap-2 text-xs text-slate-400">
-                <span id="q-disciplina-tag" class="bg-slate-700 px-2.5 py-1 rounded-md text-slate-200">Disciplina</span>
-                <span id="q-assunto-tag" class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md">Assunto</span>
-              </div>
-              <p id="q-enunciado" class="text-base sm:text-lg text-slate-100 font-medium leading-relaxed">
-                Carregando enunciado da questão...
-              </p>
-            </div>
-
-            <!-- Alternativas -->
-            <div id="q-alternativas" class="space-y-3">
-              <!-- Renderizadas dinamicamente via JS -->
-            </div>
-
-            <!-- Ações: Responder e Navegar -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
-              <div class="flex gap-2">
-                <button id="btn-q-anterior" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-50">
-                  <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+        <!-- NAVEGAÇÃO LATERAL (MENU HAMBÚRGUER) -->
+        <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+        <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-brand-400 font-semibold">
+                    <i data-lucide="compass" class="w-5 h-5"></i>
+                    <span>Navegação</span>
+                </div>
+                <button id="btnCloseSidebar" class="p-1 text-slate-400 hover:text-white rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
-                <button id="btn-q-proxima" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-50">
-                  Próxima <i class="fa-solid fa-arrow-right ml-1"></i>
+            </div>
+
+            <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+                <button data-target="viewDashboard" class="nav-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-400"></i> Dashboard
                 </button>
-              </div>
+                <button data-target="viewTimer" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="timer" class="w-4 h-4 text-emerald-400"></i> Cronômetro (Horas Líquidas)
+                </button>
+                <button data-target="viewDisciplines" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="book-open" class="w-4 h-4 text-amber-400"></i> Disciplinas & Conteúdos
+                </button>
+                <button data-target="viewEdital" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="check-square" class="w-4 h-4 text-indigo-400"></i> Edital Verticalizado & Check-in
+                </button>
+                <button data-target="viewSchedule" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="calendar" class="w-4 h-4 text-purple-400"></i> Cronograma & Revisões
+                </button>
+                <button data-target="viewFilterQuestions" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <i data-lucide="filter" class="w-4 h-4 text-rose-400"></i> Filtro Avançado de Questões
+                </button>
+            </nav>
+        </aside>
 
-              <button id="btn-q-confirmar" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-lg shadow-brand-600/20 active:scale-[0.98]">
-                Confirmar Gabarito
-              </button>
-            </div>
+        <!-- ÁREA PRINCIPAL DE CONTEÚDO -->
+        <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
 
-            <!-- Gabarito Comentado (Oculto até responder) -->
-            <div id="q-comentario-box" class="hidden bg-slate-900 border border-slate-700 rounded-xl p-5 space-y-3">
-              <div class="flex items-center gap-2">
-                <span id="q-status-badge" class="px-3 py-1 rounded-lg text-xs font-bold uppercase">Correto</span>
-                <h4 class="text-sm font-bold text-white">Gabarito Comentado</h4>
-              </div>
-              <p id="q-comentario-texto" class="text-sm text-slate-300 leading-relaxed">Explicação do gabarito...</p>
-            </div>
-          </div>
+            <!-- SEÇÃO 1: DASHBOARD PRINCIPAL -->
+            <section id="viewDashboard" class="view-section space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Dashboard do Concurseiro</h2>
+                        <p class="text-sm text-slate-400">Acompanhe seu desempenho acumulado e diário em tempo real.</p>
+                    </div>
+                    <button id="btnEndDay" class="bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                        <i data-lucide="power" class="w-4 h-4"></i> Encerrar Estudo do Dia
+                    </button>
+                </div>
 
-        </div>
-      </section>
+                <!-- CARDS PAINEL GERAL + DIA -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Painel Geral (Acumulado) -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="font-semibold text-slate-200 flex items-center gap-2">
+                                <i data-lucide="pie-chart" class="w-4 h-4 text-brand-400"></i> Acumulado Histórico
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-slate-400">Total</p>
+                                <p id="dashTotal" class="text-xl font-bold text-white">0</p>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-emerald-400">Acertos</p>
+                                <p id="dashCorrect" class="text-xl font-bold text-emerald-400">0</p>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-red-400">Erros</p>
+                                <p id="dashIncorrect" class="text-xl font-bold text-red-400">0</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Aproveitamento Geral</span>
+                                <span id="dashRate" class="font-bold text-slate-200">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 flex">
+                                <div id="dashBarCorrect" class="bg-emerald-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+                                <div id="dashBarIncorrect" class="bg-red-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
 
-      <!-- ABA 4: REVISÕES ESPAÇADAS (SRS) -->
-      <section id="tab-revisoes" class="tab-content hidden space-y-6">
-        <div>
-          <h1 class="text-2xl font-bold text-white">Quadro de Revisões Espaçadas (SRS)</h1>
-          <p class="text-slate-400 text-sm">Revisões agendadas automaticamente (1, 3, 7, 15 e 30 dias)</p>
-        </div>
+                    <!-- Painel do Dia -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="font-semibold text-slate-200 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i> Desempenho Diário
+                            </span>
+                            <span class="text-xs text-slate-500">00:00 - 23:59</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-slate-400">Hoje</p>
+                                <p id="dashTodayTotal" class="text-xl font-bold text-white">0</p>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-emerald-400">Acertos</p>
+                                <p id="dashTodayCorrect" class="text-xl font-bold text-emerald-400">0</p>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                                <p class="text-xs text-red-400">Erros</p>
+                                <p id="dashTodayIncorrect" class="text-xl font-bold text-red-400">0</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Aproveitamento do Dia</span>
+                                <span id="dashTodayRate" class="font-bold text-slate-200">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 flex">
+                                <div id="dashTodayBar" class="bg-amber-500 h-2.5 transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-calendar-day text-amber-400"></i> Revisões Agendadas para Hoje
-            </h2>
-            <span id="revisoes-hoje-count" class="bg-amber-500/20 text-amber-400 font-bold px-3 py-1 rounded-lg text-xs">
-              0 pendentes
-            </span>
-          </div>
+                <!-- PAINEL DO EDITAL VERTICALIZADO (VISÃO RÁPIDA) -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <h3 class="font-semibold text-slate-200 flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i> Progresso de Cobertura do Edital
+                    </h3>
+                    <div id="dashEditalProgress" class="space-y-3">
+                        <p class="text-xs text-slate-500">Nenhuma disciplina cadastrada ainda.</p>
+                    </div>
+                </div>
+            </section>
 
-          <div id="lista-revisoes-hoje" class="space-y-3">
-            <!-- Renderizado via JS -->
-            <p class="text-slate-500 text-sm italic">Nenhuma revisão pendente para o dia de hoje!</p>
-          </div>
-        </div>
-      </section>
+            <!-- SEÇÃO 2: CRONÔMETRO (HORAS LÍQUIDAS) -->
+            <section id="viewTimer" class="view-section hidden space-y-6">
+                <div class="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6 text-center">
+                    <h2 class="text-xl font-bold text-white flex items-center justify-center gap-2">
+                        <i data-lucide="timer" class="w-5 h-5 text-emerald-400"></i> Gestão de Horas Líquidas
+                    </h2>
 
-      <!-- ABA 5: IMPORTADOR JSON -->
-      <section id="tab-importador" class="tab-content hidden space-y-6">
-        <div>
-          <h1 class="text-2xl font-bold text-white">Importar Lote de Questões JSON</h1>
-          <p class="text-slate-400 text-sm">Cole o código JSON estruturado para cadastrar questões e temas automaticamente</p>
-        </div>
+                    <div class="text-left space-y-2">
+                        <label class="text-xs font-semibold text-slate-400 uppercase">Selecione a Disciplina</label>
+                        <select id="timerDisciplineSelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
 
-        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Estrutura JSON</label>
-            <textarea id="json-input" rows="12" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 font-mono text-xs text-emerald-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 leading-relaxed" placeholder='{
-  "disciplina": "Língua Portuguesa",
-  "tema": "Concordância Verbal e Nominal",
-  "questoes": [
-    {
-      "id": 1,
-      "enunciado": "Assinale a alternativa correta...",
-      "alternativas": {
-        "A": "Primeira opção",
-        "B": "Segunda opção",
-        "C": "Terceira opção",
-        "D": "Quarta opção"
-      },
-      "resposta_correta": "D",
-      "comentario": "Comentário explicativo..."
-    }
-  ]
-}'></textarea>
-          </div>
+                    <div class="py-6 bg-slate-950 rounded-2xl border border-slate-800">
+                        <span id="timerDisplay" class="text-5xl font-mono font-bold text-emerald-400 tracking-wider">00:00:00</span>
+                    </div>
 
-          <div class="flex items-center justify-between pt-2">
-            <button id="btn-processar-json" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-lg shadow-brand-600/20 flex items-center gap-2 text-sm">
-              <i class="fa-solid fa-file-code"></i> Processar e Importar
-            </button>
-          </div>
-        </div>
-      </section>
+                    <div class="flex justify-center gap-3">
+                        <button id="btnStartTimer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                            <i data-lucide="play" class="w-4 h-4"></i> Iniciar
+                        </button>
+                        <button id="btnPauseTimer" class="bg-amber-600 hover:bg-amber-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition" disabled>
+                            <i data-lucide="pause" class="w-4 h-4"></i> Pausar
+                        </button>
+                        <button id="btnSaveTimer" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition" disabled>
+                            <i data-lucide="save" class="w-4 h-4"></i> Salvar Sessão
+                        </button>
+                    </div>
+                </div>
 
-    </main>
-  </div>
+                <!-- REGISTRO DE HORAS ACUMULADAS -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <h3 class="font-semibold text-slate-200">Horas Acumuladas por Disciplina</h3>
+                    <div id="studyTimeRecords" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <p class="text-xs text-slate-500 col-span-full">Nenhum registro de estudo salvo ainda.</p>
+                    </div>
+                </div>
+            </section>
 
-  <!-- LOUSA / CANVAS OVERLAY FLUTUANTE -->
-  <div id="canvas-container" class="hidden">
-    <canvas id="draw-canvas"></canvas>
-    
-    <!-- Barra de Ferramentas da Lousa -->
-    <div class="fixed top-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-700 backdrop-blur-md p-2 rounded-2xl shadow-2xl flex items-center gap-3 z-50 pointer-events-auto">
-      <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-xl">
-        <button data-color="#38bdf8" class="color-btn w-6 h-6 rounded-full bg-sky-400 ring-2 ring-white"></button>
-        <button data-color="#f43f5e" class="color-btn w-6 h-6 rounded-full bg-rose-500"></button>
-        <button data-color="#10b981" class="color-btn w-6 h-6 rounded-full bg-emerald-500"></button>
-        <button data-color="#fbbf24" class="color-btn w-6 h-6 rounded-full bg-amber-400"></button>
-        <button data-color="#ffffff" class="color-btn w-6 h-6 rounded-full bg-white"></button>
-      </div>
+            <!-- SEÇÃO 3: DISCIPLINAS & CONTEÚDOS -->
+            <section id="viewDisciplines" class="view-section hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Disciplinas e Assuntos</h2>
+                        <p class="text-sm text-slate-400">Cadastre a estrutura do seu edital e importe lotes de questões.</p>
+                    </div>
+                    <button id="btnNewDiscipline" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Nova Disciplina
+                    </button>
+                </div>
 
-      <div class="h-6 w-px bg-slate-700"></div>
+                <div id="disciplinesList" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
 
-      <input type="range" id="brush-size" min="2" max="20" value="4" class="w-20 accent-brand-500">
+            <!-- SEÇÃO 4: EDITAL VERTICALIZADO & CHECK-IN -->
+            <section id="viewEdital" class="view-section hidden space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Edital Verticalizado</h2>
+                    <p class="text-sm text-slate-400">Marque o progresso de estudo de cada assunto do seu edital.</p>
+                </div>
+                <div id="editalCheckinList" class="space-y-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
 
-      <div class="h-6 w-px bg-slate-700"></div>
+            <!-- SEÇÃO 5: CRONOGRAMA / REVISÕES -->
+            <section id="viewSchedule" class="view-section hidden space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Cronograma & Revisões Espaçadas</h2>
+                    <p class="text-sm text-slate-400">Sugerido com base nos assuntos estudados e resoluções.</p>
+                </div>
+                <div id="scheduleList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
 
-      <button id="btn-eraser" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition text-xs flex items-center gap-1">
-        <i class="fa-solid fa-eraser"></i> Borracha
-      </button>
+            <!-- SEÇÃO 6: FILTRO AVANÇADO DE QUESTÕES -->
+            <section id="viewFilterQuestions" class="view-section hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i data-lucide="filter" class="w-5 h-5 text-rose-400"></i> Filtro Avançado de Questões
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Disciplina</label>
+                            <select id="filterDiscipline" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200">
+                                <option value="ALL">Todas as Disciplinas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Assunto</label>
+                            <select id="filterTopic" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200">
+                                <option value="ALL">Todos os Assuntos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Status</label>
+                            <select id="filterStatus" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200">
+                                <option value="ALL">Todas</option>
+                                <option value="CORRECT">Acertadas</option>
+                                <option value="INCORRECT">Erradas</option>
+                                <option value="UNANSWERED">Não Respondidas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="btnApplyFilter" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        Filtrar e Resolver
+                    </button>
+                </div>
+            </section>
 
-      <button id="btn-clear-canvas" class="p-2 text-rose-400 hover:text-rose-300 rounded-lg hover:bg-slate-800 transition text-xs flex items-center gap-1">
-        <i class="fa-solid fa-trash"></i> Limpar
-      </button>
+            <!-- MÓDULO DE RESOLUÇÃO DE QUESTÕES (MODAL / OVERLAY INTEGRADO) -->
+            <section id="viewQuestionRunner" class="view-section hidden space-y-6">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                    <div>
+                        <span id="runnerBatchTitle" class="text-xs text-brand-400 font-semibold uppercase tracking-wider">Lote Geral</span>
+                        <h2 id="runnerTopicTitle" class="text-lg font-bold text-white">Nome do Assunto</h2>
+                    </div>
+                    <button id="btnCloseRunner" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800">
+                        <i data-lucide="x" class="w-5 h-5"></i> Sair da Bateria
+                    </button>
+                </div>
 
-      <button id="btn-close-canvas" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition text-xs flex items-center gap-1 ml-2">
-        <i class="fa-solid fa-xmark"></i> Fechar
-      </button>
+                <!-- CARD DA QUESTÃO -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+                    <div class="flex justify-between items-center text-xs text-slate-400 border-b border-slate-800/80 pb-3">
+                        <span id="questionProgress">Questão 1 de 10</span>
+                        <div class="flex gap-4">
+                            <span class="text-emerald-400 font-medium">Acertos: <span id="runnerCorrectCount">0</span></span>
+                            <span class="text-red-400 font-medium">Erros: <span id="runnerIncorrectCount">0</span></span>
+                        </div>
+                    </div>
+
+                    <div id="questionStatement" class="text-slate-200 leading-relaxed text-base font-medium">
+                        <!-- Enunciado -->
+                    </div>
+
+                    <!-- ALTERNATIVAS -->
+                    <div id="questionOptions" class="space-y-3">
+                        <!-- Opções dinâmicas -->
+                    </div>
+
+                    <!-- GABARITO COMENTADO (OCULTO INICIALMENTE) -->
+                    <div id="questionFeedback" class="hidden p-4 rounded-xl border space-y-2">
+                        <p id="feedbackText" class="font-bold text-sm"></p>
+                        <p id="feedbackComment" class="text-sm text-slate-300 leading-relaxed"></p>
+                    </div>
+
+                    <!-- BOTÕES DE NAVEGAÇÃO / AÇÃO -->
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-800">
+                        <button id="btnPrevQuestion" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition" disabled>
+                            Anterior
+                        </button>
+                        <div class="flex gap-2">
+                            <button id="btnConfirmAnswer" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition">
+                                Confirmar Resposta
+                            </button>
+                            <button id="btnNextQuestion" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition">
+                                Próxima
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
-  </div>
 
-  <!-- MODAIS -->
+    <!-- MODAIS DE SUPORTE -->
 
-  <!-- Modal Cadastrar/Editar Disciplina -->
-  <div id="modal-disciplina" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-      <h3 id="modal-disc-titulo" class="text-lg font-bold text-white">Nova Disciplina</h3>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nome da Disciplina</label>
-        <input type="text" id="input-disc-nome" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="Ex: Direito Constitucional">
-      </div>
-      <div class="flex justify-end gap-3 pt-2">
-        <button id="btn-cancelar-disc" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium">Cancelar</button>
-        <button id="btn-salvar-disc" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Cadastrar/Editar Assunto -->
-  <div id="modal-assunto" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
-      <h3 id="modal-assunto-titulo" class="text-lg font-bold text-white">Novo Assunto</h3>
-      <input type="hidden" id="input-assunto-disc-id">
-      <input type="hidden" id="input-assunto-id">
-      
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nome do Assunto/Tópico</label>
-        <input type="text" id="input-assunto-nome" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="Ex: Direitos Fundamentais">
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Prioridade</label>
-          <input type="text" id="input-assunto-prioridade" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="P1, P2 ou 1, 2">
+    <!-- MODAL: NOVA DISCIPLINA -->
+    <div id="modalDiscipline" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white">Nova Disciplina</h3>
+            <input type="text" id="inputDisciplineName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500" placeholder="Ex: Direito Constitucional">
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="btnCloseModalDiscipline" class="px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800">Cancelar</button>
+                <button id="btnSaveDiscipline" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium">Salvar</button>
+            </div>
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Status</label>
-          <select id="select-assunto-status" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
-            <option value="Nao Iniciado">Não Iniciado</option>
-            <option value="Estudado">Estudado</option>
-            <option value="Em Revisao">Em Revisão</option>
-            <option value="Concluido">Concluído</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Link Resumo Google Docs (URL)</label>
-        <input type="url" id="input-assunto-docs" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="https://docs.google.com/document/d/...">
-      </div>
-
-      <div class="flex justify-end gap-3 pt-2">
-        <button id="btn-cancelar-assunto" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium">Cancelar</button>
-        <button id="btn-salvar-assunto" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium">Salvar</button>
-      </div>
     </div>
-  </div>
 
-  <!-- FIREBASE SDK V10 ES MODULES -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signInWithPopup, 
-      GoogleAuthProvider, 
-      signOut 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      updateDoc, 
-      collection, 
-      getDocs, 
-      addDoc, 
-      deleteDoc 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // Configuração do Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
-      authDomain: "qgestudo.firebaseapp.com",
-      projectId: "qgestudo",
-      storageBucket: "qgestudo.firebasestorage.app",
-      messagingSenderId: "939034677008",
-      appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
-      measurementId: "G-PC8ESJHFZ5"
-    };
-
-    // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Estado da Aplicação
-    let currentUser = null;
-    let AppState = {
-      disciplinas: [],
-      lotes: [],
-      questoes: [],
-      historicoQuestoes: [],
-      revisoes: [],
-      sessaoQuestaoAtual: {
-        listaQuestoes: [],
-        indexAtual: 0,
-        respostasSessao: {},
-        loteId: null,
-        assuntoId: null,
-        acertos: 0,
-        erros: 0
-      }
-    };
-
-    // Timer Variables
-    let timerInterval = null;
-    let timerSeconds = 0;
-    let timerRunning = false;
-
-    // DOM Elements
-    const loadingScreen = document.getElementById('loading-screen');
-    const authScreen = document.getElementById('auth-screen');
-    const appScreen = document.getElementById('app-screen');
-
-    // Inicializar Monitor de Sessão Auth
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('user-name').innerText = user.displayName || user.email.split('@')[0];
-        document.getElementById('user-email').innerText = user.email;
-        document.getElementById('user-avatar').innerText = (user.displayName || user.email)[0].toUpperCase();
-
-        await carregarDadosUsuario();
-        
-        loadingScreen.classList.add('opacity-0');
-        setTimeout(() => {
-          loadingScreen.classList.add('hidden');
-          authScreen.classList.add('hidden');
-          appScreen.classList.remove('hidden');
-        }, 300);
-      } else {
-        currentUser = null;
-        loadingScreen.classList.add('hidden');
-        appScreen.classList.add('hidden');
-        authScreen.classList.remove('hidden');
-      }
-    });
-
-    // --- AUTENTICAÇÃO ---
-    document.getElementById('auth-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-password').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (err) {
-        alert("Erro no login: " + err.message);
-      }
-    });
-
-    document.getElementById('btn-register').addEventListener('click', async () => {
-      const email = document.getElementById('auth-email').value;
-      const pass = document.getElementById('auth-password').value;
-      if (!email || !pass) return alert("Preencha e-mail e senha para cadastrar.");
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-      } catch (err) {
-        alert("Erro no cadastro: " + err.message);
-      }
-    });
-
-    document.getElementById('btn-google').addEventListener('click', async () => {
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        alert("Erro no login Google: " + err.message);
-      }
-    });
-
-    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
-
-    // --- NAVEGAÇÃO ENTRE ABAS ---
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        
-        document.querySelectorAll('.nav-btn').forEach(b => {
-          b.classList.remove('active', 'text-brand-500', 'bg-brand-500/10');
-          b.classList.add('text-slate-400');
-        });
-        btn.classList.add('active', 'text-brand-500', 'bg-brand-500/10');
-
-        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
-        document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
-
-        if (targetTab === 'dashboard') atualizarDashboard();
-        if (targetTab === 'edital') renderizarEdital();
-        if (targetTab === 'revisoes') renderizarRevisoes();
-      });
-    });
-
-    // --- CARREGAR DADOS DO FIRESTORE ---
-    async function carregarDadosUsuario() {
-      if (!currentUser) return;
-      const uid = currentUser.uid;
-
-      try {
-        // Carregar Disciplinas
-        const discSnap = await getDocs(collection(db, `users/${uid}/disciplinas`));
-        AppState.disciplinas = discSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        // Carregar Lotes e Questões
-        const lotesSnap = await getDocs(collection(db, `users/${uid}/lotes`));
-        AppState.lotes = lotesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const qSnap = await getDocs(collection(db, `users/${uid}/questoes`));
-        AppState.questoes = qSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        // Carregar Histórico
-        const histSnap = await getDocs(collection(db, `users/${uid}/historico`));
-        AppState.historicoQuestoes = histSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        // Carregar Revisões
-        const revSnap = await getDocs(collection(db, `users/${uid}/revisoes`));
-        AppState.revisoes = revSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        atualizarDashboard();
-        populasSelectsFiltro();
-        atualizarBadgeRevisoes();
-      } catch (e) {
-        console.error("Erro ao carregar dados:", e);
-      }
-    }
-
-    // --- DASHBOARD E MÉTRICAS ---
-    function atualizarDashboard() {
-      const hojeStr = new Date().toISOString().split('T')[0];
-
-      // Filtrar histórico de hoje
-      const historicoHoje = AppState.historicoQuestoes.filter(h => h.data === hojeStr);
-      const hojeTotal = historicoHoje.length;
-      const hojeAcertos = historicoHoje.filter(h => h.correto).length;
-      const hojeErros = hojeTotal - hojeAcertos;
-      const hojeTaxa = hojeTotal > 0 ? Math.round((hojeAcertos / hojeTotal) * 100) : 0;
-
-      document.getElementById('dash-hoje-total').innerText = hojeTotal;
-      document.getElementById('dash-hoje-acertos').innerText = hojeAcertos;
-      document.getElementById('dash-hoje-erros').innerText = hojeErros;
-      document.getElementById('dash-hoje-taxa').innerText = `${hojeTaxa}%`;
-
-      // Métricas Gerais
-      const geralTotal = AppState.historicoQuestoes.length;
-      const geralAcertos = AppState.historicoQuestoes.filter(h => h.correto).length;
-      const geralErros = geralTotal - geralAcertos;
-      const geralTaxa = geralTotal > 0 ? Math.round((geralAcertos / geralTotal) * 100) : 0;
-
-      document.getElementById('dash-geral-total').innerText = `${geralTotal} questões`;
-      document.getElementById('dash-geral-acertos').innerText = geralAcertos;
-      document.getElementById('dash-geral-erros').innerText = geralErros;
-      document.getElementById('dash-geral-taxa').innerText = `${geralTaxa}%`;
-
-      // Progresso das Disciplinas
-      const containerDisc = document.getElementById('dash-disciplinas-progress');
-      containerDisc.innerHTML = '';
-
-      if (AppState.disciplinas.length === 0) {
-        containerDisc.innerHTML = '<p class="text-slate-500 text-sm italic col-span-2">Nenhuma disciplina cadastrada ainda.</p>';
-        return;
-      }
-
-      AppState.disciplinas.forEach(d => {
-        const assuntos = d.assuntos || [];
-        const concluidos = assuntos.filter(a => a.status === 'Concluido').length;
-        const totalAssuntos = assuntos.length;
-        const perc = totalAssuntos > 0 ? Math.round((concluidos / totalAssuntos) * 100) : 0;
-
-        containerDisc.innerHTML += `
-          <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4 space-y-2">
-            <div class="flex justify-between items-center text-sm">
-              <span class="font-medium text-white">${d.nome}</span>
-              <span class="text-xs font-bold text-brand-400">${perc}%</span>
-            </div>
-            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
-              <div class="bg-brand-500 h-2 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-slate-500">
-              <span>${concluidos} de ${totalAssuntos} concluídos</span>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    // --- EDITAL VERTICALIZADO CRUD ---
-    function renderizarEdital() {
-      const container = document.getElementById('edital-container');
-      container.innerHTML = '';
-
-      if (AppState.disciplinas.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-slate-500">Nenhuma disciplina cadastrada. Clique em "Nova Disciplina" para começar.</div>';
-        return;
-      }
-
-      AppState.disciplinas.forEach(d => {
-        const assuntos = d.assuntos || [];
-        const concluidos = assuntos.filter(a => a.status === 'Concluido').length;
-        const perc = assuntos.length > 0 ? Math.round((concluidos / assuntos.length) * 100) : 0;
-
-        let assuntosHTML = '';
-        assuntos.forEach((a, index) => {
-          let statusColor = "text-slate-400 bg-slate-800";
-          if (a.status === 'Concluido') statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-          if (a.status === 'Em Revisao') statusColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
-          if (a.status === 'Estudado') statusColor = "text-blue-400 bg-blue-500/10 border-blue-500/20";
-
-          assuntosHTML += `
-            <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-800/80 hover:border-slate-700 transition">
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <span class="text-xs font-bold text-slate-400 bg-slate-800 px-2 py-1 rounded">${a.prioridade || 'P3'}</span>
-                <span class="text-sm font-medium text-slate-200 truncate">${a.nome}</span>
-              </div>
-
-              <div class="flex items-center gap-2">
-                ${a.docsUrl ? `
-                  <a href="${a.docsUrl}" target="_blank" class="p-1.5 text-blue-400 hover:text-blue-300 rounded-lg hover:bg-slate-800 text-xs" title="Abrir Resumo no Google Docs">
-                    <i class="fa-solid fa-file-lines"></i>
-                  </a>
-                ` : ''}
-
-                <span class="text-xs px-2.5 py-1 rounded-lg border font-medium ${statusColor}">${a.status || 'Não Iniciado'}</span>
-
-                <button onclick="window.editarAssunto('${d.id}', ${index})" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-xs">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <button onclick="window.excluirAssunto('${d.id}', ${index})" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 text-xs">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML += `
-          <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
-              <div>
-                <h3 class="text-lg font-bold text-white">${d.nome}</h3>
-                <p class="text-xs text-slate-400">${concluidos} de ${assuntos.length} tópicos concluídos (${perc}%)</p>
-              </div>
-              <div class="flex items-center gap-2">
-                <button onclick="window.modalNovoAssunto('${d.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Add Assunto
-                </button>
-                <button onclick="window.excluirDisciplina('${d.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg text-xs">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              ${assuntosHTML || '<p class="text-xs text-slate-500 italic">Nenhum assunto cadastrado nesta disciplina.</p>'}
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    // Modal Disciplina
-    document.getElementById('btn-add-disciplina').addEventListener('click', () => {
-      document.getElementById('input-disc-nome').value = '';
-      document.getElementById('modal-disciplina').classList.remove('hidden');
-    });
-    document.getElementById('btn-cancelar-disc').addEventListener('click', () => {
-      document.getElementById('modal-disciplina').classList.add('hidden');
-    });
-
-    document.getElementById('btn-salvar-disc').addEventListener('click', async () => {
-      const nome = document.getElementById('input-disc-nome').value;
-      if (!nome) return alert("Digite o nome da disciplina");
-
-      const uid = currentUser.uid;
-      const newDoc = { nome, assuntos: [] };
-      const docRef = await addDoc(collection(db, `users/${uid}/disciplinas`), newDoc);
-      AppState.disciplinas.push({ id: docRef.id, ...newDoc });
-
-      document.getElementById('modal-disciplina').classList.add('hidden');
-      renderizarEdital();
-      atualizarDashboard();
-      populasSelectsFiltro();
-    });
-
-    window.excluirDisciplina = async (id) => {
-      if (!confirm("Deseja realmente excluir esta disciplina?")) return;
-      const uid = currentUser.uid;
-      await deleteDoc(doc(db, `users/${uid}/disciplinas`, id));
-      AppState.disciplinas = AppState.disciplinas.filter(d => d.id !== id);
-      renderizarEdital();
-      atualizarDashboard();
-      populasSelectsFiltro();
-    };
-
-    // Modal Assunto
-    window.modalNovoAssunto = (discId) => {
-      document.getElementById('input-assunto-disc-id').value = discId;
-      document.getElementById('input-assunto-id').value = '';
-      document.getElementById('input-assunto-nome').value = '';
-      document.getElementById('input-assunto-prioridade').value = 'P1';
-      document.getElementById('select-assunto-status').value = 'Nao Iniciado';
-      document.getElementById('input-assunto-docs').value = '';
-      document.getElementById('modal-assunto').classList.remove('hidden');
-    };
-
-    window.editarAssunto = (discId, index) => {
-      const disc = AppState.disciplinas.find(d => d.id === discId);
-      const ass = disc.assuntos[index];
-
-      document.getElementById('input-assunto-disc-id').value = discId;
-      document.getElementById('input-assunto-id').value = index;
-      document.getElementById('input-assunto-nome').value = ass.nome;
-      document.getElementById('input-assunto-prioridade').value = ass.prioridade || 'P1';
-      document.getElementById('select-assunto-status').value = ass.status || 'Nao Iniciado';
-      document.getElementById('input-assunto-docs').value = ass.docsUrl || '';
-      document.getElementById('modal-assunto').classList.remove('hidden');
-    };
-
-    document.getElementById('btn-cancelar-assunto').addEventListener('click', () => {
-      document.getElementById('modal-assunto').classList.add('hidden');
-    });
-
-    document.getElementById('btn-salvar-assunto').addEventListener('click', async () => {
-      const discId = document.getElementById('input-assunto-disc-id').value;
-      const assIndex = document.getElementById('input-assunto-id').value;
-      const nome = document.getElementById('input-assunto-nome').value;
-      const prioridade = document.getElementById('input-assunto-prioridade').value;
-      const status = document.getElementById('select-assunto-status').value;
-      const docsUrl = document.getElementById('input-assunto-docs').value;
-
-      if (!nome) return alert("Digite o nome do assunto");
-
-      const disc = AppState.disciplinas.find(d => d.id === discId);
-      if (!disc.assuntos) disc.assuntos = [];
-
-      const novoAssunto = { id: Date.now().toString(), nome, prioridade, status, docsUrl };
-
-      if (assIndex === '') {
-        disc.assuntos.push(novoAssunto);
-        // Gerar SRS se status for Concluído
-        if (status === 'Concluido') agendarSRS(disc.nome, nome);
-      } else {
-        const oldStatus = disc.assuntos[assIndex].status;
-        disc.assuntos[assIndex] = { ...disc.assuntos[assIndex], nome, prioridade, status, docsUrl };
-        if (oldStatus !== 'Concluido' && status === 'Concluido') agendarSRS(disc.nome, nome);
-      }
-
-      const uid = currentUser.uid;
-      await updateDoc(doc(db, `users/${uid}/disciplinas`, discId), { assuntos: disc.assuntos });
-
-      document.getElementById('modal-assunto').classList.add('hidden');
-      renderizarEdital();
-      atualizarDashboard();
-      populasSelectsFiltro();
-    });
-
-    window.excluirAssunto = async (discId, index) => {
-      if (!confirm("Excluir este assunto?")) return;
-      const disc = AppState.disciplinas.find(d => d.id === discId);
-      disc.assuntos.splice(index, 1);
-
-      const uid = currentUser.uid;
-      await updateDoc(doc(db, `users/${uid}/disciplinas`, discId), { assuntos: disc.assuntos });
-      renderizarEdital();
-      atualizarDashboard();
-      populasSelectsFiltro();
-    };
-
-    // --- IMPORTADOR JSON DE QUESTÕES ---
-    document.getElementById('btn-processar-json').addEventListener('click', async () => {
-      const jsonText = document.getElementById('json-input').value;
-      try {
-        const data = JSON.parse(jsonText);
-        if (!data.disciplina || !data.tema || !Array.isArray(data.questoes)) {
-          return alert("Formato JSON inválido. Certifique-se de incluir 'disciplina', 'tema' e o array 'questoes'.");
-        }
-
-        const uid = currentUser.uid;
-
-        // 1. Garantir Disciplina e Assunto no Firestore
-        let disc = AppState.disciplinas.find(d => d.nome.toLowerCase() === data.disciplina.toLowerCase());
-        if (!disc) {
-          const newD = { nome: data.disciplina, assuntos: [{ id: Date.now().toString(), nome: data.tema, status: 'Nao Iniciado' }] };
-          const docRef = await addDoc(collection(db, `users/${uid}/disciplinas`), newD);
-          disc = { id: docRef.id, ...newD };
-          AppState.disciplinas.push(disc);
-        } else {
-          if (!disc.assuntos) disc.assuntos = [];
-          if (!disc.assuntos.find(a => a.nome.toLowerCase() === data.tema.toLowerCase())) {
-            disc.assuntos.push({ id: Date.now().toString(), nome: data.tema, status: 'Nao Iniciado' });
-            await updateDoc(doc(db, `users/${uid}/disciplinas`, disc.id), { assuntos: disc.assuntos });
-          }
-        }
-
-        // 2. Criar Lote
-        const loteDoc = {
-          disciplina: data.disciplina,
-          tema: data.tema,
-          dataCriacao: new Date().toISOString(),
-          posicaoAtual: 0
-        };
-        const loteRef = await addDoc(collection(db, `users/${uid}/lotes`), loteDoc);
-
-        // 3. Cadastrar Questões
-        for (const q of data.questoes) {
-          const qDoc = {
-            loteId: loteRef.id,
-            disciplina: data.disciplina,
-            tema: data.tema,
-            enunciado: q.enunciado,
-            alternativas: q.alternativas,
-            resposta_correta: q.resposta_correta,
-            comentario: q.comentario || ''
-          };
-          const qRef = await addDoc(collection(db, `users/${uid}/questoes`), qDoc);
-          AppState.questoes.push({ id: qRef.id, ...qDoc });
-        }
-
-        alert("Questões importadas com sucesso!");
-        document.getElementById('json-input').value = '';
-        populasSelectsFiltro();
-        await carregarDadosUsuario();
-      } catch (err) {
-        alert("Erro ao processar JSON: " + err.message);
-      }
-    });
-
-    // --- FILTROS E INÍCIO DA RESOLUÇÃO ---
-    function populasSelectsFiltro() {
-      const selectDisc = document.getElementById('filtro-disciplina');
-      selectDisc.innerHTML = '<option value="">Todas as Disciplinas</option>';
-
-      AppState.disciplinas.forEach(d => {
-        selectDisc.innerHTML += `<option value="${d.nome}">${d.nome}</option>`;
-      });
-    }
-
-    document.getElementById('filtro-disciplina').addEventListener('change', (e) => {
-      const discNome = e.target.value;
-      const selectAssunto = document.getElementById('filtro-assunto');
-      selectAssunto.innerHTML = '<option value="">Todos os Assuntos</option>';
-
-      const disc = AppState.disciplinas.find(d => d.nome === discNome);
-      if (disc && disc.assuntos) {
-        disc.assuntos.forEach(a => {
-          selectAssunto.innerHTML += `<option value="${a.nome}">${a.nome}</option>`;
-        });
-      }
-    });
-
-    document.getElementById('filtro-modo').addEventListener('change', (e) => {
-      const container = document.getElementById('container-lotes-especificos');
-      if (e.target.value === 'individual') {
-        container.classList.remove('hidden');
-        carregarSelectLotes();
-      } else {
-        container.classList.add('hidden');
-      }
-    });
-
-    function carregarSelectLotes() {
-      const selectLote = document.getElementById('select-lote-especifico');
-      selectLote.innerHTML = '';
-      AppState.lotes.forEach(l => {
-        selectLote.innerHTML += `<option value="${l.id}">${l.disciplina} - ${l.tema} (${new Date(l.dataCriacao).toLocaleDateString()})</option>`;
-      });
-    }
-
-    document.getElementById('btn-iniciar-zero').addEventListener('click', () => iniciarSessao(false));
-    document.getElementById('btn-continuar-parei').addEventListener('click', () => iniciarSessao(true));
-
-    function iniciarSessao(continuar = false) {
-      const modo = document.getElementById('filtro-modo').value;
-      const discFilter = document.getElementById('filtro-disciplina').value;
-      const assuntoFilter = document.getElementById('filtro-assunto').value;
-
-      let lista = [];
-
-      if (modo === 'individual') {
-        const loteId = document.getElementById('select-lote-especifico').value;
-        lista = AppState.questoes.filter(q => q.loteId === loteId);
-      } else {
-        lista = AppState.questoes.filter(q => {
-          const matchDisc = !discFilter || q.disciplina === discFilter;
-          const matchAssunto = !assuntoFilter || q.tema === assuntoFilter;
-          return matchDisc && matchAssunto;
-        });
-      }
-
-      if (lista.length === 0) return alert("Nenhuma questão encontrada com os filtros selecionados.");
-
-      AppState.sessaoQuestaoAtual = {
-        listaQuestoes: lista,
-        indexAtual: continuar ? Math.min(0, lista.length - 1) : 0,
-        respostasSessao: {},
-        acertos: 0,
-        erros: 0
-      };
-
-      document.getElementById('area-resolucao').classList.remove('hidden');
-      iniciarTimer();
-      renderizarQuestaoAtual();
-    }
-
-    // --- RENDERIZAR E RESPONDER QUESTÃO ---
-    function renderizarQuestaoAtual() {
-      const sessao = AppState.sessaoQuestaoAtual;
-      const q = sessao.listaQuestoes[sessao.indexAtual];
-
-      document.getElementById('questao-progresso').innerText = `Questão ${sessao.indexAtual + 1}/${sessao.listaQuestoes.length}`;
-      document.getElementById('q-disciplina-tag').innerText = q.disciplina;
-      document.getElementById('q-assunto-tag').innerText = q.tema;
-      document.getElementById('q-enunciado').innerText = q.enunciado;
-
-      // Renderizar Alternativas
-      const containerAlt = document.getElementById('q-alternativas');
-      containerAlt.innerHTML = '';
-
-      Object.entries(q.alternativas).forEach(([letra, texto]) => {
-        containerAlt.innerHTML += `
-          <label class="flex items-start gap-3 p-4 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition">
-            <input type="radio" name="alternativa" value="${letra}" class="mt-1 accent-brand-500">
-            <span class="text-sm text-slate-200"><strong>${letra})</strong> ${texto}</span>
-          </label>
-        `;
-      });
-
-      // Resetar Comentário
-      document.getElementById('q-comentario-box').classList.add('hidden');
-      document.getElementById('btn-q-confirmar').disabled = false;
-
-      // Botões de Navegação
-      document.getElementById('btn-q-anterior').disabled = sessao.indexAtual === 0;
-      document.getElementById('btn-q-proxima').disabled = sessao.indexAtual === sessao.listaQuestoes.length - 1;
-    }
-
-    document.getElementById('btn-q-anterior').addEventListener('click', () => {
-      if (AppState.sessaoQuestaoAtual.indexAtual > 0) {
-        AppState.sessaoQuestaoAtual.indexAtual--;
-        renderizarQuestaoAtual();
-      }
-    });
-
-    document.getElementById('btn-q-proxima').addEventListener('click', () => {
-      if (AppState.sessaoQuestaoAtual.indexAtual < AppState.sessaoQuestaoAtual.listaQuestoes.length - 1) {
-        AppState.sessaoQuestaoAtual.indexAtual++;
-        renderizarQuestaoAtual();
-      }
-    });
-
-    document.getElementById('btn-q-confirmar').addEventListener('click', async () => {
-      const selecionada = document.querySelector('input[name="alternativa"]:checked');
-      if (!selecionada) return alert("Selecione uma alternativa!");
-
-      const sessao = AppState.sessaoQuestaoAtual;
-      const q = sessao.listaQuestoes[sessao.indexAtual];
-      const respostaCorreta = q.resposta_correta.toUpperCase();
-      const acertou = selecionada.value.toUpperCase() === respostaCorreta;
-
-      // Atualizar contadores da sessão
-      if (acertou) sessao.acertos++; else sessao.erros++;
-      const totalRespondidas = sessao.acertos + sessao.erros;
-      const taxaSessao = Math.round((sessao.acertos / totalRespondidas) * 100);
-
-      document.getElementById('sessao-acertos').innerText = sessao.acertos;
-      document.getElementById('sessao-erros').innerText = sessao.erros;
-      document.getElementById('sessao-taxa').innerText = `${taxaSessao}%`;
-
-      // Exibir Comentário
-      const box = document.getElementById('q-comentario-box');
-      const badge = document.getElementById('q-status-badge');
-      const textoComentario = document.getElementById('q-comentario-texto');
-
-      box.classList.remove('hidden');
-      if (acertou) {
-        badge.className = "px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-500/20 text-emerald-400";
-        badge.innerText = "Você Acertou!";
-      } else {
-        badge.className = "px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-500/20 text-rose-400";
-        badge.innerText = `Você Errou! Gabarito: ${respostaCorreta}`;
-      }
-      textoComentario.innerText = q.comentario || "Nenhum comentário cadastrado para esta questão.";
-
-      document.getElementById('btn-q-confirmar').disabled = true;
-
-      // Salvar no Histórico Firestore
-      const uid = currentUser.uid;
-      const histItem = {
-        questaoId: q.id,
-        disciplina: q.disciplina,
-        tema: q.tema,
-        resposta: selecionada.value,
-        correto: acertou,
-        data: new Date().toISOString().split('T')[0]
-      };
-      await addDoc(collection(db, `users/${uid}/historico`), histItem);
-      AppState.historicoQuestoes.push(histItem);
-      atualizarDashboard();
-    });
-
-    // --- TIMER / CRONÔMETRO ---
-    function iniciarTimer() {
-      clearInterval(timerInterval);
-      timerSeconds = 0;
-      timerRunning = true;
-      timerInterval = setInterval(() => {
-        if (timerRunning) {
-          timerSeconds++;
-          const min = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-          const sec = String(timerSeconds % 60).padStart(2, '0');
-          document.getElementById('timer-display').innerText = `${min}:${sec}`;
-        }
-      }, 1000);
-    }
-
-    document.getElementById('btn-timer-toggle').addEventListener('click', () => {
-      timerRunning = !timerRunning;
-      const icon = document.getElementById('btn-timer-toggle').querySelector('i');
-      icon.className = timerRunning ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-    });
-
-    // --- SISTEMA SRS (REVISÕES ESPAÇADAS) ---
-    async function agendarSRS(disciplina, tema) {
-      const uid = currentUser.uid;
-      const intervalos = [1, 3, 7, 15, 30];
-      const hoje = new Date();
-
-      for (const d of intervalos) {
-        const dataRev = new Date(hoje);
-        dataRev.setDate(dataRev.getDate() + d);
-        const dataStr = dataRev.toISOString().split('T')[0];
-
-        const revDoc = { disciplina, tema, dataAgendada: dataStr, concluida: false };
-        const ref = await addDoc(collection(db, `users/${uid}/revisoes`), revDoc);
-        AppState.revisoes.push({ id: ref.id, ...revDoc });
-      }
-      atualizarBadgeRevisoes();
-    }
-
-    function renderizarRevisoes() {
-      const hojeStr = new Date().toISOString().split('T')[0];
-      const pendentesHoje = AppState.revisoes.filter(r => r.dataAgendada === hojeStr && !r.concluida);
-
-      document.getElementById('revisoes-hoje-count').innerText = `${pendentesHoje.length} pendentes`;
-
-      const container = document.getElementById('lista-revisoes-hoje');
-      container.innerHTML = '';
-
-      if (pendentesHoje.length === 0) {
-        container.innerHTML = '<p class="text-slate-500 text-sm italic">Nenhuma revisão pendente para o dia de hoje!</p>';
-        return;
-      }
-
-      pendentesHoje.forEach(r => {
-        container.innerHTML += `
-          <div class="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-xl">
+    <!-- MODAL: NOVO ASSUNTO -->
+    <div id="modalTopic" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white">Novo Assunto</h3>
+            <input type="hidden" id="inputTopicDisciplineId">
             <div>
-              <p class="text-xs text-brand-400 font-semibold">${r.disciplina}</p>
-              <h4 class="text-sm font-bold text-white">${r.tema}</h4>
+                <label class="text-xs text-slate-400 uppercase font-semibold block mb-1">Nome do Assunto</label>
+                <input type="text" id="inputTopicName" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200" placeholder="Ex: Direitos Fundamentais">
             </div>
-            <button onclick="window.concluirRevisao('${r.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-              Concluir Revisão
-            </button>
-          </div>
-        `;
-      });
-    }
+            <div>
+                <label class="text-xs text-slate-400 uppercase font-semibold block mb-1">Link do Resumo (Google Docs)</label>
+                <input type="url" id="inputTopicDocLink" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200" placeholder="https://docs.google.com/...">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="btnCloseModalTopic" class="px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800">Cancelar</button>
+                <button id="btnSaveTopic" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium">Salvar Assunto</button>
+            </div>
+        </div>
+    </div>
 
-    window.concluirRevisao = async (id) => {
-      const uid = currentUser.uid;
-      await updateDoc(doc(db, `users/${uid}/revisoes`, id), { concluida: true });
-      const r = AppState.revisoes.find(rev => rev.id === id);
-      if (r) r.concluida = true;
-      renderizarRevisoes();
-      atualizarBadgeRevisoes();
-    };
+    <!-- MODAL: IMPORTAR JSON DE QUESTÕES -->
+    <div id="modalImportJson" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-xl w-full p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white">Importar Lote de Questões (JSON)</h3>
+            <input type="hidden" id="importDisciplineId">
+            <input type="hidden" id="importTopicId">
+            <p class="text-xs text-slate-400">Cole abaixo o objeto JSON contendo o lote de questões conforme o padrão do sistema.</p>
+            <textarea id="inputJsonText" rows="10" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-emerald-400 focus:outline-none focus:border-brand-500" placeholder='{ "disciplina": "...", "tema": "...", "questoes": [...] }'></textarea>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="btnCloseModalJson" class="px-4 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-800">Cancelar</button>
+                <button id="btnSaveJsonBatch" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium">Importar Lote</button>
+            </div>
+        </div>
+    </div>
 
-    function atualizarBadgeRevisoes() {
-      const hojeStr = new Date().toISOString().split('T')[0];
-      const count = AppState.revisoes.filter(r => r.dataAgendada === hojeStr && !r.concluida).length;
-      const badge = document.getElementById('badge-revisoes');
-      if (count > 0) {
-        badge.innerText = count;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
-    }
+    <!-- POPUP / MODAL: RELATÓRIO DE ENCERRAMENTO DIÁRIO -->
+    <div id="modalEndDayReport" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5">
+            <div class="flex items-center gap-3 text-emerald-400 border-b border-slate-800 pb-3">
+                <i data-lucide="award" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold text-white">Resumo do Estudo Diário</h3>
+            </div>
+            <div class="space-y-3">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span class="text-sm text-slate-400">Total de Questões Hoje:</span>
+                    <span id="reportTotalToday" class="text-xl font-bold text-white">0</span>
+                </div>
+                <div class="space-y-2">
+                    <h4 class="text-xs font-semibold text-slate-400 uppercase">Detalhamento por Disciplina:</h4>
+                    <div id="reportByDiscipline" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button id="btnCloseReport" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-medium">Fechar e Continuar</button>
+            </div>
+        </div>
+    </div>
 
-    // --- LOUSA / CANVAS OVERLAY ---
-    const canvas = document.getElementById('draw-canvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-    let strokeColor = '#38bdf8';
-    let strokeWidth = 4;
-    let isEraser = false;
+    <!-- FIREBASE SDK V10 ES MODULES SCRIPTS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            onSnapshot, 
+            collection, 
+            addDoc, 
+            updateDoc, 
+            deleteDoc, 
+            query, 
+            where 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+        // Configuração Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
+            authDomain: "qgestudo.firebaseapp.com",
+            projectId: "qgestudo",
+            storageBucket: "qgestudo.firebasestorage.app",
+            messagingSenderId: "939034677008",
+            appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
+            measurementId: "G-PC8ESJHFZ5"
+        };
 
-    document.getElementById('btn-toggle-lousa').addEventListener('click', () => {
-      document.getElementById('canvas-container').classList.remove('hidden');
-    });
+        // Inicialização
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    document.getElementById('btn-close-canvas').addEventListener('click', () => {
-      document.getElementById('canvas-container').classList.add('hidden');
-    });
+        // Estado da Aplicação
+        let currentUser = null;
+        let userData = {
+            disciplines: [],
+            answers: {}, // questionUniqueKey -> { correct: bool, date: string ISO, disciplineId, topicId }
+            studyTimes: {} // disciplineId -> seconds
+        };
+        let timerInterval = null;
+        let timerSeconds = 0;
 
-    document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        isEraser = false;
-        strokeColor = btn.getAttribute('data-color');
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('ring-2', 'ring-white'));
-        btn.classList.add('ring-2', 'ring-white');
-      });
-    });
+        // Estado da Execução de Questões
+        let currentQuestionsBatch = [];
+        let currentQuestionIndex = 0;
+        let currentAnswersState = {};
 
-    document.getElementById('brush-size').addEventListener('input', (e) => {
-      strokeWidth = e.target.value;
-    });
+        // Canvas / Lousa Flutuante State
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let drawingMode = false;
+        let strokeColor = '#38bdf8';
+        let strokeWidth = 3;
 
-    document.getElementById('btn-eraser').addEventListener('click', () => {
-      isEraser = true;
-    });
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-    document.getElementById('btn-clear-canvas').addEventListener('click', () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
+        // Autenticação
+        const authScreen = document.getElementById('authScreen');
+        const appContainer = document.getElementById('appContainer');
+        const authForm = document.getElementById('authForm');
+        const authError = document.getElementById('authError');
 
-    canvas.addEventListener('mousedown', (e) => {
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(e.clientX, e.clientY);
-    });
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            authError.classList.add('hidden');
 
-    canvas.addEventListener('mousemove', (e) => {
-      if (!drawing) return;
-      ctx.lineWidth = strokeWidth;
-      ctx.lineCap = 'round';
-      if (isEraser) {
-        ctx.globalCompositeOperation = 'destination-out';
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = strokeColor;
-      }
-      ctx.lineTo(e.clientX, e.clientY);
-      ctx.stroke();
-    });
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                authError.textContent = "Erro na autenticação: " + err.message;
+                authError.classList.remove('hidden');
+            }
+        });
 
-    canvas.addEventListener('mouseup', () => drawing = false);
-  </script>
+        document.getElementById('btnRegister').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            authError.classList.add('hidden');
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                authError.textContent = "Erro no cadastro: " + err.message;
+                authError.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userEmailDisplay').textContent = user.email;
+                authScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                subscribeUserData();
+            } else {
+                currentUser = null;
+                authScreen.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+            }
+        });
+
+        // Sincronização Firestore
+        function subscribeUserData() {
+            if (!currentUser) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    userData = docSnap.data();
+                    if (!userData.disciplines) userData.disciplines = [];
+                    if (!userData.answers) userData.answers = {};
+                    if (!userData.studyTimes) userData.studyTimes = {};
+                } else {
+                    userData = { disciplines: [], answers: {}, studyTimes: {} };
+                    setDoc(userDocRef, userData);
+                }
+                updateUI();
+            });
+        }
+
+        async function saveUserData() {
+            if (!currentUser) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            await setDoc(userDocRef, userData, { merge: true });
+        }
+
+        // Navegação Lateral & Views
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        document.getElementById('btnOpenSidebar').addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarBackdrop.classList.remove('hidden');
+        });
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+        }
+
+        document.getElementById('btnCloseSidebar').addEventListener('click', closeSidebar);
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'bg-slate-800', 'text-white'));
+                btn.classList.add('active', 'bg-slate-800', 'text-white');
+                
+                const targetView = btn.getAttribute('data-target');
+                document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+                document.getElementById(targetView).classList.remove('hidden');
+                closeSidebar();
+            });
+        });
+
+        // Atualização da UI Global
+        function updateUI() {
+            updateDashboard();
+            renderDisciplines();
+            renderTimerSelect();
+            renderStudyTimes();
+            renderEditalCheckin();
+            renderSchedule();
+            populateFilterOptions();
+            lucide.createIcons();
+        }
+
+        // DASHBOARD COMPUTATIONS
+        function updateDashboard() {
+            const answers = Object.values(userData.answers || {});
+            const total = answers.length;
+            const correct = answers.filter(a => a.correct).length;
+            const incorrect = total - correct;
+            const rate = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+            document.getElementById('dashTotal').textContent = total;
+            document.getElementById('dashCorrect').textContent = correct;
+            document.getElementById('dashIncorrect').textContent = incorrect;
+            document.getElementById('dashRate').textContent = `${rate}%`;
+            document.getElementById('dashBarCorrect').style.width = `${rate}%`;
+            document.getElementById('dashBarIncorrect').style.width = `${100 - rate}%`;
+
+            // Hoje
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayAnswers = answers.filter(a => a.date && a.date.startsWith(todayStr));
+            const todayTotal = todayAnswers.length;
+            const todayCorrect = todayAnswers.filter(a => a.correct).length;
+            const todayIncorrect = todayTotal - todayCorrect;
+            const todayRate = todayTotal > 0 ? Math.round((todayCorrect / todayTotal) * 100) : 0;
+
+            document.getElementById('dashTodayTotal').textContent = todayTotal;
+            document.getElementById('dashTodayCorrect').textContent = todayCorrect;
+            document.getElementById('dashTodayIncorrect').textContent = todayIncorrect;
+            document.getElementById('dashTodayRate').textContent = `${todayRate}%`;
+            document.getElementById('dashTodayBar').style.width = `${todayRate}%`;
+
+            // Edital Progresso Rápido
+            const editalContainer = document.getElementById('dashEditalProgress');
+            if (userData.disciplines.length === 0) {
+                editalContainer.innerHTML = `<p class="text-xs text-slate-500">Nenhuma disciplina cadastrada ainda.</p>`;
+            } else {
+                editalContainer.innerHTML = userData.disciplines.map(d => {
+                    const topics = d.topics || [];
+                    const completed = topics.filter(t => t.completed).length;
+                    const pct = topics.length > 0 ? Math.round((completed / topics.length) * 100) : 0;
+                    return `
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-300">
+                                <span>${d.name}</span>
+                                <span class="font-bold">${pct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                                <div class="bg-brand-500 h-2 transition-all duration-300" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // RELATÓRIO ENCERRAMENTO DIÁRIO
+        document.getElementById('btnEndDay').addEventListener('click', () => {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const answers = Object.values(userData.answers || {});
+            const todayAnswers = answers.filter(a => a.date && a.date.startsWith(todayStr));
+
+            document.getElementById('reportTotalToday').textContent = todayAnswers.length;
+
+            const disciplineStats = {};
+            userData.disciplines.forEach(d => disciplineStats[d.id] = { name: d.name, count: 0, correct: 0 });
+
+            todayAnswers.forEach(a => {
+                if (disciplineStats[a.disciplineId]) {
+                    disciplineStats[a.disciplineId].count++;
+                    if (a.correct) disciplineStats[a.disciplineId].correct++;
+                }
+            });
+
+            const reportContainer = document.getElementById('reportByDiscipline');
+            reportContainer.innerHTML = Object.values(disciplineStats).map(st => `
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 flex justify-between items-center text-xs">
+                    <span class="text-slate-200 font-medium">${st.name}</span>
+                    <span class="text-slate-400">${st.count} questões (${st.correct} acertos)</span>
+                </div>
+            `).join('');
+
+            document.getElementById('modalEndDayReport').classList.remove('hidden');
+        });
+
+        document.getElementById('btnCloseReport').addEventListener('click', () => {
+            document.getElementById('modalEndDayReport').classList.add('hidden');
+        });
+
+        // CRONÔMETRO
+        function renderTimerSelect() {
+            const select = document.getElementById('timerDisciplineSelect');
+            select.innerHTML = userData.disciplines.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+        }
+
+        document.getElementById('btnStartTimer').addEventListener('click', () => {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+                const secs = String(timerSeconds % 60).padStart(2, '0');
+                document.getElementById('timerDisplay').textContent = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+
+            document.getElementById('btnStartTimer').disabled = true;
+            document.getElementById('btnPauseTimer').disabled = false;
+            document.getElementById('btnSaveTimer').disabled = false;
+        });
+
+        document.getElementById('btnPauseTimer').addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('btnStartTimer').disabled = false;
+            document.getElementById('btnPauseTimer').disabled = true;
+        });
+
+        document.getElementById('btnSaveTimer').addEventListener('click', async () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            const disciplineId = document.getElementById('timerDisciplineSelect').value;
+            if (disciplineId && timerSeconds > 0) {
+                userData.studyTimes[disciplineId] = (userData.studyTimes[disciplineId] || 0) + timerSeconds;
+                await saveUserData();
+                timerSeconds = 0;
+                document.getElementById('timerDisplay').textContent = "00:00:00";
+            }
+            document.getElementById('btnStartTimer').disabled = false;
+            document.getElementById('btnPauseTimer').disabled = true;
+            document.getElementById('btnSaveTimer').disabled = true;
+        });
+
+        function renderStudyTimes() {
+            const container = document.getElementById('studyTimeRecords');
+            if (Object.keys(userData.studyTimes).length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 col-span-full">Nenhum registro de estudo salvo ainda.</p>`;
+                return;
+            }
+            container.innerHTML = userData.disciplines.map(d => {
+                const totalSecs = userData.studyTimes[d.id] || 0;
+                const hrs = Math.floor(totalSecs / 3600);
+                const mins = Math.floor((totalSecs % 3600) / 60);
+                return `
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                        <span class="text-xs text-slate-400 font-medium">${d.name}</span>
+                        <p class="text-lg font-bold text-emerald-400">${hrs}h ${mins}min</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // GERENCIAMENTO DE DISCIPLINAS & ASSUNTOS
+        document.getElementById('btnNewDiscipline').addEventListener('click', () => {
+            document.getElementById('modalDiscipline').classList.remove('hidden');
+        });
+
+        document.getElementById('btnCloseModalDiscipline').addEventListener('click', () => {
+            document.getElementById('modalDiscipline').classList.add('hidden');
+        });
+
+        document.getElementById('btnSaveDiscipline').addEventListener('click', async () => {
+            const name = document.getElementById('inputDisciplineName').value.trim();
+            if (name) {
+                userData.disciplines.push({ id: 'disc_' + Date.now(), name, topics: [] });
+                await saveUserData();
+                document.getElementById('inputDisciplineName').value = '';
+                document.getElementById('modalDiscipline').classList.add('hidden');
+            }
+        });
+
+        function renderDisciplines() {
+            const container = document.getElementById('disciplinesList');
+            if (userData.disciplines.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500">Nenhuma disciplina cadastrada. Clique em "Nova Disciplina" para começar.</p>`;
+                return;
+            }
+
+            container.innerHTML = userData.disciplines.map(d => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="font-bold text-slate-100">${d.name}</h3>
+                        <div class="flex gap-2">
+                            <button onclick="openModalTopic('${d.id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-brand-400 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Assunto
+                            </button>
+                            <button onclick="deleteDiscipline('${d.id}')" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 p-1.5 rounded-lg">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        ${(d.topics || []).map(t => `
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                                <div>
+                                    <h4 class="font-semibold text-sm text-slate-200">${t.name}</h4>${t.docLink ? `<a href="${t.docLink}" target="_blank" class="text-xs text-brand-400 hover:underline inline-flex items-center gap-1 mt-1"><i data-lucide="external-link" class="w-3 h-3"></i> Resumo no Docs</a>` : ''}
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="openModalImportJson('${d.id}', '${t.id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg">
+                                        + JSON Questões
+                                    </button>
+                                    <button onclick="startBatchQuestions('${d.id}', '${t.id}')" class="text-xs bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg font-medium">
+                                        Resolver Lote
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.openModalTopic = (disciplineId) => {
+            document.getElementById('inputTopicDisciplineId').value = disciplineId;
+            document.getElementById('modalTopic').classList.remove('hidden');
+        };
+
+        document.getElementById('btnCloseModalTopic').addEventListener('click', () => {
+            document.getElementById('modalTopic').classList.add('hidden');
+        });
+
+        document.getElementById('btnSaveTopic').addEventListener('click', async () => {
+            const discId = document.getElementById('inputTopicDisciplineId').value;
+            const name = document.getElementById('inputTopicName').value.trim();
+            const docLink = document.getElementById('inputTopicDocLink').value.trim();
+
+            if (discId && name) {
+                const disc = userData.disciplines.find(d => d.id === discId);
+                if (disc) {
+                    if (!disc.topics) disc.topics = [];
+                    disc.topics.push({ id: 'top_' + Date.now(), name, docLink, completed: false, batches: [] });
+                    await saveUserData();
+                    document.getElementById('inputTopicName').value = '';
+                    document.getElementById('inputTopicDocLink').value = '';
+                    document.getElementById('modalTopic').classList.add('hidden');
+                }
+            }
+        });
+
+        window.deleteDiscipline = async (discId) => {
+            if (confirm("Tem certeza que deseja excluir esta disciplina?")) {
+                userData.disciplines = userData.disciplines.filter(d => d.id !== discId);
+                await saveUserData();
+            }
+        };
+
+        // IMPORTAR JSON DE QUESTÕES
+        window.openModalImportJson = (discId, topicId) => {
+            document.getElementById('importDisciplineId').value = discId;
+            document.getElementById('importTopicId').value = topicId;
+            document.getElementById('modalImportJson').classList.remove('hidden');
+        };
+
+        document.getElementById('btnCloseModalJson').addEventListener('click', () => {
+            document.getElementById('modalImportJson').classList.add('hidden');
+        });
+
+        document.getElementById('btnSaveJsonBatch').addEventListener('click', async () => {
+            const discId = document.getElementById('importDisciplineId').value;
+            const topicId = document.getElementById('importTopicId').value;
+            const jsonText = document.getElementById('inputJsonText').value.trim();
+
+            try {
+                const parsed = JSON.parse(jsonText);
+                const disc = userData.disciplines.find(d => d.id === discId);
+                const topic = disc ? disc.topics.find(t => t.id === topicId) : null;
+
+                if (topic) {
+                    if (!topic.batches) topic.batches = [];
+                    topic.batches.push({ id: 'batch_' + Date.now(), questions: parsed.questoes || [] });
+                    await saveUserData();
+                    document.getElementById('inputJsonText').value = '';
+                    document.getElementById('modalImportJson').classList.add('hidden');
+                    alert("Lote de questões importado com sucesso!");
+                }
+            } catch (err) {
+                alert("Erro ao validar o JSON. Verifique o formato inserido.");
+            }
+        });
+
+        // RESOLUÇÃO DE QUESTÕES
+        window.startBatchQuestions = (discId, topicId) => {
+            const disc = userData.disciplines.find(d => d.id === discId);
+            const topic = disc ? disc.topics.find(t => t.id === topicId) : null;
+
+            if (!topic || !topic.batches || topic.batches.length === 0) {
+                alert("Nenhum lote de questões cadastrado neste assunto.");
+                return;
+            }
+
+            // Compilar todas as questões do assunto
+            currentQuestionsBatch = [];
+            topic.batches.forEach(b => {
+                (b.questions || []).forEach(q => {
+                    currentQuestionsBatch.push({ ...q, disciplineId: discId, topicId: topicId });
+                });
+            });
+
+            currentQuestionIndex = 0;
+            currentAnswersState = {};
+
+            document.getElementById('runnerTopicTitle').textContent = topic.name;
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById('viewQuestionRunner').classList.remove('hidden');
+
+            renderCurrentQuestion();
+        };
+
+        function renderCurrentQuestion() {
+            if (currentQuestionsBatch.length === 0) return;
+
+            const q = currentQuestionsBatch[currentQuestionIndex];
+            document.getElementById('questionProgress').textContent = `Questão ${currentQuestionIndex + 1} de ${currentQuestionsBatch.length}`;
+            document.getElementById('questionStatement').textContent = q.enunciado;
+
+            const optionsContainer = document.getElementById('questionOptions');
+            const keys = Object.keys(q.alternativas || {});
+
+            optionsContainer.innerHTML = keys.map(key => `
+                <label class="flex items-start gap-3 bg-slate-950 p-3.5 rounded-lg border border-slate-800/80 cursor-pointer hover:border-slate-700 transition">
+                    <input type="radio" name="option" value="${key}" class="mt-1 text-brand-500 focus:ring-0">
+                    <span class="text-sm text-slate-300"><strong class="text-slate-100">${key})</strong> ${q.alternativas[key]}</span>
+                </label>
+            `).join('');
+
+            document.getElementById('questionFeedback').classList.add('hidden');
+            document.getElementById('btnConfirmAnswer').disabled = false;
+
+            document.getElementById('btnPrevQuestion').disabled = currentQuestionIndex === 0;
+            document.getElementById('btnNextQuestion').disabled = currentQuestionIndex === currentQuestionsBatch.length - 1;
+        }
+
+        document.getElementById('btnConfirmAnswer').addEventListener('click', async () => {
+            const selected = document.querySelector('input[name="option"]:checked');
+            if (!selected) {
+                alert("Selecione uma alternativa.");
+                return;
+            }
+
+            const q = currentQuestionsBatch[currentQuestionIndex];
+            const isCorrect = selected.value === q.resposta_correta;
+            const uniqueKey = `${q.disciplineId}_${q.topicId}_${q.id}`;
+
+            userData.answers[uniqueKey] = {
+                correct: isCorrect,
+                date: new Date().toISOString(),
+                disciplineId: q.disciplineId,
+                topicId: q.topicId
+            };
+
+            await saveUserData();
+
+            const feedback = document.getElementById('questionFeedback');
+            const text = document.getElementById('feedbackText');
+            const comment = document.getElementById('feedbackComment');
+
+            feedback.classList.remove('hidden', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400', 'bg-red-500/10', 'border-red-500/30', 'text-red-400');
+
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400');
+                text.textContent = "Resposta Correta! 🎉";
+            } else {
+                feedback.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-400');
+                text.textContent = `Resposta Incorreta. Gabarito: ${q.resposta_correta}`;
+            }
+
+            comment.textContent = q.comentario || "Sem comentário disponível.";
+            document.getElementById('btnConfirmAnswer').disabled = true;
+
+            // Atualizar contadores do runner
+            const answers = Object.values(userData.answers);
+            document.getElementById('runnerCorrectCount').textContent = answers.filter(a => a.correct).length;
+            document.getElementById('runnerIncorrectCount').textContent = answers.filter(a => !a.correct).length;
+        });
+
+        document.getElementById('btnNextQuestion').addEventListener('click', () => {
+            if (currentQuestionIndex < currentQuestionsBatch.length - 1) {
+                currentQuestionIndex++;
+                renderCurrentQuestion();
+            }
+        });
+
+        document.getElementById('btnPrevQuestion').addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderCurrentQuestion();
+            }
+        });
+
+        document.getElementById('btnCloseRunner').addEventListener('click', () => {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById('viewDashboard').classList.remove('hidden');
+        });
+
+        // EDITAL VERTICALIZADO & CHECK-IN
+        function renderEditalCheckin() {
+            const container = document.getElementById('editalCheckinList');
+            if (userData.disciplines.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500">Nenhuma disciplina cadastrada para o edital.</p>`;
+                return;
+            }
+
+            container.innerHTML = userData.disciplines.map(d => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+                    <h3 class="font-bold text-slate-100">${d.name}</h3>
+                    <div class="space-y-2">
+                        ${(d.topics || []).map(t => `
+                            <label class="flex items-center justify-between bg-slate-950 p-3 rounded-lg border border-slate-800 cursor-pointer">
+                                <span class="text-sm text-slate-300 ${t.completed ? 'line-through text-slate-500' : ''}">${t.name}</span>
+                                <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTopicComplete('${d.id}', '${t.id}')" class="rounded bg-slate-900 border-slate-700 text-brand-500 focus:ring-0">
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.toggleTopicComplete = async (discId, topicId) => {
+            const disc = userData.disciplines.find(d => d.id === discId);
+            const topic = disc ? disc.topics.find(t => t.id === topicId) : null;
+            if (topic) {
+                topic.completed = !topic.completed;
+                await saveUserData();
+            }
+        };
+
+        // CRONOGRAMA & REVISÕES
+        function renderSchedule() {
+            const container = document.getElementById('scheduleList');
+            const topicsToReview = [];
+
+            userData.disciplines.forEach(d => {
+                (d.topics || []).forEach(t => {
+                    topicsToReview.push({ discipline: d.name, topic: t.name });
+                });
+            });
+
+            if (topicsToReview.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 col-span-full">Nenhum assunto disponível para revisão.</p>`;
+                return;
+            }
+
+            container.innerHTML = topicsToReview.slice(0, 4).map((item, idx) => `
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <span class="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded font-medium">Revisão R${idx + 1} (Espaçada)</span>
+                    <h4 class="font-semibold text-sm text-slate-200">${item.topic}</h4>
+                    <p class="text-xs text-slate-400">${item.discipline}</p>
+                </div>
+            `).join('');
+        }
+
+        // FILTRO AVANÇADO
+        function populateFilterOptions() {
+            const selectDisc = document.getElementById('filterDiscipline');
+            selectDisc.innerHTML = '<option value="ALL">Todas as Disciplinas</option>' + 
+                userData.disciplines.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+        }
+
+        // LOUSA FLUTUANTE / CANVAS OVERLAY CONTROLS
+        const pencilBtn = document.getElementById('toolPencil');
+        const eraserBtn = document.getElementById('toolEraser');
+        const clearBtn = document.getElementById('toolClear');
+        const togglePointerBtn = document.getElementById('toggleCanvasPointer');
+        const colorInput = document.getElementById('pencilColor');
+
+        togglePointerBtn.addEventListener('click', () => {
+            drawingMode = !drawingMode;
+            if (drawingMode) {
+                canvas.classList.remove('pointer-events-none');
+                togglePointerBtn.classList.add('bg-brand-600', 'text-white');
+            } else {
+                canvas.classList.add('pointer-events-none');
+                togglePointerBtn.classList.remove('bg-brand-600', 'text-white');
+            }
+        });
+
+        pencilBtn.addEventListener('click', () => {
+            strokeColor = colorInput.value;
+            strokeWidth = 3;
+        });
+
+        eraserBtn.addEventListener('click', () => {
+            strokeColor = 'rgba(0,0,0,1)';
+            ctx.globalCompositeOperation = 'destination-out';
+            strokeWidth = 20;
+        });
+
+        colorInput.addEventListener('change', (e) => {
+            strokeColor = e.target.value;
+            ctx.globalCompositeOperation = 'source-over';
+            strokeWidth = 3;
+        });
+
+        clearBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!drawingMode) return;
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!isDrawing || !drawingMode) return;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.lineCap = 'round';
+            ctx.lineTo(e.clientX, e.clientY);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('pointerup', () => isDrawing = false);
+    </script>
 </body>
 </html>
