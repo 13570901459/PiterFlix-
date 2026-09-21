@@ -3,583 +3,525 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QG de Estudos - Cronômetro Tático Concursos</title>
+  <title>Plataforma de Estudos Profissional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    :root {
-      --bg-dark: #0a0c0e;
-      --panel-dark: #12161a;
-      --border-military: #2a323d;
-      --tactical-yellow: #f1c40f;
-      --tactical-yellow-hover: #d4ac0d;
-      --ops-green: #2ecc71;
-      --ops-red: #e74c3c;
-      --text-main: #e0e6ed;
-      --text-muted: #7f8c8d;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Courier New', Courier, monospace, -apple-system, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px 15px;
-    }
-
-    .header-ops {
-      text-align: center;
-      margin-bottom: 25px;
-      border-bottom: 2px solid var(--tactical-yellow);
-      padding-bottom: 10px;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .header-ops h1 {
-      font-size: 1.6rem;
-      letter-spacing: 2px;
-      color: var(--tactical-yellow);
-      text-transform: uppercase;
-    }
-
-    .header-ops p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 5px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .card-ops {
-      background-color: var(--panel-dark);
-      border: 1px solid var(--border-military);
-      border-left: 4px solid var(--tactical-yellow);
-      border-radius: 6px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    }
-
-    .card-title {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .status-badge {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background-color: var(--border-military);
-      color: var(--text-main);
-      font-weight: bold;
-    }
-
-    .status-badge.estudo {
-      background-color: rgba(46, 204, 113, 0.2);
-      color: var(--ops-green);
-      border: 1px solid var(--ops-green);
-    }
-
-    .status-badge.descanso {
-      background-color: rgba(241, 196, 15, 0.2);
-      color: var(--tactical-yellow);
-      border: 1px solid var(--tactical-yellow);
-    }
-
-    /* Display do Cronômetro */
-    .timer-display {
-      font-size: 3.2rem;
-      font-weight: bold;
-      text-align: center;
-      color: var(--tactical-yellow);
-      letter-spacing: 3px;
-      margin: 10px 0;
-      text-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
-    }
-
-    /* Grid de Estatísticas */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    .stat-box {
-      background-color: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-military);
-      padding: 15px;
-      border-radius: 4px;
-      text-align: center;
-    }
-
-    .stat-box h4 {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .stat-box p {
-      font-size: 1.4rem;
-      font-weight: bold;
-    }
-
-    .stat-box.liquido p {
-      color: var(--ops-green);
-    }
-
-    .stat-box.total p {
-      color: var(--tactical-yellow);
-    }
-
-    /* Inputs */
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .input-group label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .input-group input {
-      background-color: var(--bg-dark);
-      border: 1px solid var(--border-military);
-      color: var(--text-main);
-      padding: 10px;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: inherit;
-    }
-
-    .input-group input:focus {
-      outline: none;
-      border-color: var(--tactical-yellow);
-    }
-
-    /* Botões */
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-ops {
-      background-color: var(--tactical-yellow);
-      color: #000;
-      border: none;
-      padding: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background-color 0.2s;
-    }
-
-    .btn-ops:hover {
-      background-color: var(--tactical-yellow-hover);
-    }
-
-    .btn-ops.pause {
-      background-color: var(--ops-red);
-      color: #fff;
-    }
-
-    .btn-ops.pause:hover {
-      background-color: #c0392b;
-    }
-
-    .btn-ops.fullscreen {
-      background-color: transparent;
-      border: 1px solid var(--tactical-yellow);
-      color: var(--tactical-yellow);
-      grid-column: span 2;
-    }
-
-    .btn-ops.fullscreen:hover {
-      background-color: rgba(241, 196, 15, 0.1);
-    }
-
-    .btn-ops.reset {
-      background-color: transparent;
-      border: 1px solid var(--border-military);
-      color: var(--text-muted);
-      grid-column: span 2;
-    }
-
-    .btn-ops.reset:hover {
-      border-color: var(--ops-red);
-      color: var(--ops-red);
-    }
-
-    /* --- ESTILOS PARA MODO TELA CHEIA (FULLSCREEN) --- */
-    .card-ops:fullscreen {
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: var(--bg-dark);
-      padding: 40px;
-    }
-
-    .card-ops:fullscreen .timer-display {
-      font-size: 15vw;
-      margin: 30px 0;
-    }
-
-    .card-ops:fullscreen .card-title {
-      font-size: 2rem;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .card-ops:fullscreen .controls-grid {
-      width: 100%;
-      max-width: 600px;
-    }
-
-    /* Responsividade */
-    @media (max-width: 480px) {
-      .timer-display {
-        font-size: 2.5rem;
-      }
-      .config-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+    .sidebar-transition { transition: transform 0.3s ease-in-out; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
 
-  <div class="header-ops">
-    <h1>⚡ QG DE ESTUDOS - TÁTICO</h1>
-    <p>SISTEMA DE CRONOMETRAGEM E HORAS LÍQUIDAS</p>
+  <!-- Tela de Login -->
+  <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md shadow-2xl">
+      <div class="flex flex-col items-center mb-6">
+        <div class="p-3 bg-blue-600/10 rounded-xl border border-blue-500/20 text-blue-400 mb-3">
+          <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white">Portal de Estudos</h2>
+        <p class="text-xs text-slate-400 mt-1">Acesse seu histórico e desempenho de qualquer lugar</p>
+      </div>
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">E-mail</label>
+          <input type="email" id="login-email" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500" placeholder="seu@email.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Senha</label>
+          <input type="password" id="login-password" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition text-sm flex items-center justify-center gap-2">
+          <span>Entrar no Painel</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
   </div>
 
-  <div class="container">
+  <!-- Layout Principal da Plataforma -->
+  <div id="app-screen" class="hidden flex-1 flex overflow-hidden">
     
-    <!-- Painel Principal do Cronômetro -->
-    <div class="card-ops" id="timerCard">
-      <div class="card-title">
-        <span>Ciclo Operacional</span>
-        <span class="status-badge" id="statusBadge">Aguardando</span>
+    <!-- Sidebar / Menu Hambúrguer -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 border-r border-slate-800 transform -translate-x-full md:translate-x-0 sidebar-transition flex flex-col">
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="graduation-cap" class="w-6 h-6 text-blue-400"></i>
+          <span class="font-bold text-slate-100 text-lg">StudyPRO</span>
+        </div>
+        <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
       </div>
 
-      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
+        <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition active">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="navigate('edital')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i data-lucide="list-checks" class="w-4 h-4 text-emerald-400"></i>
+          <span>Edital Verticalizado</span>
+        </button>
+        <button onclick="navigate('disciplinas')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i data-lucide="book-open" class="w-4 h-4 text-purple-400"></i>
+          <span>Disciplinas & Lotes</span>
+        </button>
+      </nav>
 
-      <div class="controls-grid">
-        <button class="btn-ops" id="startBtn" onclick="iniciarCronometro()">Iniciar Missão</button>
-        <button class="btn-ops pause" id="pauseBtn" onclick="pausarCronometro()" disabled>Pausar / Intervalo</button>
-        <button class="btn-ops fullscreen" onclick="toggleFullscreen()">🔲 Tela Cheia</button>
-        <button class="btn-ops reset" onclick="zerarSessao()">Zerar Sessão Atual</button>
+      <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 text-xs" id="user-avatar">US</div>
+          <div class="text-xs">
+            <p class="font-semibold text-white truncate max-w-[110px]" id="user-display-email">usuario@email.com</p>
+            <p class="text-slate-400 text-[10px]">Aluno PRO</p>
+          </div>
+        </div>
+        <button onclick="logout()" class="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg transition" title="Sair">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Overlay do Menu Mobile -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 md:ml-64 flex flex-col min-h-screen bg-slate-900 overflow-y-auto custom-scrollbar">
+      
+      <!-- Topbar Header -->
+      <header class="h-16 border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-20 px-4 md:px-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg border border-slate-800">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <h1 id="page-title" class="text-lg font-bold text-white">Dashboard Geral</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Online
+          </span>
+        </div>
+      </header>
+
+      <!-- Seção Dinâmica de Páginas -->
+      <div class="p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
+        
+        <!-- PÁGINA 1: DASHBOARD -->
+        <section id="page-dashboard" class="space-y-6">
+          <!-- Cards de Métricas Principais -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+              <p class="text-xs font-semibold text-slate-400 uppercase">Total Resolvido</p>
+              <h3 id="dash-total-questoes" class="text-2xl font-black text-white mt-1">0</h3>
+              <p class="text-[11px] text-slate-500 mt-1">Questões feitas no total</p>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+              <p class="text-xs font-semibold text-emerald-400 uppercase">Taxa de Acertos</p>
+              <h3 id="dash-porcentagem-acerto" class="text-2xl font-black text-emerald-400 mt-1">0%</h3>
+              <p class="text-[11px] text-slate-500 mt-1"><span id="dash-total-acertos">0</span> acertos efetuados</p>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+              <p class="text-xs font-semibold text-rose-400 uppercase">Margem de Erro</p>
+              <h3 id="dash-porcentagem-erro" class="text-2xl font-black text-rose-400 mt-1">0%</h3>
+              <p class="text-[11px] text-slate-500 mt-1"><span id="dash-total-erros">0</span> erros registrados</p>
+            </div>
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
+              <p class="text-xs font-semibold text-purple-400 uppercase">Horas Líquidas</p>
+              <h3 id="dash-horas-liquidas" class="text-2xl font-black text-purple-400 mt-1">0h 0m</h3>
+              <p class="text-[11px] text-slate-500 mt-1">Acumulado em estudos</p>
+            </div>
+          </div>
+
+          <!-- Andamento do Edital & Desempenho por Disciplina -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-white text-base">Andamento do Edital</h3>
+                <span id="dash-progresso-geral-pct" class="text-xs font-bold text-blue-400">0%</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div id="dash-progresso-geral-bar" class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <p class="text-xs text-slate-400">Percentual de assuntos marcados com check-in no edital verticalizado.</p>
+            </div>
+
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <h3 class="font-bold text-white text-base">Desempenho por Disciplina</h3>
+              <div id="dash-disciplinas-list" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                <!-- Inserido dinamicamente via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PÁGINA 2: EDITAL VERTICALIZADO -->
+        <section id="page-edital" class="hidden space-y-6">
+          <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+              <div>
+                <h2 class="text-lg font-bold text-white">Edital Verticalizado</h2>
+                <p class="text-xs text-slate-400">Marque o check-in nos assuntos estudados para atualizar o progresso automaticamente.</p>
+              </div>
+              <button onclick="openModalDisciplina()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Nova Disciplina
+              </button>
+            </div>
+
+            <div id="edital-disciplinas-container" class="space-y-6">
+              <!-- Renderizado dinamicamente -->
+            </div>
+          </div>
+        </section>
+
+        <!-- PÁGINA 3: DISCIPLINAS & RESOLUÇÃO DE LOTES -->
+        <section id="page-disciplinas" class="hidden space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Lista de Disciplinas -->
+            <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <h3 class="font-bold text-white text-sm">Disciplinas Cadastradas</h3>
+              <div id="disciplinas-menu-list" class="space-y-2">
+                <!-- Renderizado via JS -->
+              </div>
+            </div>
+
+            <!-- Detalhes da Disciplina / Assuntos / Lotes -->
+            <div class="md:col-span-2 bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-5">
+              <div id="selected-disciplina-content" class="space-y-4">
+                <p class="text-slate-400 text-sm italic">Selecione uma disciplina ao lado para visualizar os assuntos, resumos e lotes de questões.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Nova Disciplina -->
+  <div id="modal-disciplina" class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4">
+      <h3 class="text-lg font-bold text-white">Cadastrar Disciplina</h3>
+      <input type="text" id="input-nome-disciplina" placeholder="Nome da Disciplina (ex: Direito Constitucional)" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500">
+      <div class="flex justify-end gap-2">
+        <button onclick="closeModalDisciplina()" class="px-4 py-2 bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold">Cancelar</button>
+        <button onclick="salvarDisciplina()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold">Salvar</button>
       </div>
     </div>
-
-    <!-- Estatísticas de Tempo -->
-    <div class="card-ops">
-      <div class="card-title">
-        <span>Relatório de Tempo do Dia</span>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-box liquido">
-          <h4>Horas Líquidas</h4>
-          <p id="horasLiquidasDisplay">00:00:00</p>
-        </div>
-        <div class="stat-box total">
-          <h4>Tempo Total</h4>
-          <p id="horasTotaisDisplay">00:00:00</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Configuração de Ciclos -->
-    <div class="card-ops">
-      <div class="card-title">
-        <span>Parâmetros de Missão</span>
-      </div>
-
-      <div class="config-grid">
-        <div class="input-group">
-          <label for="inputBlocoEstudo">Estudo (Minutos)</label>
-          <input type="number" id="inputBlocoEstudo" value="30" min="1" onchange="salvarConfiguracoes()">
-        </div>
-        <div class="input-group">
-          <label for="inputBlocoDescanso">Descanso (Minutos)</label>
-          <input type="number" id="inputBlocoDescanso" value="15" min="1" onchange="salvarConfiguracoes()">
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <script>
-    // --- ESTADO DO SISTEMA ---
-    let tempoLiquidoSegundos = 0;
-    let tempoTotalSegundos = 0;
-    
-    let tempoRestanteBloco = 0;
-    let modoAtual = 'estudo'; // 'estudo' ou 'descanso'
-    let emExecucao = false;
-    
-    let intervalBloco = null;
-    let intervalTotal = null;
-
-    // Elementos DOM
-    const timerCard = document.getElementById('timerCard');
-    const timerDisplay = document.getElementById('timerDisplay');
-    const statusBadge = document.getElementById('statusBadge');
-    const horasLiquidasDisplay = document.getElementById('horasLiquidasDisplay');
-    const horasTotaisDisplay = document.getElementById('horasTotaisDisplay');
-    const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-
-    // --- MODO TELA CHEIA ---
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        if (timerCard.requestFullscreen) {
-          timerCard.requestFullscreen();
-        } else if (timerCard.webkitRequestFullscreen) { /* Safari */
-          timerCard.webkitRequestFullscreen();
-        } else if (timerCard.msRequestFullscreen) { /* IE11 */
-          timerCard.msRequestFullscreen();
+    // ESTADO DA APLICAÇÃO (Simula o Banco de Dados Local)
+    let state = {
+      currentUser: null,
+      disciplinas: [
+        {
+          id: 1,
+          nome: "Língua Portuguesa",
+          horasLiquidas: 12,
+          assuntos: [
+            { id: 101, titulo: "Sintaxe e Concordância", concluido: true, questoesAcertos: 25, questoesErros: 5 },
+            { id: 102, titulo: "Pontuação e Crase", concluido: false, questoesAcertos: 10, questoesErros: 8 }
+          ],
+          resumoUrl: "https://docs.google.com",
+          lotes: [
+            { id: 201, nome: "Lote 01 - Questões Gerais", total: 10, resolvidos: 10, acertos: 8, erros: 2 }
+          ]
+        },
+        {
+          id: 2,
+          nome: "Direito Constitucional",
+          horasLiquidas: 18,
+          assuntos: [
+            { id: 201, titulo: "Direitos Fundamentais (Art. 5º)", concluido: true, questoesAcertos: 40, questoesErros: 2 },
+            { id: 202, titulo: "Organização do Estado", concluido: false, questoesAcertos: 15, questoesErros: 5 }
+          ],
+          resumoUrl: "",
+          lotes: [
+            { id: 202, nome: "Lote 01 - Art. 5º", total: 15, resolvidos: 15, acertos: 14, erros: 1 }
+          ]
         }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    }
+      ]
+    };
 
-    // --- SINTETIZADOR DE ÁUDIO (ALARME MILITAR) ---
-    function tocarAlarmeMilitar() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        [0, 0.25, 0.5].forEach(delay => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(880, audioCtx.currentTime + delay);
-          
-          gain.gain.setValueAtTime(0.3, audioCtx.currentTime + delay);
-          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + delay + 0.15);
-
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-
-          osc.start(audioCtx.currentTime + delay);
-          osc.stop(audioCtx.currentTime + delay + 0.15);
-        });
-      } catch (e) {
-        console.log("Erro ao emitir áudio: " + e);
-      }
-    }
-
-    // --- FORMATAÇÃO DE TEMPO ---
-    function formatarTempo(segundos) {
-      const hrs = Math.floor(segundos / 3600);
-      const mins = Math.floor((segundos % 3600) / 60);
-      const segs = segundos % 60;
-
-      const pad = num => String(num).padStart(2, '0');
-      return `${pad(hrs)}:${pad(mins)}:${pad(segs)}`;
-    }
-
-    // --- CONTROLE DE CRONÔMETRO ---
-    function iniciarCronometro() {
-      if (emExecucao) return;
-
-      emExecucao = true;
-      startBtn.disabled = true;
-      pauseBtn.disabled = false;
-
-      if (tempoRestanteBloco <= 0) {
-        configurarNovoBloco(modoAtual);
-      }
-
-      atualizarInterface();
-
-      intervalBloco = setInterval(() => {
-        tempoRestanteBloco--;
-
-        if (modoAtual === 'estudo') {
-          tempoLiquidoSegundos++;
-        }
-
-        atualizarDisplays();
-        salvarDados();
-
-        if (tempoRestanteBloco <= 0) {
-          tocarAlarmeMilitar();
-          alternarModo();
-        }
-      }, 1000);
-
-      intervalTotal = setInterval(() => {
-        tempoTotalSegundos++;
-        horasTotaisDisplay.innerText = formatarTempo(tempoTotalSegundos);
-        salvarDados();
-      }, 1000);
-    }
-
-    function pausarCronometro() {
-      if (!emExecucao) return;
-
-      emExecucao = false;
-      clearInterval(intervalBloco);
-      clearInterval(intervalTotal);
-
-      startBtn.disabled = false;
-      pauseBtn.disabled = true;
-
-      statusBadge.innerText = 'Pausado';
-      statusBadge.className = 'status-badge';
-      
-      salvarDados();
-    }
-
-    function configurarNovoBloco(modo) {
-      modoAtual = modo;
-      if (modo === 'estudo') {
-        const mins = parseInt(document.getElementById('inputBlocoEstudo').value) || 30;
-        tempoRestanteBloco = mins * 60;
-      } else {
-        const mins = parseInt(document.getElementById('inputBlocoDescanso').value) || 15;
-        tempoRestanteBloco = mins * 60;
-      }
-    }
-
-    function alternarModo() {
-      pausarCronometro();
-      if (modoAtual === 'estudo') {
-        modoAtual = 'descanso';
-        alert("🚨 FIM DO BLOCO DE ESTUDO! Inicie seu descanso tático.");
-      } else {
-        modoAtual = 'estudo';
-        alert("⚡ FIM DO DESCANSO! Voltar para a missão de estudo.");
-      }
-      configurarNovoBloco(modoAtual);
-      atualizarInterface();
-      iniciarCronometro();
-    }
-
-    function zerarSessao() {
-      if (confirm("Deseja zerar os contadores da sessão atual?")) {
-        pausarCronometro();
-        tempoLiquidoSegundos = 0;
-        tempoTotalSegundos = 0;
-        tempoRestanteBloco = 0;
-        modoAtual = 'estudo';
-        
-        salvarDados();
-        atualizarDisplays();
-        
-        statusBadge.innerText = 'Aguardando';
-        statusBadge.className = 'status-badge';
-        timerDisplay.innerText = '00:00:00';
-      }
-    }
-
-    function atualizarDisplays() {
-      timerDisplay.innerText = formatarTempo(tempoRestanteBloco);
-      horasLiquidasDisplay.innerText = formatarTempo(tempoLiquidoSegundos);
-      horasTotaisDisplay.innerText = formatarTempo(tempoTotalSegundos);
-    }
-
-    function atualizarInterface() {
-      atualizarDisplays();
-      if (modoAtual === 'estudo') {
-        statusBadge.innerText = 'Em Estudo';
-        statusBadge.className = 'status-badge estudo';
-      } else {
-        statusBadge.innerText = 'Em Descanso';
-        statusBadge.className = 'status-badge descanso';
-      }
-    }
-
-    // --- PERSISTÊNCIA COMPLETA EM LOCALSTORAGE ---
-    function salvarDados() {
-      const dados = {
-        tempoLiquidoSegundos,
-        tempoTotalSegundos,
-        tempoRestanteBloco,
-        modoAtual,
-        estudoMins: document.getElementById('inputBlocoEstudo').value,
-        descansoMins: document.getElementById('inputBlocoDescanso').value,
-        data: new Date().toLocaleDateString()
-      };
-      localStorage.setItem('qg_estudos_dados', JSON.stringify(dados));
-    }
-
-    function salvarConfiguracoes() {
-      salvarDados();
-      if (!emExecucao) {
-        configurarNovoBloco(modoAtual);
-        atualizarDisplays();
-      }
-    }
-
-    function carregarDados() {
-      const salvo = localStorage.getItem('qg_estudos_dados');
-      if (salvo) {
-        try {
-          const dados = JSON.parse(salvo);
-          // Valida se o registro é do mesmo dia
-          if (dados.data === new Date().toLocaleDateString()) {
-            tempoLiquidoSegundos = dados.tempoLiquidoSegundos || 0;
-            tempoTotalSegundos = dados.tempoTotalSegundos || 0;
-            tempoRestanteBloco = dados.tempoRestanteBloco || 0;
-            modoAtual = dados.modoAtual || 'estudo';
-
-            if (dados.estudoMins) document.getElementById('inputBlocoEstudo').value = dados.estudoMins;
-            if (dados.descansoMins) document.getElementById('inputBlocoDescanso').value = dados.descansoMins;
-          }
-        } catch (e) {
-          console.error("Erro ao carregar do localStorage", e);
-        }
-      }
-      atualizarDisplays();
-    }
+    let selectedDisciplinaId = 1;
 
     // Inicialização
-    carregarDados();
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      checkAuth();
+    });
+
+    function checkAuth() {
+      const user = localStorage.getItem("studypro_user");
+      if (user) {
+        state.currentUser = JSON.parse(user);
+        document.getElementById("auth-screen").classList.add("hidden");
+        document.getElementById("app-screen").classList.remove("hidden");
+        document.getElementById("user-display-email").innerText = state.currentUser.email;
+        renderDashboard();
+      } else {
+        document.getElementById("auth-screen").classList.remove("hidden");
+        document.getElementById("app-screen").classList.add("hidden");
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const user = { email: email, token: "demo-token-123" };
+      localStorage.setItem("studypro_user", JSON.stringify(user));
+      checkAuth();
+    }
+
+    function logout() {
+      localStorage.removeItem("studypro_user");
+      checkAuth();
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebar-overlay");
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    }
+
+    function navigate(page) {
+      document.querySelectorAll("main section").forEach(sec => sec.classList.add("hidden"));
+      document.getElementById(`page-${page}`).classList.remove("hidden");
+      
+      const titles = {
+        dashboard: "Dashboard Geral",
+        edital: "Edital Verticalizado",
+        disciplinas: "Disciplinas & Lotes de Questões"
+      };
+      document.getElementById("page-title").innerText = titles[page];
+
+      if(page === 'dashboard') renderDashboard();
+      if(page === 'edital') renderEdital();
+      if(page === 'disciplinas') renderDisciplinasPage();
+
+      if (window.innerWidth < 768) toggleSidebar();
+    }
+
+    // DASHBOARD CALCULOS
+    function renderDashboard() {
+      let totalAcertos = 0;
+      let totalErros = 0;
+      let totalHoras = 0;
+      let totalAssuntos = 0;
+      let assuntosConcluidos = 0;
+
+      state.disciplinas.forEach(d => {
+        totalHoras += d.horasLiquidas;
+        d.assuntos.forEach(a => {
+          totalAssuntos++;
+          if (a.concluido) assuntosConcluidos++;
+          totalAcertos += a.questoesAcertos;
+          totalErros += a.questoesErros;
+        });
+      });
+
+      const totalQuestoes = totalAcertos + totalErros;
+      const pctAcerto = totalQuestoes > 0 ? ((totalAcertos / totalQuestoes) * 100).toFixed(1) : 0;
+      const pctErro = totalQuestoes > 0 ? ((totalErros / totalQuestoes) * 100).toFixed(1) : 0;
+      const pctEdital = totalAssuntos > 0 ? Math.round((assuntosConcluidos / totalAssuntos) * 100) : 0;
+
+      document.getElementById("dash-total-questoes").innerText = totalQuestoes;
+      document.getElementById("dash-total-acertos").innerText = totalAcertos;
+      document.getElementById("dash-total-erros").innerText = totalErros;
+      document.getElementById("dash-porcentagem-acerto").innerText = `${pctAcerto}%`;
+      document.getElementById("dash-porcentagem-erro").innerText = `${pctErro}%`;
+      document.getElementById("dash-horas-liquidas").innerText = `${totalHoras}h 0m`;
+
+      document.getElementById("dash-progresso-geral-pct").innerText = `${pctEdital}%`;
+      document.getElementById("dash-progresso-geral-bar").style.width = `${pctEdital}%`;
+
+      // Lista por disciplina
+      const discList = document.getElementById("dash-disciplinas-list");
+      discList.innerHTML = state.disciplinas.map(d => {
+        let ac = 0, er = 0;
+        d.assuntos.forEach(a => { ac += a.questoesAcertos; er += a.questoesErros; });
+        let tot = ac + er;
+        let pct = tot > 0 ? Math.round((ac / tot) * 100) : 0;
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-200 font-medium">${d.nome}</span>
+              <span class="text-blue-400 font-bold">${pct}% acertos (${tot} q)</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2">
+              <div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // EDITAL VERTICALIZADO
+    function renderEdital() {
+      const container = document.getElementById("edital-disciplinas-container");
+      container.innerHTML = state.disciplinas.map(d => {
+        const concluidos = d.assuntos.filter(a => a.concluido).length;
+        const pct = d.assuntos.length > 0 ? Math.round((concluidos / d.assuntos.length) * 100) : 0;
+
+        return `
+          <div class="border border-slate-800 rounded-xl p-4 bg-slate-900/40 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-white text-sm">${d.nome}</h4>
+                <p class="text-[11px] text-slate-400">${concluidos} de ${d.assuntos.length} assuntos concluídos (${pct}%)</p>
+              </div>
+              <button onclick="excluirDisciplina(${d.id})" class="text-slate-500 hover:text-rose-400 p-1">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5">
+              <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${pct}%"></div>
+            </div>
+            <div class="space-y-2 pt-2">
+              ${d.assuntos.map(a => `
+                <label class="flex items-center justify-between p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 hover:border-slate-700 cursor-pointer text-xs">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" ${a.concluido ? 'checked' : ''} onchange="toggleCheckin(${d.id},${a.id})" class="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-0">
+                    <span class="${a.concluido ? 'line-through text-slate-500' : 'text-slate-200'}">${a.titulo}</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">${a.questoesAcertos + a.questoesErros} q. resolvidas</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+      lucide.createIcons();
+    }
+
+    function toggleCheckin(discId, assuntoId) {
+      const disc = state.disciplinas.find(d => d.id === discId);
+      if (disc) {
+        const ass = disc.assuntos.find(a => a.id === assuntoId);
+        if (ass) ass.concluido = !ass.concluido;
+      }
+      renderEdital();
+    }
+
+    function openModalDisciplina() { document.getElementById("modal-disciplina").classList.remove("hidden"); }
+    function closeModalDisciplina() { document.getElementById("modal-disciplina").classList.add("hidden"); }
+
+    function salvarDisciplina() {
+      const nome = document.getElementById("input-nome-disciplina").value;
+      if (!nome) return;
+      state.disciplinas.push({
+        id: Date.now(),
+        nome: nome,
+        horasLiquidas: 0,
+        assuntos: [],
+        resumoUrl: "",
+        lotes: []
+      });
+      document.getElementById("input-nome-disciplina").value = "";
+      closeModalDisciplina();
+      renderEdital();
+    }
+
+    function excluirDisciplina(id) {
+      state.disciplinas = state.disciplinas.filter(d => d.id !== id);
+      renderEdital();
+    }
+
+    // PÁGINA DE DISCIPLINAS & LOTES
+    function renderDisciplinasPage() {
+      const menu = document.getElementById("disciplinas-menu-list");
+      menu.innerHTML = state.disciplinas.map(d => `
+        <button onclick="selectDisciplina(${d.id})" class="w-full text-left px-3 py-2.5 rounded-xl border ${selectedDisciplinaId === d.id ? 'bg-blue-600/10 border-blue-500/30 text-blue-400 font-semibold' : 'border-slate-800 text-slate-300 hover:bg-slate-800'} text-xs flex justify-between items-center">
+          <span class="truncate">${d.nome}</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+        </button>
+      `).join("");
+
+      const content = document.getElementById("selected-disciplina-content");
+      const disc = state.disciplinas.find(d => d.id === selectedDisciplinaId);
+
+      if (!disc) return;
+
+      content.innerHTML = `
+        <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+          <h3 class="text-base font-bold text-white">${disc.nome}</h3>
+          <span class="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-full">${disc.horasLiquidas}h de Estudo</span>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase text-slate-400">Resumo Integrado (Google Docs)</h4>
+          <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-xs flex items-center justify-between">
+            <span class="text-slate-300 truncate">${disc.resumoUrl || 'Nenhum Google Doc vinculado.'}</span>
+            <button onclick="alert('Funcionalidade para vincular Google Doc')" class="text-blue-400 font-medium text-[11px] hover:underline">Vincular</button>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-bold uppercase text-slate-400">Lotes de Questões</h4>
+            <button onclick="criarLote(${disc.id})" class="text-xs text-blue-400 font-semibold hover:underline">+ Novo Lote</button>
+          </div>
+
+          <div class="space-y-2">
+            ${disc.lotes.map(l => `
+              <div class="p-3 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-white">${l.nome}</p>
+                  <p class="text-[10px] text-slate-400">${l.resolvidos}/${l.total} resolvidas • ${l.acertos} acertos / ${l.erros} erros</p>
+                </div>
+                <button onclick="iniciarLote(${disc.id},${l.id})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold">Iniciar Lote</button>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function selectDisciplina(id) {
+      selectedDisciplinaId = id;
+      renderDisciplinasPage();
+    }
+
+    function criarLote(discId) {
+      const disc = state.disciplinas.find(d => d.id === discId);
+      if (disc) {
+        disc.lotes.push({
+          id: Date.now(),
+          nome: `Lote ${disc.lotes.length + 1}`,
+          total: 10,
+          resolvidos: 0,
+          acertos: 0,
+          erros: 0
+        });
+        renderDisciplinasPage();
+      }
+    }
+
+    function iniciarLote(discId, loteId) {
+      const disc = state.disciplinas.find(d => d.id === discId);
+      const lote = disc.lotes.find(l => l.id === loteId);
+      if (lote) {
+        const acertou = confirm("Simular resposta de questão:\n\nClique OK para REGISTRAR ACERTO.\nClique CANCELAR para REGISTRAR ERRO.");
+        lote.resolvidos++;
+        if (acertou) {
+          lote.acertos++;
+          if (disc.assuntos[0]) disc.assuntos[0].questoesAcertos++;
+        } else {
+          lote.erros++;
+          if (disc.assuntos[0]) disc.assuntos[0].questoesErros++;
+        }
+        renderDisciplinasPage();
+      }
+    }
   </script>
 </body>
 </html>
