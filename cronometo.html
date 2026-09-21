@@ -1,488 +1,1365 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plataforma de Estudos & Edital Verticalizado</title>
+  <title>QG Estudo - Plataforma de Estudos para Concursos</title>
   
-  <!-- CSS Base Dark Mode Moderno -->
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --success: #22c55e;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --border-color: #334155;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    /* Modais e Autenticação */
-    .auth-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .auth-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 30px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-
-    .auth-card h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: var(--accent);
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      font-family: 'Inter', sans-serif;
       background-color: #0f172a;
-      color: var(--text-main);
-      outline: none;
+      color: #f8fafc;
     }
-
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background-color: var(--accent);
-      color: #0f172a;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 10px;
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    .btn:hover {
-      background-color: var(--accent-hover);
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
     }
-
-    .btn-secondary {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
     }
-
-    .btn-secondary:hover {
-      background-color: var(--border-color);
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
     }
-
-    .toggle-auth {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    /* Layout Principal */
-    #app {
-      display: none;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    nav {
-      display: flex;
-      gap: 10px;
-    }
-
-    .nav-btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .nav-btn.active {
-      background-color: var(--border-color);
-      color: var(--accent);
-    }
-
-    main {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      flex-grow: 1;
-    }
-
-    .grid-dashboard {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .card h3 {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .card .value {
-      font-size: 1.8rem;
-      font-weight: bold;
-    }
-
-    /* Lousa Flutuante */
-    #lousa-container {
-      display: none;
+    /* Estilos do Canvas Overlay */
+    #canvas-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 999;
+      z-index: 40;
       pointer-events: none;
     }
-
-    #lousa-canvas {
+    #draw-canvas {
       width: 100%;
       height: 100%;
       pointer-events: auto;
     }
-
-    .lousa-tools {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 10px 20px;
-      border-radius: 30px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-      z-index: 1000;
-    }
-
-    /* Ocultar Seções */
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    .doc-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background-color: #2563eb;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 0.8rem;
-      margin-top: 5px;
-    }
   </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-  <!-- TELA DE AUTENTICAÇÃO -->
-  <div id="auth-screen" class="auth-container">
-    <div class="auth-card">
-      <h2 id="auth-title">Acessar Plataforma</h2>
-      <form id="auth-form">
-        <div class="form-group">
-          <label>E-mail</label>
-          <input type="email" id="auth-email" required placeholder="seu@email.com">
+  <!-- Tela de Carregamento Inicial -->
+  <div id="loading-screen" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand-500 mb-4"></div>
+    <p class="text-slate-400 font-medium animate-pulse">Carregando ambiente de estudo...</p>
+  </div>
+
+  <!-- Tela de Login / Cadastro -->
+  <div id="auth-screen" class="hidden min-h-screen flex items-center justify-center p-4 bg-slate-950">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex p-3 bg-brand-500/10 rounded-2xl text-brand-500 mb-2">
+          <i class="fa-solid fa-graduation-cap text-3xl"></i>
         </div>
-        <div class="form-group">
-          <label>Senha</label>
-          <input type="password" id="auth-password" required placeholder="******">
+        <h1 class="text-2xl font-bold tracking-tight text-white">QG Estudo Concursos</h1>
+        <p class="text-sm text-slate-400">Sua plataforma de alta performance para aprovação</p>
+      </div>
+
+      <form id="auth-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">E-mail</label>
+          <input type="email" id="auth-email" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" placeholder="seu@email.com">
         </div>
-        <button type="submit" class="btn" id="auth-btn-submit">Entrar</button>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Senha</label>
+          <input type="password" id="auth-password" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition" placeholder="••••••••">
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="submit" id="btn-login" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-brand-600/20 active:scale-[0.98]">
+            Entrar
+          </button>
+          <button type="button" id="btn-register" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold py-3 px-4 rounded-xl transition active:scale-[0.98]">
+            Cadastrar
+          </button>
+        </div>
       </form>
-      <div class="toggle-auth" id="toggle-auth">
-        Não tem uma conta? Criar conta
+
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
+        <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-900 px-3 text-slate-500">Ou acesse com</span></div>
       </div>
+
+      <button id="btn-google" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition active:scale-[0.98]">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        Entrar com Google
+      </button>
     </div>
   </div>
 
-  <!-- APLICAÇÃO PRINCIPAL -->
-  <div id="app">
-    <header>
-      <h2>Estudos & Edital</h2>
-      <nav>
-        <button class="nav-btn active" onclick="switchTab('dashboard')">Dashboard</button>
-        <button class="nav-btn" onclick="switchTab('edital')">Edital</button>
-        <button class="nav-btn" onclick="switchTab('revisoes')">Revisões</button>
-        <button class="nav-btn" onclick="toggleLousa()">Lousa</button>
-        <button class="nav-btn" onclick="handleLogout()">Sair</button>
+  <!-- Layout Principal (App) -->
+  <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
+    
+    <!-- Sidebar / Navegação -->
+    <aside class="w-full md:w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0">
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-brand-500/10 text-brand-500 rounded-xl">
+            <i class="fa-solid fa-graduation-cap text-xl"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-white text-base leading-tight">QG Estudo</h2>
+            <span class="text-xs text-brand-500 font-medium">Concursos Públicos</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="p-4 space-y-1 flex-1">
+        <button data-tab="dashboard" class="nav-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition text-brand-500 bg-brand-500/10">
+          <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        </button>
+        <button data-tab="edital" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-list-check w-5"></i> Edital Verticalizado
+        </button>
+        <button data-tab="questoes" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-pen-to-square w-5"></i> Responder Questões
+        </button>
+        <button data-tab="revisoes" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-clock-rotate-left w-5"></i> Revisões
+          </div>
+          <span id="badge-revisoes" class="hidden bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        </button>
+        <button data-tab="importador" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition">
+          <i class="fa-solid fa-file-import w-5"></i> Importar Questões
+        </button>
       </nav>
-    </header>
 
-    <main>
-      <!-- DASHBOARD -->
-      <section id="sec-dashboard" class="section active">
-        <h2>Painel de Desempenho Hoje</h2>
-        <div class="grid-dashboard">
-          <div class="card">
-            <h3>Questões Feitas</h3>
-            <div class="value" id="dash-hoje-total">0</div>
+      <!-- Perfil do Usuário e Logout -->
+      <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-950/50">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="user-avatar" class="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-white text-sm shrink-0">U</div>
+          <div class="min-w-0">
+            <p id="user-name" class="text-sm font-medium text-white truncate">Usuário</p>
+            <p id="user-email" class="text-xs text-slate-500 truncate">usuario@email.com</p>
           </div>
-          <div class="card">
-            <h3>Acertos</h3>
-            <div class="value" style="color: var(--success);" id="dash-hoje-acertos">0</div>
-          </div>
-          <div class="card">
-            <h3>Erros</h3>
-            <div class="value" style="color: var(--danger);" id="dash-hoje-erros">0</div>
+        </div>
+        <button id="btn-logout" class="p-2 text-slate-400 hover:text-red-400 transition rounded-lg hover:bg-slate-800" title="Sair">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-4 md:p-8">
+      
+      <!-- ABA 1: DASHBOARD -->
+      <section id="tab-dashboard" class="tab-content space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Painel de Desempenho</h1>
+          <p class="text-slate-400 text-sm">Acompanhe suas métricas de estudo em tempo real</p>
+        </div>
+
+        <!-- Métricas do Dia -->
+        <div class="space-y-3">
+          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Desempenho de Hoje</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Respondidas Hoje</p>
+                <p id="dash-hoje-total" class="text-3xl font-bold text-white mt-1">0</p>
+              </div>
+              <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl"><i class="fa-solid fa-list text-xl"></i></div>
+            </div>
+
+            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Acertos Hoje</p>
+                <p id="dash-hoje-acertos" class="text-3xl font-bold text-emerald-400 mt-1">0</p>
+              </div>
+              <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl"><i class="fa-solid fa-circle-check text-xl"></i></div>
+            </div>
+
+            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Erros Hoje</p>
+                <p id="dash-hoje-erros" class="text-3xl font-bold text-rose-400 mt-1">0</p>
+              </div>
+              <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl"><i class="fa-solid fa-circle-xmark text-xl"></i></div>
+            </div>
+
+            <div class="bg-slate-800/50 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Taxa do Dia</p>
+                <p id="dash-hoje-taxa" class="text-3xl font-bold text-brand-400 mt-1">0%</p>
+              </div>
+              <div class="p-3 bg-brand-500/10 text-brand-400 rounded-xl"><i class="fa-solid fa-chart-line text-xl"></i></div>
+            </div>
           </div>
         </div>
 
-        <h2>Desempenho Geral</h2>
-        <div class="grid-dashboard">
-          <div class="card">
-            <h3>Total de Questões</h3>
-            <div class="value" id="dash-geral-total">0</div>
+        <!-- Métricas Históricas Gerais -->
+        <div class="space-y-3">
+          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Histórico Geral Acumulado</h2>
+          <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="space-y-1">
+              <span class="text-xs text-slate-400">Total Histórico</span>
+              <p id="dash-geral-total" class="text-2xl font-bold text-white">0 questões</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-xs text-slate-400">Total de Acertos</span>
+              <p id="dash-geral-acertos" class="text-2xl font-bold text-emerald-400">0</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-xs text-slate-400">Total de Erros</span>
+              <p id="dash-geral-erros" class="text-2xl font-bold text-rose-400">0</p>
+            </div>
+            <div class="space-y-1">
+              <span class="text-xs text-slate-400">Aproveitamento Global</span>
+              <p id="dash-geral-taxa" class="text-2xl font-bold text-brand-400">0%</p>
+            </div>
           </div>
-          <div class="card">
-            <h3>Acertos Gerais</h3>
-            <div class="value" style="color: var(--success);" id="dash-geral-acertos">0</div>
-          </div>
-          <div class="card">
-            <h3>Aproveitamento Geral</h3>
-            <div class="value" style="color: var(--accent);" id="dash-geral-aproveitamento">0%</div>
+        </div>
+
+        <!-- Progresso das Disciplinas -->
+        <div class="space-y-3">
+          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Progresso do Edital por Disciplina</h2>
+          <div id="dash-disciplinas-progress" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Renderizado dinamicamente via JS -->
+            <p class="text-slate-500 text-sm italic col-span-2">Nenhuma disciplina cadastrada ainda.</p>
           </div>
         </div>
       </section>
 
-      <!-- EDITAL VERTICALIZADO -->
-      <section id="sec-edital" class="section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2>Edital Verticalizado</h2>
-          <button class="btn" style="width: auto;" onclick="openAddDisciplinaModal()">+ Nova Disciplina</button>
+      <!-- ABA 2: EDITAL VERTICALIZADO -->
+      <section id="tab-edital" class="tab-content hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white">Edital Verticalizado</h1>
+            <p class="text-slate-400 text-sm">Gerencie suas matérias, tópicos, ordem de cobrança e resumos</p>
+          </div>
+          <button id="btn-add-disciplina" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-4 py-2.5 rounded-xl transition flex items-center gap-2 text-sm shadow-lg shadow-brand-600/20">
+            <i class="fa-solid fa-plus"></i> Nova Disciplina
+          </button>
         </div>
-        <div id="disciplinas-list"></div>
+
+        <!-- Lista de Disciplinas -->
+        <div id="edital-container" class="space-y-4">
+          <!-- Renderizado via JS -->
+        </div>
       </section>
 
-      <!-- REVISÕES -->
-      <section id="sec-revisoes" class="section">
-        <h2>Revisões do Dia</h2>
-        <div id="revisoes-list" style="margin-top: 15px;">
-          <p style="color: var(--text-muted);">Nenhuma revisão agendada para hoje.</p>
+      <!-- ABA 3: RESPONDER QUESTÕES -->
+      <section id="tab-questoes" class="tab-content hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Resolução de Questões</h1>
+          <p class="text-slate-400 text-sm">Filtre por tópicos ou escolha um lote de questões</p>
+        </div>
+
+        <!-- Filtros e Seleção -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Disciplina</label>
+              <select id="filtro-disciplina" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                <option value="">Todas as Disciplinas</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Assunto / Tema</label>
+              <select id="filtro-assunto" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                <option value="">Todos os Assuntos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Modo de Resolução</label>
+              <select id="filtro-modo" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                <option value="geral">Lote Geral (Todas do Assunto)</option>
+                <option value="individual">Lote Específico Importado</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="container-lotes-especificos" class="hidden">
+            <label class="block text-xs font-medium text-slate-400 mb-1">Selecione o Lote</label>
+            <select id="select-lote-especifico" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+              <!-- Lotes carregados via JS -->
+            </select>
+          </div>
+
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button id="btn-iniciar-zero" class="bg-brand-600 hover:bg-brand-500 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition shadow-lg shadow-brand-600/20">
+              <i class="fa-solid fa-play mr-2"></i> Iniciar Lote do Zero
+            </button>
+            <button id="btn-continuar-parei" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition">
+              <i class="fa-solid fa-forward-step mr-2"></i> Continuar de Onde Parei
+            </button>
+          </div>
+        </div>
+
+        <!-- Área de Resolução da Questão -->
+        <div id="area-resolucao" class="hidden space-y-6">
+          
+          <!-- Top Bar da Questão: Timer, Progresso e Lousa -->
+          <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 sticky top-2 z-20 backdrop-blur-md">
+            <div class="flex items-center gap-4">
+              <span id="questao-progresso" class="text-sm font-semibold text-brand-400 bg-brand-500/10 px-3 py-1 rounded-lg">Questão 1/1</span>
+              <div class="flex items-center gap-2 text-slate-300 font-mono text-sm bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                <i class="fa-regular fa-clock text-brand-500"></i>
+                <span id="timer-display">00:00</span>
+                <button id="btn-timer-toggle" class="text-xs text-slate-400 hover:text-white ml-1">
+                  <i class="fa-solid fa-pause"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Contador de Desempenho em Tempo Real da Sessão -->
+            <div class="flex items-center gap-4 text-xs font-medium">
+              <span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> Acertos: <strong id="sessao-acertos">0</strong></span>
+              <span class="text-rose-400"><i class="fa-solid fa-circle-xmark"></i> Erros: <strong id="sessao-erros">0</strong></span>
+              <span class="text-slate-400">Aproveitamento: <strong id="sessao-taxa" class="text-white">0%</strong></span>
+            </div>
+
+            <!-- Botão de Ativar Lousa / Rascunho -->
+            <button id="btn-toggle-lousa" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition">
+              <i class="fa-solid fa-pen-ruler"></i> Lousa de Anotações
+            </button>
+          </div>
+
+          <!-- Card do Enunciado e Alternativas -->
+          <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-6">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-slate-400">
+                <span id="q-disciplina-tag" class="bg-slate-700 px-2.5 py-1 rounded-md text-slate-200">Disciplina</span>
+                <span id="q-assunto-tag" class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md">Assunto</span>
+              </div>
+              <p id="q-enunciado" class="text-base sm:text-lg text-slate-100 font-medium leading-relaxed">
+                Carregando enunciado da questão...
+              </p>
+            </div>
+
+            <!-- Alternativas -->
+            <div id="q-alternativas" class="space-y-3">
+              <!-- Renderizadas dinamicamente via JS -->
+            </div>
+
+            <!-- Ações: Responder e Navegar -->
+            <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
+              <div class="flex gap-2">
+                <button id="btn-q-anterior" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-50">
+                  <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+                </button>
+                <button id="btn-q-proxima" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-sm font-medium transition disabled:opacity-50">
+                  Próxima <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+
+              <button id="btn-q-confirmar" class="bg-brand-600 hover:bg-brand-500 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition shadow-lg shadow-brand-600/20 active:scale-[0.98]">
+                Confirmar Gabarito
+              </button>
+            </div>
+
+            <!-- Gabarito Comentado (Oculto até responder) -->
+            <div id="q-comentario-box" class="hidden bg-slate-900 border border-slate-700 rounded-xl p-5 space-y-3">
+              <div class="flex items-center gap-2">
+                <span id="q-status-badge" class="px-3 py-1 rounded-lg text-xs font-bold uppercase">Correto</span>
+                <h4 class="text-sm font-bold text-white">Gabarito Comentado</h4>
+              </div>
+              <p id="q-comentario-texto" class="text-sm text-slate-300 leading-relaxed">Explicação do gabarito...</p>
+            </div>
+          </div>
+
         </div>
       </section>
+
+      <!-- ABA 4: REVISÕES ESPAÇADAS (SRS) -->
+      <section id="tab-revisoes" class="tab-content hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Quadro de Revisões Espaçadas (SRS)</h1>
+          <p class="text-slate-400 text-sm">Revisões agendadas automaticamente (1, 3, 7, 15 e 30 dias)</p>
+        </div>
+
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-calendar-day text-amber-400"></i> Revisões Agendadas para Hoje
+            </h2>
+            <span id="revisoes-hoje-count" class="bg-amber-500/20 text-amber-400 font-bold px-3 py-1 rounded-lg text-xs">
+              0 pendentes
+            </span>
+          </div>
+
+          <div id="lista-revisoes-hoje" class="space-y-3">
+            <!-- Renderizado via JS -->
+            <p class="text-slate-500 text-sm italic">Nenhuma revisão pendente para o dia de hoje!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABA 5: IMPORTADOR JSON -->
+      <section id="tab-importador" class="tab-content hidden space-y-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Importar Lote de Questões JSON</h1>
+          <p class="text-slate-400 text-sm">Cole o código JSON estruturado para cadastrar questões e temas automaticamente</p>
+        </div>
+
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Estrutura JSON</label>
+            <textarea id="json-input" rows="12" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 font-mono text-xs text-emerald-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 leading-relaxed" placeholder='{
+  "disciplina": "Língua Portuguesa",
+  "tema": "Concordância Verbal e Nominal",
+  "questoes": [
+    {
+      "id": 1,
+      "enunciado": "Assinale a alternativa correta...",
+      "alternativas": {
+        "A": "Primeira opção",
+        "B": "Segunda opção",
+        "C": "Terceira opção",
+        "D": "Quarta opção"
+      },
+      "resposta_correta": "D",
+      "comentario": "Comentário explicativo..."
+    }
+  ]
+}'></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <button id="btn-processar-json" class="bg-brand-600 hover:bg-brand-500 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-lg shadow-brand-600/20 flex items-center gap-2 text-sm">
+              <i class="fa-solid fa-file-code"></i> Processar e Importar
+            </button>
+          </div>
+        </div>
+      </section>
+
     </main>
+  </div>
 
-    <!-- LOUSA FLUTUANTE -->
-    <div id="lousa-container">
-      <canvas id="lousa-canvas"></canvas>
-      <div class="lousa-tools">
-        <input type="color" id="lousa-color" value="#38bdf8">
-        <button class="btn btn-secondary" onclick="clearLousa()">Limpar</button>
-        <button class="btn" onclick="toggleLousa()">Fechar</button>
+  <!-- LOUSA / CANVAS OVERLAY FLUTUANTE -->
+  <div id="canvas-container" class="hidden">
+    <canvas id="draw-canvas"></canvas>
+    
+    <!-- Barra de Ferramentas da Lousa -->
+    <div class="fixed top-6 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-slate-700 backdrop-blur-md p-2 rounded-2xl shadow-2xl flex items-center gap-3 z-50 pointer-events-auto">
+      <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-xl">
+        <button data-color="#38bdf8" class="color-btn w-6 h-6 rounded-full bg-sky-400 ring-2 ring-white"></button>
+        <button data-color="#f43f5e" class="color-btn w-6 h-6 rounded-full bg-rose-500"></button>
+        <button data-color="#10b981" class="color-btn w-6 h-6 rounded-full bg-emerald-500"></button>
+        <button data-color="#fbbf24" class="color-btn w-6 h-6 rounded-full bg-amber-400"></button>
+        <button data-color="#ffffff" class="color-btn w-6 h-6 rounded-full bg-white"></button>
+      </div>
+
+      <div class="h-6 w-px bg-slate-700"></div>
+
+      <input type="range" id="brush-size" min="2" max="20" value="4" class="w-20 accent-brand-500">
+
+      <div class="h-6 w-px bg-slate-700"></div>
+
+      <button id="btn-eraser" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition text-xs flex items-center gap-1">
+        <i class="fa-solid fa-eraser"></i> Borracha
+      </button>
+
+      <button id="btn-clear-canvas" class="p-2 text-rose-400 hover:text-rose-300 rounded-lg hover:bg-slate-800 transition text-xs flex items-center gap-1">
+        <i class="fa-solid fa-trash"></i> Limpar
+      </button>
+
+      <button id="btn-close-canvas" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition text-xs flex items-center gap-1 ml-2">
+        <i class="fa-solid fa-xmark"></i> Fechar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAIS -->
+
+  <!-- Modal Cadastrar/Editar Disciplina -->
+  <div id="modal-disciplina" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
+      <h3 id="modal-disc-titulo" class="text-lg font-bold text-white">Nova Disciplina</h3>
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nome da Disciplina</label>
+        <input type="text" id="input-disc-nome" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="Ex: Direito Constitucional">
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="btn-cancelar-disc" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium">Cancelar</button>
+        <button id="btn-salvar-disc" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium">Salvar</button>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE E LÓGICA DA APLICAÇÃO -->
+  <!-- Modal Cadastrar/Editar Assunto -->
+  <div id="modal-assunto" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4">
+      <h3 id="modal-assunto-titulo" class="text-lg font-bold text-white">Novo Assunto</h3>
+      <input type="hidden" id="input-assunto-disc-id">
+      <input type="hidden" id="input-assunto-id">
+      
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nome do Assunto/Tópico</label>
+        <input type="text" id="input-assunto-nome" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="Ex: Direitos Fundamentais">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Prioridade</label>
+          <input type="text" id="input-assunto-prioridade" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="P1, P2 ou 1, 2">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Status</label>
+          <select id="select-assunto-status" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-brand-500 text-sm">
+            <option value="Nao Iniciado">Não Iniciado</option>
+            <option value="Estudado">Estudado</option>
+            <option value="Em Revisao">Em Revisão</option>
+            <option value="Concluido">Concluído</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Link Resumo Google Docs (URL)</label>
+        <input type="url" id="input-assunto-docs" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500" placeholder="https://docs.google.com/document/d/...">
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button id="btn-cancelar-assunto" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium">Cancelar</button>
+        <button id="btn-salvar-assunto" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE SDK V10 ES MODULES -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
       getAuth, 
+      onAuthStateChanged, 
       signInWithEmailAndPassword, 
       createUserWithEmailAndPassword, 
-      onAuthStateChanged, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
       signOut 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
       getFirestore, 
       doc, 
-      setDoc, 
       getDoc, 
-      onSnapshot 
+      setDoc, 
+      updateDoc, 
+      collection, 
+      getDocs, 
+      addDoc, 
+      deleteDoc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⚠️ ATENÇÃO: Substitua os dados abaixo com as credenciais do seu projeto Firebase Console
+    // Configuração do Firebase
     const firebaseConfig = {
-  apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
-  authDomain: "qgestudo.firebaseapp.com",
-  projectId: "qgestudo",
-  storageBucket: "qgestudo.firebasestorage.app",
-  messagingSenderId: "939034677008",
-  appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
-  measurementId: "G-PC8ESJHFZ5"
-};
+      apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
+      authDomain: "qgestudo.firebaseapp.com",
+      projectId: "qgestudo",
+      storageBucket: "qgestudo.firebasestorage.app",
+      messagingSenderId: "939034677008",
+      appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
+      measurementId: "G-PC8ESJHFZ5"
+    };
 
+    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Estado da Aplicação
     let currentUser = null;
-    let isSignUp = false;
-
-    // Gerenciamento de Autenticação
-    const authForm = document.getElementById("auth-form");
-    const toggleAuth = document.getElementById("toggle-auth");
-    const authTitle = document.getElementById("auth-title");
-    const authBtnSubmit = document.getElementById("auth-btn-submit");
-
-    toggleAuth.addEventListener("click", () => {
-      isSignUp = !isSignUp;
-      authTitle.innerText = isSignUp ? "Criar Conta" : "Acessar Plataforma";
-      authBtnSubmit.innerText = isSignUp ? "Cadastrar" : "Entrar";
-      toggleAuth.innerText = isSignUp ? "Já tem uma conta? Entrar" : "Não tem uma conta? Criar conta";
-    });
-
-    authForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("auth-email").value;
-      const password = document.getElementById("auth-password").value;
-
-      try {
-        if (isSignUp) {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert("Conta criada com sucesso!");
-        } else {
-          await signInWithEmailAndPassword(auth, email, password);
-        }
-      } catch (error) {
-        alert("Erro na autenticação: " + error.message);
+    let AppState = {
+      disciplinas: [],
+      lotes: [],
+      questoes: [],
+      historicoQuestoes: [],
+      revisoes: [],
+      sessaoQuestaoAtual: {
+        listaQuestoes: [],
+        indexAtual: 0,
+        respostasSessao: {},
+        loteId: null,
+        assuntoId: null,
+        acertos: 0,
+        erros: 0
       }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById("auth-screen").style.display = "none";
-        document.getElementById("app").style.display = "flex";
-        loadUserData();
-      } else {
-        currentUser = null;
-        document.getElementById("auth-screen").style.display = "flex";
-        document.getElementById("app").style.display = "none";
-      }
-    });
-
-    window.handleLogout = () => signOut(auth);
-
-    // Navegação por Abas
-    window.switchTab = (tabName) => {
-      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-      
-      document.getElementById(`sec-${tabName}`).classList.add("active");
-      event.target.classList.add("active");
     };
 
-    // Lógica da Lousa Flutuante
-    let isDrawing = false;
-    const canvas = document.getElementById("lousa-canvas");
-    const ctx = canvas.getContext("2d");
+    // Timer Variables
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let timerRunning = false;
+
+    // DOM Elements
+    const loadingScreen = document.getElementById('loading-screen');
+    const authScreen = document.getElementById('auth-screen');
+    const appScreen = document.getElementById('app-screen');
+
+    // Inicializar Monitor de Sessão Auth
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('user-name').innerText = user.displayName || user.email.split('@')[0];
+        document.getElementById('user-email').innerText = user.email;
+        document.getElementById('user-avatar').innerText = (user.displayName || user.email)[0].toUpperCase();
+
+        await carregarDadosUsuario();
+        
+        loadingScreen.classList.add('opacity-0');
+        setTimeout(() => {
+          loadingScreen.classList.add('hidden');
+          authScreen.classList.add('hidden');
+          appScreen.classList.remove('hidden');
+        }, 300);
+      } else {
+        currentUser = null;
+        loadingScreen.classList.add('hidden');
+        appScreen.classList.add('hidden');
+        authScreen.classList.remove('hidden');
+      }
+    });
+
+    // --- AUTENTICAÇÃO ---
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value;
+      const pass = document.getElementById('auth-password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Erro no login: " + err.message);
+      }
+    });
+
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value;
+      const pass = document.getElementById('auth-password').value;
+      if (!email || !pass) return alert("Preencha e-mail e senha para cadastrar.");
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Erro no cadastro: " + err.message);
+      }
+    });
+
+    document.getElementById('btn-google').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert("Erro no login Google: " + err.message);
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
+
+    // --- NAVEGAÇÃO ENTRE ABAS ---
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        
+        document.querySelectorAll('.nav-btn').forEach(b => {
+          b.classList.remove('active', 'text-brand-500', 'bg-brand-500/10');
+          b.classList.add('text-slate-400');
+        });
+        btn.classList.add('active', 'text-brand-500', 'bg-brand-500/10');
+
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+        document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+
+        if (targetTab === 'dashboard') atualizarDashboard();
+        if (targetTab === 'edital') renderizarEdital();
+        if (targetTab === 'revisoes') renderizarRevisoes();
+      });
+    });
+
+    // --- CARREGAR DADOS DO FIRESTORE ---
+    async function carregarDadosUsuario() {
+      if (!currentUser) return;
+      const uid = currentUser.uid;
+
+      try {
+        // Carregar Disciplinas
+        const discSnap = await getDocs(collection(db, `users/${uid}/disciplinas`));
+        AppState.disciplinas = discSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Carregar Lotes e Questões
+        const lotesSnap = await getDocs(collection(db, `users/${uid}/lotes`));
+        AppState.lotes = lotesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        const qSnap = await getDocs(collection(db, `users/${uid}/questoes`));
+        AppState.questoes = qSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Carregar Histórico
+        const histSnap = await getDocs(collection(db, `users/${uid}/historico`));
+        AppState.historicoQuestoes = histSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Carregar Revisões
+        const revSnap = await getDocs(collection(db, `users/${uid}/revisoes`));
+        AppState.revisoes = revSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        atualizarDashboard();
+        populasSelectsFiltro();
+        atualizarBadgeRevisoes();
+      } catch (e) {
+        console.error("Erro ao carregar dados:", e);
+      }
+    }
+
+    // --- DASHBOARD E MÉTRICAS ---
+    function atualizarDashboard() {
+      const hojeStr = new Date().toISOString().split('T')[0];
+
+      // Filtrar histórico de hoje
+      const historicoHoje = AppState.historicoQuestoes.filter(h => h.data === hojeStr);
+      const hojeTotal = historicoHoje.length;
+      const hojeAcertos = historicoHoje.filter(h => h.correto).length;
+      const hojeErros = hojeTotal - hojeAcertos;
+      const hojeTaxa = hojeTotal > 0 ? Math.round((hojeAcertos / hojeTotal) * 100) : 0;
+
+      document.getElementById('dash-hoje-total').innerText = hojeTotal;
+      document.getElementById('dash-hoje-acertos').innerText = hojeAcertos;
+      document.getElementById('dash-hoje-erros').innerText = hojeErros;
+      document.getElementById('dash-hoje-taxa').innerText = `${hojeTaxa}%`;
+
+      // Métricas Gerais
+      const geralTotal = AppState.historicoQuestoes.length;
+      const geralAcertos = AppState.historicoQuestoes.filter(h => h.correto).length;
+      const geralErros = geralTotal - geralAcertos;
+      const geralTaxa = geralTotal > 0 ? Math.round((geralAcertos / geralTotal) * 100) : 0;
+
+      document.getElementById('dash-geral-total').innerText = `${geralTotal} questões`;
+      document.getElementById('dash-geral-acertos').innerText = geralAcertos;
+      document.getElementById('dash-geral-erros').innerText = geralErros;
+      document.getElementById('dash-geral-taxa').innerText = `${geralTaxa}%`;
+
+      // Progresso das Disciplinas
+      const containerDisc = document.getElementById('dash-disciplinas-progress');
+      containerDisc.innerHTML = '';
+
+      if (AppState.disciplinas.length === 0) {
+        containerDisc.innerHTML = '<p class="text-slate-500 text-sm italic col-span-2">Nenhuma disciplina cadastrada ainda.</p>';
+        return;
+      }
+
+      AppState.disciplinas.forEach(d => {
+        const assuntos = d.assuntos || [];
+        const concluidos = assuntos.filter(a => a.status === 'Concluido').length;
+        const totalAssuntos = assuntos.length;
+        const perc = totalAssuntos > 0 ? Math.round((concluidos / totalAssuntos) * 100) : 0;
+
+        containerDisc.innerHTML += `
+          <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-sm">
+              <span class="font-medium text-white">${d.nome}</span>
+              <span class="text-xs font-bold text-brand-400">${perc}%</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+              <div class="bg-brand-500 h-2 rounded-full transition-all duration-500" style="width: ${perc}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>${concluidos} de ${totalAssuntos} concluídos</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // --- EDITAL VERTICALIZADO CRUD ---
+    function renderizarEdital() {
+      const container = document.getElementById('edital-container');
+      container.innerHTML = '';
+
+      if (AppState.disciplinas.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-slate-500">Nenhuma disciplina cadastrada. Clique em "Nova Disciplina" para começar.</div>';
+        return;
+      }
+
+      AppState.disciplinas.forEach(d => {
+        const assuntos = d.assuntos || [];
+        const concluidos = assuntos.filter(a => a.status === 'Concluido').length;
+        const perc = assuntos.length > 0 ? Math.round((concluidos / assuntos.length) * 100) : 0;
+
+        let assuntosHTML = '';
+        assuntos.forEach((a, index) => {
+          let statusColor = "text-slate-400 bg-slate-800";
+          if (a.status === 'Concluido') statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+          if (a.status === 'Em Revisao') statusColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+          if (a.status === 'Estudado') statusColor = "text-blue-400 bg-blue-500/10 border-blue-500/20";
+
+          assuntosHTML += `
+            <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-900/60 rounded-xl border border-slate-800/80 hover:border-slate-700 transition">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <span class="text-xs font-bold text-slate-400 bg-slate-800 px-2 py-1 rounded">${a.prioridade || 'P3'}</span>
+                <span class="text-sm font-medium text-slate-200 truncate">${a.nome}</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                ${a.docsUrl ? `
+                  <a href="${a.docsUrl}" target="_blank" class="p-1.5 text-blue-400 hover:text-blue-300 rounded-lg hover:bg-slate-800 text-xs" title="Abrir Resumo no Google Docs">
+                    <i class="fa-solid fa-file-lines"></i>
+                  </a>
+                ` : ''}
+
+                <span class="text-xs px-2.5 py-1 rounded-lg border font-medium ${statusColor}">${a.status || 'Não Iniciado'}</span>
+
+                <button onclick="window.editarAssunto('${d.id}', ${index})" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-xs">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button onclick="window.excluirAssunto('${d.id}', ${index})" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 text-xs">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML += `
+          <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">${d.nome}</h3>
+                <p class="text-xs text-slate-400">${concluidos} de ${assuntos.length} tópicos concluídos (${perc}%)</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="window.modalNovoAssunto('${d.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                  <i class="fa-solid fa-plus mr-1"></i> Add Assunto
+                </button>
+                <button onclick="window.excluirDisciplina('${d.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg text-xs">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              ${assuntosHTML || '<p class="text-xs text-slate-500 italic">Nenhum assunto cadastrado nesta disciplina.</p>'}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Modal Disciplina
+    document.getElementById('btn-add-disciplina').addEventListener('click', () => {
+      document.getElementById('input-disc-nome').value = '';
+      document.getElementById('modal-disciplina').classList.remove('hidden');
+    });
+    document.getElementById('btn-cancelar-disc').addEventListener('click', () => {
+      document.getElementById('modal-disciplina').classList.add('hidden');
+    });
+
+    document.getElementById('btn-salvar-disc').addEventListener('click', async () => {
+      const nome = document.getElementById('input-disc-nome').value;
+      if (!nome) return alert("Digite o nome da disciplina");
+
+      const uid = currentUser.uid;
+      const newDoc = { nome, assuntos: [] };
+      const docRef = await addDoc(collection(db, `users/${uid}/disciplinas`), newDoc);
+      AppState.disciplinas.push({ id: docRef.id, ...newDoc });
+
+      document.getElementById('modal-disciplina').classList.add('hidden');
+      renderizarEdital();
+      atualizarDashboard();
+      populasSelectsFiltro();
+    });
+
+    window.excluirDisciplina = async (id) => {
+      if (!confirm("Deseja realmente excluir esta disciplina?")) return;
+      const uid = currentUser.uid;
+      await deleteDoc(doc(db, `users/${uid}/disciplinas`, id));
+      AppState.disciplinas = AppState.disciplinas.filter(d => d.id !== id);
+      renderizarEdital();
+      atualizarDashboard();
+      populasSelectsFiltro();
+    };
+
+    // Modal Assunto
+    window.modalNovoAssunto = (discId) => {
+      document.getElementById('input-assunto-disc-id').value = discId;
+      document.getElementById('input-assunto-id').value = '';
+      document.getElementById('input-assunto-nome').value = '';
+      document.getElementById('input-assunto-prioridade').value = 'P1';
+      document.getElementById('select-assunto-status').value = 'Nao Iniciado';
+      document.getElementById('input-assunto-docs').value = '';
+      document.getElementById('modal-assunto').classList.remove('hidden');
+    };
+
+    window.editarAssunto = (discId, index) => {
+      const disc = AppState.disciplinas.find(d => d.id === discId);
+      const ass = disc.assuntos[index];
+
+      document.getElementById('input-assunto-disc-id').value = discId;
+      document.getElementById('input-assunto-id').value = index;
+      document.getElementById('input-assunto-nome').value = ass.nome;
+      document.getElementById('input-assunto-prioridade').value = ass.prioridade || 'P1';
+      document.getElementById('select-assunto-status').value = ass.status || 'Nao Iniciado';
+      document.getElementById('input-assunto-docs').value = ass.docsUrl || '';
+      document.getElementById('modal-assunto').classList.remove('hidden');
+    };
+
+    document.getElementById('btn-cancelar-assunto').addEventListener('click', () => {
+      document.getElementById('modal-assunto').classList.add('hidden');
+    });
+
+    document.getElementById('btn-salvar-assunto').addEventListener('click', async () => {
+      const discId = document.getElementById('input-assunto-disc-id').value;
+      const assIndex = document.getElementById('input-assunto-id').value;
+      const nome = document.getElementById('input-assunto-nome').value;
+      const prioridade = document.getElementById('input-assunto-prioridade').value;
+      const status = document.getElementById('select-assunto-status').value;
+      const docsUrl = document.getElementById('input-assunto-docs').value;
+
+      if (!nome) return alert("Digite o nome do assunto");
+
+      const disc = AppState.disciplinas.find(d => d.id === discId);
+      if (!disc.assuntos) disc.assuntos = [];
+
+      const novoAssunto = { id: Date.now().toString(), nome, prioridade, status, docsUrl };
+
+      if (assIndex === '') {
+        disc.assuntos.push(novoAssunto);
+        // Gerar SRS se status for Concluído
+        if (status === 'Concluido') agendarSRS(disc.nome, nome);
+      } else {
+        const oldStatus = disc.assuntos[assIndex].status;
+        disc.assuntos[assIndex] = { ...disc.assuntos[assIndex], nome, prioridade, status, docsUrl };
+        if (oldStatus !== 'Concluido' && status === 'Concluido') agendarSRS(disc.nome, nome);
+      }
+
+      const uid = currentUser.uid;
+      await updateDoc(doc(db, `users/${uid}/disciplinas`, discId), { assuntos: disc.assuntos });
+
+      document.getElementById('modal-assunto').classList.add('hidden');
+      renderizarEdital();
+      atualizarDashboard();
+      populasSelectsFiltro();
+    });
+
+    window.excluirAssunto = async (discId, index) => {
+      if (!confirm("Excluir este assunto?")) return;
+      const disc = AppState.disciplinas.find(d => d.id === discId);
+      disc.assuntos.splice(index, 1);
+
+      const uid = currentUser.uid;
+      await updateDoc(doc(db, `users/${uid}/disciplinas`, discId), { assuntos: disc.assuntos });
+      renderizarEdital();
+      atualizarDashboard();
+      populasSelectsFiltro();
+    };
+
+    // --- IMPORTADOR JSON DE QUESTÕES ---
+    document.getElementById('btn-processar-json').addEventListener('click', async () => {
+      const jsonText = document.getElementById('json-input').value;
+      try {
+        const data = JSON.parse(jsonText);
+        if (!data.disciplina || !data.tema || !Array.isArray(data.questoes)) {
+          return alert("Formato JSON inválido. Certifique-se de incluir 'disciplina', 'tema' e o array 'questoes'.");
+        }
+
+        const uid = currentUser.uid;
+
+        // 1. Garantir Disciplina e Assunto no Firestore
+        let disc = AppState.disciplinas.find(d => d.nome.toLowerCase() === data.disciplina.toLowerCase());
+        if (!disc) {
+          const newD = { nome: data.disciplina, assuntos: [{ id: Date.now().toString(), nome: data.tema, status: 'Nao Iniciado' }] };
+          const docRef = await addDoc(collection(db, `users/${uid}/disciplinas`), newD);
+          disc = { id: docRef.id, ...newD };
+          AppState.disciplinas.push(disc);
+        } else {
+          if (!disc.assuntos) disc.assuntos = [];
+          if (!disc.assuntos.find(a => a.nome.toLowerCase() === data.tema.toLowerCase())) {
+            disc.assuntos.push({ id: Date.now().toString(), nome: data.tema, status: 'Nao Iniciado' });
+            await updateDoc(doc(db, `users/${uid}/disciplinas`, disc.id), { assuntos: disc.assuntos });
+          }
+        }
+
+        // 2. Criar Lote
+        const loteDoc = {
+          disciplina: data.disciplina,
+          tema: data.tema,
+          dataCriacao: new Date().toISOString(),
+          posicaoAtual: 0
+        };
+        const loteRef = await addDoc(collection(db, `users/${uid}/lotes`), loteDoc);
+
+        // 3. Cadastrar Questões
+        for (const q of data.questoes) {
+          const qDoc = {
+            loteId: loteRef.id,
+            disciplina: data.disciplina,
+            tema: data.tema,
+            enunciado: q.enunciado,
+            alternativas: q.alternativas,
+            resposta_correta: q.resposta_correta,
+            comentario: q.comentario || ''
+          };
+          const qRef = await addDoc(collection(db, `users/${uid}/questoes`), qDoc);
+          AppState.questoes.push({ id: qRef.id, ...qDoc });
+        }
+
+        alert("Questões importadas com sucesso!");
+        document.getElementById('json-input').value = '';
+        populasSelectsFiltro();
+        await carregarDadosUsuario();
+      } catch (err) {
+        alert("Erro ao processar JSON: " + err.message);
+      }
+    });
+
+    // --- FILTROS E INÍCIO DA RESOLUÇÃO ---
+    function populasSelectsFiltro() {
+      const selectDisc = document.getElementById('filtro-disciplina');
+      selectDisc.innerHTML = '<option value="">Todas as Disciplinas</option>';
+
+      AppState.disciplinas.forEach(d => {
+        selectDisc.innerHTML += `<option value="${d.nome}">${d.nome}</option>`;
+      });
+    }
+
+    document.getElementById('filtro-disciplina').addEventListener('change', (e) => {
+      const discNome = e.target.value;
+      const selectAssunto = document.getElementById('filtro-assunto');
+      selectAssunto.innerHTML = '<option value="">Todos os Assuntos</option>';
+
+      const disc = AppState.disciplinas.find(d => d.nome === discNome);
+      if (disc && disc.assuntos) {
+        disc.assuntos.forEach(a => {
+          selectAssunto.innerHTML += `<option value="${a.nome}">${a.nome}</option>`;
+        });
+      }
+    });
+
+    document.getElementById('filtro-modo').addEventListener('change', (e) => {
+      const container = document.getElementById('container-lotes-especificos');
+      if (e.target.value === 'individual') {
+        container.classList.remove('hidden');
+        carregarSelectLotes();
+      } else {
+        container.classList.add('hidden');
+      }
+    });
+
+    function carregarSelectLotes() {
+      const selectLote = document.getElementById('select-lote-especifico');
+      selectLote.innerHTML = '';
+      AppState.lotes.forEach(l => {
+        selectLote.innerHTML += `<option value="${l.id}">${l.disciplina} - ${l.tema} (${new Date(l.dataCriacao).toLocaleDateString()})</option>`;
+      });
+    }
+
+    document.getElementById('btn-iniciar-zero').addEventListener('click', () => iniciarSessao(false));
+    document.getElementById('btn-continuar-parei').addEventListener('click', () => iniciarSessao(true));
+
+    function iniciarSessao(continuar = false) {
+      const modo = document.getElementById('filtro-modo').value;
+      const discFilter = document.getElementById('filtro-disciplina').value;
+      const assuntoFilter = document.getElementById('filtro-assunto').value;
+
+      let lista = [];
+
+      if (modo === 'individual') {
+        const loteId = document.getElementById('select-lote-especifico').value;
+        lista = AppState.questoes.filter(q => q.loteId === loteId);
+      } else {
+        lista = AppState.questoes.filter(q => {
+          const matchDisc = !discFilter || q.disciplina === discFilter;
+          const matchAssunto = !assuntoFilter || q.tema === assuntoFilter;
+          return matchDisc && matchAssunto;
+        });
+      }
+
+      if (lista.length === 0) return alert("Nenhuma questão encontrada com os filtros selecionados.");
+
+      AppState.sessaoQuestaoAtual = {
+        listaQuestoes: lista,
+        indexAtual: continuar ? Math.min(0, lista.length - 1) : 0,
+        respostasSessao: {},
+        acertos: 0,
+        erros: 0
+      };
+
+      document.getElementById('area-resolucao').classList.remove('hidden');
+      iniciarTimer();
+      renderizarQuestaoAtual();
+    }
+
+    // --- RENDERIZAR E RESPONDER QUESTÃO ---
+    function renderizarQuestaoAtual() {
+      const sessao = AppState.sessaoQuestaoAtual;
+      const q = sessao.listaQuestoes[sessao.indexAtual];
+
+      document.getElementById('questao-progresso').innerText = `Questão ${sessao.indexAtual + 1}/${sessao.listaQuestoes.length}`;
+      document.getElementById('q-disciplina-tag').innerText = q.disciplina;
+      document.getElementById('q-assunto-tag').innerText = q.tema;
+      document.getElementById('q-enunciado').innerText = q.enunciado;
+
+      // Renderizar Alternativas
+      const containerAlt = document.getElementById('q-alternativas');
+      containerAlt.innerHTML = '';
+
+      Object.entries(q.alternativas).forEach(([letra, texto]) => {
+        containerAlt.innerHTML += `
+          <label class="flex items-start gap-3 p-4 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:border-slate-700 transition">
+            <input type="radio" name="alternativa" value="${letra}" class="mt-1 accent-brand-500">
+            <span class="text-sm text-slate-200"><strong>${letra})</strong> ${texto}</span>
+          </label>
+        `;
+      });
+
+      // Resetar Comentário
+      document.getElementById('q-comentario-box').classList.add('hidden');
+      document.getElementById('btn-q-confirmar').disabled = false;
+
+      // Botões de Navegação
+      document.getElementById('btn-q-anterior').disabled = sessao.indexAtual === 0;
+      document.getElementById('btn-q-proxima').disabled = sessao.indexAtual === sessao.listaQuestoes.length - 1;
+    }
+
+    document.getElementById('btn-q-anterior').addEventListener('click', () => {
+      if (AppState.sessaoQuestaoAtual.indexAtual > 0) {
+        AppState.sessaoQuestaoAtual.indexAtual--;
+        renderizarQuestaoAtual();
+      }
+    });
+
+    document.getElementById('btn-q-proxima').addEventListener('click', () => {
+      if (AppState.sessaoQuestaoAtual.indexAtual < AppState.sessaoQuestaoAtual.listaQuestoes.length - 1) {
+        AppState.sessaoQuestaoAtual.indexAtual++;
+        renderizarQuestaoAtual();
+      }
+    });
+
+    document.getElementById('btn-q-confirmar').addEventListener('click', async () => {
+      const selecionada = document.querySelector('input[name="alternativa"]:checked');
+      if (!selecionada) return alert("Selecione uma alternativa!");
+
+      const sessao = AppState.sessaoQuestaoAtual;
+      const q = sessao.listaQuestoes[sessao.indexAtual];
+      const respostaCorreta = q.resposta_correta.toUpperCase();
+      const acertou = selecionada.value.toUpperCase() === respostaCorreta;
+
+      // Atualizar contadores da sessão
+      if (acertou) sessao.acertos++; else sessao.erros++;
+      const totalRespondidas = sessao.acertos + sessao.erros;
+      const taxaSessao = Math.round((sessao.acertos / totalRespondidas) * 100);
+
+      document.getElementById('sessao-acertos').innerText = sessao.acertos;
+      document.getElementById('sessao-erros').innerText = sessao.erros;
+      document.getElementById('sessao-taxa').innerText = `${taxaSessao}%`;
+
+      // Exibir Comentário
+      const box = document.getElementById('q-comentario-box');
+      const badge = document.getElementById('q-status-badge');
+      const textoComentario = document.getElementById('q-comentario-texto');
+
+      box.classList.remove('hidden');
+      if (acertou) {
+        badge.className = "px-3 py-1 rounded-lg text-xs font-bold uppercase bg-emerald-500/20 text-emerald-400";
+        badge.innerText = "Você Acertou!";
+      } else {
+        badge.className = "px-3 py-1 rounded-lg text-xs font-bold uppercase bg-rose-500/20 text-rose-400";
+        badge.innerText = `Você Errou! Gabarito: ${respostaCorreta}`;
+      }
+      textoComentario.innerText = q.comentario || "Nenhum comentário cadastrado para esta questão.";
+
+      document.getElementById('btn-q-confirmar').disabled = true;
+
+      // Salvar no Histórico Firestore
+      const uid = currentUser.uid;
+      const histItem = {
+        questaoId: q.id,
+        disciplina: q.disciplina,
+        tema: q.tema,
+        resposta: selecionada.value,
+        correto: acertou,
+        data: new Date().toISOString().split('T')[0]
+      };
+      await addDoc(collection(db, `users/${uid}/historico`), histItem);
+      AppState.historicoQuestoes.push(histItem);
+      atualizarDashboard();
+    });
+
+    // --- TIMER / CRONÔMETRO ---
+    function iniciarTimer() {
+      clearInterval(timerInterval);
+      timerSeconds = 0;
+      timerRunning = true;
+      timerInterval = setInterval(() => {
+        if (timerRunning) {
+          timerSeconds++;
+          const min = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+          const sec = String(timerSeconds % 60).padStart(2, '0');
+          document.getElementById('timer-display').innerText = `${min}:${sec}`;
+        }
+      }, 1000);
+    }
+
+    document.getElementById('btn-timer-toggle').addEventListener('click', () => {
+      timerRunning = !timerRunning;
+      const icon = document.getElementById('btn-timer-toggle').querySelector('i');
+      icon.className = timerRunning ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+    });
+
+    // --- SISTEMA SRS (REVISÕES ESPAÇADAS) ---
+    async function agendarSRS(disciplina, tema) {
+      const uid = currentUser.uid;
+      const intervalos = [1, 3, 7, 15, 30];
+      const hoje = new Date();
+
+      for (const d of intervalos) {
+        const dataRev = new Date(hoje);
+        dataRev.setDate(dataRev.getDate() + d);
+        const dataStr = dataRev.toISOString().split('T')[0];
+
+        const revDoc = { disciplina, tema, dataAgendada: dataStr, concluida: false };
+        const ref = await addDoc(collection(db, `users/${uid}/revisoes`), revDoc);
+        AppState.revisoes.push({ id: ref.id, ...revDoc });
+      }
+      atualizarBadgeRevisoes();
+    }
+
+    function renderizarRevisoes() {
+      const hojeStr = new Date().toISOString().split('T')[0];
+      const pendentesHoje = AppState.revisoes.filter(r => r.dataAgendada === hojeStr && !r.concluida);
+
+      document.getElementById('revisoes-hoje-count').innerText = `${pendentesHoje.length} pendentes`;
+
+      const container = document.getElementById('lista-revisoes-hoje');
+      container.innerHTML = '';
+
+      if (pendentesHoje.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-sm italic">Nenhuma revisão pendente para o dia de hoje!</p>';
+        return;
+      }
+
+      pendentesHoje.forEach(r => {
+        container.innerHTML += `
+          <div class="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-xl">
+            <div>
+              <p class="text-xs text-brand-400 font-semibold">${r.disciplina}</p>
+              <h4 class="text-sm font-bold text-white">${r.tema}</h4>
+            </div>
+            <button onclick="window.concluirRevisao('${r.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+              Concluir Revisão
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    window.concluirRevisao = async (id) => {
+      const uid = currentUser.uid;
+      await updateDoc(doc(db, `users/${uid}/revisoes`, id), { concluida: true });
+      const r = AppState.revisoes.find(rev => rev.id === id);
+      if (r) r.concluida = true;
+      renderizarRevisoes();
+      atualizarBadgeRevisoes();
+    };
+
+    function atualizarBadgeRevisoes() {
+      const hojeStr = new Date().toISOString().split('T')[0];
+      const count = AppState.revisoes.filter(r => r.dataAgendada === hojeStr && !r.concluida).length;
+      const badge = document.getElementById('badge-revisoes');
+      if (count > 0) {
+        badge.innerText = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // --- LOUSA / CANVAS OVERLAY ---
+    const canvas = document.getElementById('draw-canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let strokeColor = '#38bdf8';
+    let strokeWidth = 4;
+    let isEraser = false;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    window.toggleLousa = () => {
-      const container = document.getElementById("lousa-container");
-      const isVisible = container.style.display === "block";
-      container.style.display = isVisible ? "none" : "block";
-    };
+    document.getElementById('btn-toggle-lousa').addEventListener('click', () => {
+      document.getElementById('canvas-container').classList.remove('hidden');
+    });
 
-    canvas.addEventListener("mousedown", () => isDrawing = true);
-    canvas.addEventListener("mouseup", () => { isDrawing = false; ctx.beginPath(); });
-    canvas.addEventListener("mousemove", draw);
+    document.getElementById('btn-close-canvas').addEventListener('click', () => {
+      document.getElementById('canvas-container').classList.add('hidden');
+    });
 
-    function draw(e) {
-      if (!isDrawing) return;
-      ctx.lineWidth = 3;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = document.getElementById("lousa-color").value;
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        isEraser = false;
+        strokeColor = btn.getAttribute('data-color');
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('ring-2', 'ring-white'));
+        btn.classList.add('ring-2', 'ring-white');
+      });
+    });
 
-      ctx.lineTo(e.clientX, e.clientY);
-      ctx.stroke();
+    document.getElementById('brush-size').addEventListener('input', (e) => {
+      strokeWidth = e.target.value;
+    });
+
+    document.getElementById('btn-eraser').addEventListener('click', () => {
+      isEraser = true;
+    });
+
+    document.getElementById('btn-clear-canvas').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      drawing = true;
       ctx.beginPath();
       ctx.moveTo(e.clientX, e.clientY);
-    }
+    });
 
-    window.clearLousa = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
+      ctx.lineWidth = strokeWidth;
+      ctx.lineCap = 'round';
+      if (isEraser) {
+        ctx.globalCompositeOperation = 'destination-out';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = strokeColor;
+      }
+      ctx.lineTo(e.clientX, e.clientY);
+      ctx.stroke();
+    });
 
-    // Carregar Dados do Usuário
-    function loadUserData() {
-      if (!currentUser) return;
-      // Ouvinte em tempo real no Firestore
-      onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          // Atualizar indicadores e interface
-        }
-      });
-    }
+    canvas.addEventListener('mouseup', () => drawing = false);
   </script>
 </body>
 </html>
