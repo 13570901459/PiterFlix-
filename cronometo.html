@@ -3,479 +3,485 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plataforma Completa de Estudos</title>
+  <title>Plataforma de Estudos & Edital Verticalizado</title>
   
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <!-- CSS Base Dark Mode Moderno -->
   <style>
-    /* Estilização da Lousa Interativa (Canvas Overlay) */
-    #canvas-overlay {
-      position: absolute;
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --border-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Modais e Autenticação */
+    .auth-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 30px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .auth-card h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: #0f172a;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    .toggle-auth {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Layout Principal */
+    #app {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .nav-btn.active {
+      background-color: var(--border-color);
+      color: var(--accent);
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    .grid-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .card h3 {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .card .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    /* Lousa Flutuante */
+    #lousa-container {
+      display: none;
+      position: fixed;
       top: 0;
       left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
       pointer-events: none;
-      z-index: 40;
     }
-    #canvas-overlay.active {
+
+    #lousa-canvas {
+      width: 100%;
+      height: 100%;
       pointer-events: auto;
-      cursor: crosshair;
     }
-    .sidebar-transition {
-      transition: transform 0.3s ease-in-out;
+
+    .lousa-tools {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 30px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+
+    /* Ocultar Seções */
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .doc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background-color: #2563eb;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.8rem;
+      margin-top: 5px;
     }
   </style>
 </head>
-<body class="bg-gray-900 text-gray-100 flex h-screen overflow-hidden relative">
+<body>
 
-  <!-- LOUSA DE RASCUNHO OVERLAY -->
-  <canvas id="canvas-overlay"></canvas>
-  
-  <!-- BARRA FLUTUANTE DA LOUSA -->
-  <div id="lousa-controls" class="hidden fixed top-4 right-4 z-50 bg-gray-800 border border-gray-700 p-2 rounded-xl shadow-2xl flex items-center space-x-3">
-    <span class="text-xs font-bold text-gray-400 pl-2">LOUSA:</span>
-    <button onclick="setPenColor('#ef4444')" class="w-7 h-7 rounded-full bg-red-500 hover:ring-2 ring-white transition"></button>
-    <button onclick="setPenColor('#3b82f6')" class="w-7 h-7 rounded-full bg-blue-500 hover:ring-2 ring-white transition"></button>
-    <button onclick="setEraser()" class="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-medium">Borracha</button>
-    <button onclick="clearCanvas()" class="px-2 py-1 text-xs bg-red-900/50 hover:bg-red-800 text-red-200 rounded-lg font-medium">Limpar</button>
-    <button onclick="toggleLousa()" class="px-3 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-bold">Fechar</button>
+  <!-- TELA DE AUTENTICAÇÃO -->
+  <div id="auth-screen" class="auth-container">
+    <div class="auth-card">
+      <h2 id="auth-title">Acessar Plataforma</h2>
+      <form id="auth-form">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="auth-email" required placeholder="seu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="auth-password" required placeholder="******">
+        </div>
+        <button type="submit" class="btn" id="auth-btn-submit">Entrar</button>
+      </form>
+      <div class="toggle-auth" id="toggle-auth">
+        Não tem uma conta? Criar conta
+      </div>
+    </div>
   </div>
 
-  <!-- MENU HAMBÚRGUER LATERAL ANIMADO -->
-  <aside id="sidebar" class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col fixed inset-y-0 left-0 z-30 transform -translate-x-full md:translate-x-0 sidebar-transition">
-    <div class="p-5 border-b border-gray-700 flex justify-between items-center">
-      <h1 class="text-xl font-black text-indigo-400 tracking-wider">STUDY<span class="text-white">HUB</span></h1>
-      <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
-        <i data-lucide="x"></i>
-      </button>
-    </div>
-    
-    <nav class="flex-1 p-4 space-y-2">
-      <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-400 text-gray-300 font-medium transition">
-        <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
-      </button>
-      <button onclick="switchTab('edital')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-400 text-gray-300 font-medium transition">
-        <i data-lucide="list-checks"></i><span>Edital Verticalizado</span>
-      </button>
-      <button onclick="switchTab('disciplinas')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-400 text-gray-300 font-medium transition">
-        <i data-lucide="book-open"></i><span>Disciplinas / Assuntos</span>
-      </button>
-      <button onclick="switchTab('questoes')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-400 text-gray-300 font-medium transition">
-        <i data-lucide="help-circle"></i><span>Banco de Questões</span>
-      </button>
-      <button onclick="switchTab('pomodoro')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-indigo-600/20 hover:text-indigo-400 text-gray-300 font-medium transition">
-        <i data-lucide="timer"></i><span>Cronômetro / Pomodoro</span>
-      </button>
-    </nav>
-  </aside>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <div class="flex-1 flex flex-col md:ml-64 h-full overflow-y-auto" id="main-scroll">
-    
-    <!-- TOPBAR -->
-    <header class="bg-gray-800/50 backdrop-blur-md border-b border-gray-700 p-4 sticky top-0 z-20 flex justify-between items-center">
-      <button onclick="toggleSidebar()" class="md:hidden text-gray-300 focus:outline-none">
-        <i data-lucide="menu"></i>
-      </button>
-      <h2 id="page-title" class="text-lg font-bold text-gray-100">Dashboard</h2>
-      
-      <button onclick="toggleLousa()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow-lg transition">
-        <i data-lucide="edit-3" class="w-4 h-4"></i>
-        <span>Ativar Lousa / Rascunho</span>
-      </button>
+  <!-- APLICAÇÃO PRINCIPAL -->
+  <div id="app">
+    <header>
+      <h2>Estudos & Edital</h2>
+      <nav>
+        <button class="nav-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+        <button class="nav-btn" onclick="switchTab('edital')">Edital</button>
+        <button class="nav-btn" onclick="switchTab('revisoes')">Revisões</button>
+        <button class="nav-btn" onclick="toggleLousa()">Lousa</button>
+        <button class="nav-btn" onclick="handleLogout()">Sair</button>
+      </nav>
     </header>
 
-    <!-- CONTAINER DAS ABAS -->
-    <main class="p-6 flex-1 space-y-6">
-
-      <!-- ABA 1: DASHBOARD -->
-      <section id="tab-dashboard" class="tab-content space-y-6">
-        <!-- KPIS GERAIS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-gray-800 p-4 rounded-2xl border border-gray-700">
-            <span class="text-xs text-gray-400 font-semibold uppercase">Total de Questões</span>
-            <div id="kpi-total" class="text-2xl font-black text-white mt-1">0</div>
+    <main>
+      <!-- DASHBOARD -->
+      <section id="sec-dashboard" class="section active">
+        <h2>Painel de Desempenho Hoje</h2>
+        <div class="grid-dashboard">
+          <div class="card">
+            <h3>Questões Feitas</h3>
+            <div class="value" id="dash-hoje-total">0</div>
           </div>
-          <div class="bg-gray-800 p-4 rounded-2xl border border-gray-700">
-            <span class="text-xs text-emerald-400 font-semibold uppercase">Acertos</span>
-            <div id="kpi-acertos" class="text-2xl font-black text-emerald-400 mt-1">0</div>
+          <div class="card">
+            <h3>Acertos</h3>
+            <div class="value" style="color: var(--success);" id="dash-hoje-acertos">0</div>
           </div>
-          <div class="bg-gray-800 p-4 rounded-2xl border border-gray-700">
-            <span class="text-xs text-rose-400 font-semibold uppercase">Erros</span>
-            <div id="kpi-erros" class="text-2xl font-black text-rose-400 mt-1">0</div>
-          </div>
-          <div class="bg-gray-800 p-4 rounded-2xl border border-gray-700">
-            <span class="text-xs text-indigo-400 font-semibold uppercase">Aproveitamento Geral</span>
-            <div id="kpi-aproveitamento" class="text-2xl font-black text-indigo-400 mt-1">0%</div>
+          <div class="card">
+            <h3>Erros</h3>
+            <div class="value" style="color: var(--danger);" id="dash-hoje-erros">0</div>
           </div>
         </div>
 
-        <!-- FILTROS TEMPORAIS -->
-        <div class="flex justify-between items-center bg-gray-800 p-3 rounded-xl border border-gray-700">
-          <span class="text-sm font-medium text-gray-300">Filtro de Desempenho:</span>
-          <div class="flex space-x-2">
-            <button onclick="setFilter('diario')" class="filter-btn bg-indigo-600 text-xs px-3 py-1.5 rounded-lg font-bold">Diário (00:00 - 23:59)</button>
-            <button onclick="setFilter('semanal')" class="filter-btn bg-gray-700 text-xs px-3 py-1.5 rounded-lg font-bold">Semanal</button>
-            <button onclick="setFilter('mensal')" class="filter-btn bg-gray-700 text-xs px-3 py-1.5 rounded-lg font-bold">Mensal</button>
+        <h2>Desempenho Geral</h2>
+        <div class="grid-dashboard">
+          <div class="card">
+            <h3>Total de Questões</h3>
+            <div class="value" id="dash-geral-total">0</div>
           </div>
-        </div>
-
-        <!-- GRÁFICO DE DESEMPENHO POR DISCIPLINA -->
-        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700">
-          <h3 class="text-md font-bold mb-4 text-gray-200">Aproveitamento por Disciplina</h3>
-          <div class="h-64">
-            <canvas id="chart-disciplinas"></canvas>
+          <div class="card">
+            <h3>Acertos Gerais</h3>
+            <div class="value" style="color: var(--success);" id="dash-geral-acertos">0</div>
+          </div>
+          <div class="card">
+            <h3>Aproveitamento Geral</h3>
+            <div class="value" style="color: var(--accent);" id="dash-geral-aproveitamento">0%</div>
           </div>
         </div>
       </section>
 
-      <!-- ABA 2: EDITAL VERTICALIZADO -->
-      <section id="tab-edital" class="tab-content hidden space-y-6">
-        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="text-lg font-bold">Progresso Geral do Edital</h3>
-            <span id="edital-porcentagem" class="text-lg font-black text-indigo-400">0%</span>
-          </div>
-          <div class="w-full bg-gray-700 h-3 rounded-full overflow-hidden">
-            <div id="edital-bar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
-          </div>
+      <!-- EDITAL VERTICALIZADO -->
+      <section id="sec-edital" class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>Edital Verticalizado</h2>
+          <button class="btn" style="width: auto;" onclick="openAddDisciplinaModal()">+ Nova Disciplina</button>
         </div>
-
-        <div id="edital-lista" class="space-y-4">
-          <!-- Tópicos do edital injetados dinamicamente via JS -->
-        </div>
+        <div id="disciplinas-list"></div>
       </section>
 
-      <!-- ABA 3: DISCIPLINAS & ASSUNTOS (INTEGRAÇÃO GOOGLE DOCS) -->
-      <section id="tab-disciplinas" class="tab-content hidden space-y-6">
-        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 space-y-4">
-          <h3 class="text-lg font-bold">Cadastrar Disciplina / Assunto</h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="text" id="disc-nome" placeholder="Nome da Disciplina" class="bg-gray-900 border border-gray-700 p-2.5 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-            <input type="text" id="disc-assunto" placeholder="Assunto Principal" class="bg-gray-900 border border-gray-700 p-2.5 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-            <input type="url" id="disc-docs" placeholder="Link do Resumo (Google Docs)" class="bg-gray-900 border border-gray-700 p-2.5 rounded-xl text-sm focus:outline-none focus:border-indigo-500">
-          </div>
-          <button onclick="addDisciplina()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl font-bold text-sm">Salvar Disciplina</button>
-        </div>
-
-        <div id="disciplinas-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Cards de Disciplinas injetados via JS -->
+      <!-- REVISÕES -->
+      <section id="sec-revisoes" class="section">
+        <h2>Revisões do Dia</h2>
+        <div id="revisoes-list" style="margin-top: 15px;">
+          <p style="color: var(--text-muted);">Nenhuma revisão agendada para hoje.</p>
         </div>
       </section>
-
-      <!-- ABA 4: BANCO DE QUESTÕES & MÓDULO LOTE (JSON) -->
-      <section id="tab-questoes" class="tab-content hidden space-y-6">
-        <!-- IMPORTADOR JSON -->
-        <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700 space-y-3">
-          <h3 class="text-md font-bold">Importar Lote de Questões (JSON)</h3>
-          <textarea id="json-input" rows="3" placeholder='Cole o JSON aqui ex: [{"id":1,"pergunta":"...","opcoes":["A","B"],"resposta":0,"comentario":"..."}]' class="w-full bg-gray-900 border border-gray-700 p-3 rounded-xl text-xs font-mono focus:outline-none focus:border-indigo-500"></textarea>
-          <button onclick="importJSON()" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl text-xs font-bold">Importar Questões</button>
-        </div>
-
-        <!-- AREA DE RESOLUÇÃO DE QUESTÕES -->
-        <div id="questao-card" class="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
-          <div class="flex justify-between items-center text-xs text-gray-400">
-            <span id="questao-index">Questão 1 de 1</span>
-            <span id="questao-status" class="bg-gray-700 px-2 py-1 rounded">Continuar de Onde Parei</span>
-          </div>
-
-          <p id="questao-texto" class="text-base font-medium text-gray-100">Carregando questão...</p>
-
-          <div id="questao-opcoes" class="space-y-2">
-            <!-- Opções renderizadas dinamicamente -->
-          </div>
-
-          <div class="flex space-x-3 pt-3">
-            <button onclick="responderQuestao()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-xl font-bold text-sm">Confirmar Resposta</button>
-            <button onclick="proximaQuestao()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2.5 rounded-xl font-bold text-sm">Próxima</button>
-          </div>
-
-          <!-- GABARITO COMENTADO EXPANSÍVEL -->
-          <details id="gabarito-container" class="mt-4 bg-gray-900 border border-gray-700 rounded-xl p-4">
-            <summary class="font-bold text-indigo-400 cursor-pointer text-sm">Ver Gabarito Comentado</summary>
-            <p id="gabarito-texto" class="mt-2 text-xs text-gray-300 leading-relaxed">Selecione e responda a questão para liberar a explanação.</p>
-          </details>
-        </div>
-      </section>
-
-      <!-- ABA 5: POMODORO -->
-      <section id="tab-pomodoro" class="tab-content hidden space-y-6">
-        <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 text-center max-w-md mx-auto space-y-6">
-          <h3 class="text-xl font-bold">Cronômetro / Pomodoro</h3>
-          <div id="timer-display" class="text-6xl font-black text-indigo-400 tracking-widest font-mono">25:00</div>
-          <div class="flex justify-center space-x-4">
-            <button onclick="startTimer()" class="bg-emerald-600 hover:bg-emerald-500 px-6 py-2.5 rounded-xl font-bold">Iniciar</button>
-            <button onclick="pauseTimer()" class="bg-amber-600 hover:bg-amber-500 px-6 py-2.5 rounded-xl font-bold">Pausar</button>
-            <button onclick="resetTimer()" class="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded-xl font-bold">Resetar</button>
-          </div>
-        </div>
-      </section>
-
     </main>
+
+    <!-- LOUSA FLUTUANTE -->
+    <div id="lousa-container">
+      <canvas id="lousa-canvas"></canvas>
+      <div class="lousa-tools">
+        <input type="color" id="lousa-color" value="#38bdf8">
+        <button class="btn btn-secondary" onclick="clearLousa()">Limpar</button>
+        <button class="btn" onclick="toggleLousa()">Fechar</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // INITIALIZATION & LUCIDE ICONS
-    lucide.createIcons();
+  <!-- SCRIPT FIREBASE E LÓGICA DA APLICAÇÃO -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // APP STATE
-    let db = {
-      questoes: JSON.parse(localStorage.getItem('questoes')) || [],
-      disciplinas: JSON.parse(localStorage.getItem('disciplinas')) || [],
-      progressoEdital: JSON.parse(localStorage.getItem('progressoEdital')) || {},
-      historicoRespostas: JSON.parse(localStorage.getItem('historicoRespostas')) || [],
-      lastIndex: parseInt(localStorage.getItem('lastIndex')) || 0
+    // ⚠️ ATENÇÃO: Substitua os dados abaixo com as credenciais do seu projeto Firebase Console
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_PROJETO.firebaseapp.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_PROJETO.appspot.com",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
     };
 
-    let currentOption = null;
-    let timerInterval = null;
-    let timerSeconds = 1500;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // LOCAL STORAGE SYNC (SIMULANDO SYNC FIREBASE REALTIME)
-    function syncFirebase() {
-      localStorage.setItem('questoes', JSON.stringify(db.questoes));
-      localStorage.setItem('disciplinas', JSON.stringify(db.disciplinas));
-      localStorage.setItem('progressoEdital', JSON.stringify(db.progressoEdital));
-      localStorage.setItem('historicoRespostas', JSON.stringify(db.historicoRespostas));
-      localStorage.setItem('lastIndex', db.lastIndex);
-      updateDashboard();
-    }
+    let currentUser = null;
+    let isSignUp = false;
 
-    // NAVEGAÇÃO DE ABAS
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-      document.getElementById('page-title').innerText = tabId.toUpperCase();
-      if(window.innerWidth < 768) toggleSidebar();
-    }
+    // Gerenciamento de Autenticação
+    const authForm = document.getElementById("auth-form");
+    const toggleAuth = document.getElementById("toggle-auth");
+    const authTitle = document.getElementById("auth-title");
+    const authBtnSubmit = document.getElementById("auth-btn-submit");
 
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-    }
+    toggleAuth.addEventListener("click", () => {
+      isSignUp = !isSignUp;
+      authTitle.innerText = isSignUp ? "Criar Conta" : "Acessar Plataforma";
+      authBtnSubmit.innerText = isSignUp ? "Cadastrar" : "Entrar";
+      toggleAuth.innerText = isSignUp ? "Já tem uma conta? Entrar" : "Não tem uma conta? Criar conta";
+    });
 
-    // LOUSA DE RASCUNHO / CANVAS OVERLAY
-    const canvas = document.getElementById('canvas-overlay');
-    const ctx = canvas.getContext('2d');
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("auth-email").value;
+      const password = document.getElementById("auth-password").value;
+
+      try {
+        if (isSignUp) {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("Conta criada com sucesso!");
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+      } catch (error) {
+        alert("Erro na autenticação: " + error.message);
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("auth-screen").style.display = "none";
+        document.getElementById("app").style.display = "flex";
+        loadUserData();
+      } else {
+        currentUser = null;
+        document.getElementById("auth-screen").style.display = "flex";
+        document.getElementById("app").style.display = "none";
+      }
+    });
+
+    window.handleLogout = () => signOut(auth);
+
+    // Navegação por Abas
+    window.switchTab = (tabName) => {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      
+      document.getElementById(`sec-${tabName}`).classList.add("active");
+      event.target.classList.add("active");
+    };
+
+    // Lógica da Lousa Flutuante
     let isDrawing = false;
-    let penColor = '#ef4444';
+    const canvas = document.getElementById("lousa-canvas");
+    const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
-      const container = document.getElementById('main-scroll');
-      canvas.width = container.scrollWidth;
-      canvas.height = container.scrollHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resizeCanvas);
-    document.addEventListener('DOMContentLoaded', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    function toggleLousa() {
-      resizeCanvas();
-      canvas.classList.toggle('active');
-      document.getElementById('lousa-controls').classList.toggle('hidden');
-    }
+    window.toggleLousa = () => {
+      const container = document.getElementById("lousa-container");
+      const isVisible = container.style.display === "block";
+      container.style.display = isVisible ? "none" : "block";
+    };
 
-    function setPenColor(color) {
-      ctx.globalCompositeOperation = 'source-over';
-      penColor = color;
-    }
+    canvas.addEventListener("mousedown", () => isDrawing = true);
+    canvas.addEventListener("mouseup", () => { isDrawing = false; ctx.beginPath(); });
+    canvas.addEventListener("mousemove", draw);
 
-    function setEraser() {
-      ctx.globalCompositeOperation = 'destination-out';
-    }
-
-    function clearCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-      isDrawing = true;
-      ctx.beginPath();
-      ctx.moveTo(e.pageX, e.pageY);
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
+    function draw(e) {
       if (!isDrawing) return;
-      ctx.strokeStyle = penColor;
       ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.lineTo(e.pageX, e.pageY);
+      ctx.lineCap = "round";
+      ctx.strokeStyle = document.getElementById("lousa-color").value;
+
+      ctx.lineTo(e.clientX, e.clientY);
       ctx.stroke();
-    });
-
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-
-    // BANCO DE QUESTÕES & MÓDULO LOTE (JSON)
-    function importJSON() {
-      try {
-        const json = JSON.parse(document.getElementById('json-input').value);
-        if(Array.isArray(json)) {
-          db.questoes = [...db.questoes, ...json];
-          syncFirebase();
-          alert('Lote de questões importado com sucesso!');
-          renderQuestao();
-        }
-      } catch(e) {
-        alert('Formato JSON inválido.');
-      }
+      ctx.beginPath();
+      ctx.moveTo(e.clientX, e.clientY);
     }
 
-    function renderQuestao() {
-      if(db.questoes.length === 0) return;
-      const q = db.questoes[db.lastIndex];
-      document.getElementById('questao-index').innerText = `Questão ${db.lastIndex + 1} de ${db.questoes.length}`;
-      document.getElementById('questao-texto').innerText = q.pergunta;
-      
-      const optsContainer = document.getElementById('questao-opcoes');
-      optsContainer.innerHTML = '';
-      
-      q.opcoes.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = "w-full text-left p-3 rounded-xl border border-gray-700 bg-gray-900 hover:bg-gray-700/50 text-sm font-medium transition flex items-center space-x-3";
-        btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center text-xs font-bold">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
-        btn.onclick = () => {
-          document.querySelectorAll('#questao-opcoes button').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-600/10'));
-          btn.classList.add('border-indigo-500', 'bg-indigo-600/10');
-          currentOption = idx;
-        };
-        optsContainer.appendChild(btn);
-      });
+    window.clearLousa = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      document.getElementById('gabarito-texto').innerText = q.comentario || "Gabarito indisponível.";
-    }
-
-    function responderQuestao() {
-      if(currentOption === null) return alert('Selecione uma resposta.');
-      const q = db.questoes[db.lastIndex];
-      const acerto = currentOption === q.resposta;
-      
-      db.historicoRespostas.push({
-        timestamp: new Date().getTime(),
-        disciplina: q.disciplina || 'Geral',
-        acerto: acerto
-      });
-
-      alert(acerto ? 'Resposta Correta!' : 'Resposta Incorreta.');
-      syncFirebase();
-    }
-
-    function proximaQuestao() {
-      if(db.lastIndex < db.questoes.length - 1) {
-        db.lastIndex++;
-        currentOption = null;
-        syncFirebase();
-        renderQuestao();
-      }
-    }
-
-    // DASHBOARD & MÉTRICAS
-    let chartInstance = null;
-
-    function updateDashboard() {
-      const total = db.historicoRespostas.length;
-      const acertos = db.historicoRespostas.filter(r => r.acerto).length;
-      const erros = total - acertos;
-      const perc = total > 0 ? ((acertos / total) * 100).toFixed(1) : 0;
-
-      document.getElementById('kpi-total').innerText = total;
-      document.getElementById('kpi-acertos').innerText = acertos;
-      document.getElementById('kpi-erros').innerText = erros;
-      document.getElementById('kpi-aproveitamento').innerText = `${perc}%`;
-
-      renderChart();
-    }
-
-    function renderChart() {
-      const ctxChart = document.getElementById('chart-disciplinas').getContext('2d');
-      if(chartInstance) chartInstance.destroy();
-
-      chartInstance = new Chart(ctxChart, {
-        type: 'bar',
-        data: {
-          labels: ['Português', 'Direito Const.', 'Informática'],
-          datasets: [{
-            label: 'Aproveitamento (%)',
-            data: [85, 62, 74],
-            backgroundColor: '#6366f1',
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, max: 100, grid: { color: '#374151' } },
-            x: { grid: { display: false } }
-          }
+    // Carregar Dados do Usuário
+    function loadUserData() {
+      if (!currentUser) return;
+      // Ouvinte em tempo real no Firestore
+      onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // Atualizar indicadores e interface
         }
       });
     }
-
-    // CADASTRAR DISCIPLINAS & GOOGLE DOCS LINK
-    function addDisciplina() {
-      const nome = document.getElementById('disc-nome').value;
-      const assunto = document.getElementById('disc-assunto').value;
-      const docs = document.getElementById('disc-docs').value;
-
-      if(!nome) return;
-
-      db.disciplinas.push({ nome, assunto, docs });
-      syncFirebase();
-      renderDisciplinas();
-    }
-
-    function renderDisciplinas() {
-      const container = document.getElementById('disciplinas-grid');
-      container.innerHTML = '';
-      db.disciplinas.forEach(d => {
-        const card = document.createElement('div');
-        card.className = "bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-center";
-        card.innerHTML = `
-          <div>
-            <h4 class="font-bold text-white">${d.nome}</h4>
-            <p class="text-xs text-gray-400">${d.assunto}</p>
-          </div>
-          ${d.docs ? `<a href="${d.docs}" target="_blank" class="bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 p-2 rounded-lg text-xs font-bold flex items-center space-x-1"><i data-lucide="file-text" class="w-4 h-4"></i><span>Resumo</span></a>` : ''}
-        `;
-        container.appendChild(card);
-      });
-      lucide.createIcons();
-    }
-
-    // POMODORO TIMER
-    function startTimer() {
-      if(timerInterval) return;
-      timerInterval = setInterval(() => {
-        if(timerSeconds > 0) {
-          timerSeconds--;
-          const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-          const s = String(timerSeconds % 60).padStart(2, '0');
-          document.getElementById('timer-display').innerText = `${m}:${s}`;
-        } else {
-          clearInterval(timerInterval);
-          alert('Sessão de estudos concluída!');
-        }
-      }, 1000);
-    }
-
-    function pauseTimer() {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-
-    function resetTimer() {
-      pauseTimer();
-      timerSeconds = 1500;
-      document.getElementById('timer-display').innerText = "25:00";
-    }
-
-    // INICIALIZAÇÃO INICIAL
-    renderQuestao();
-    updateDashboard();
-    renderDisciplinas();
   </script>
 </body>
 </html>
