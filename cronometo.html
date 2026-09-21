@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QG Estudo - Plataforma Profissional</title>
+  <title>QG Estudo - Painel Completo</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- SDKs do Firebase v10 (CDN) -->
+  <!-- Firebase v10 SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -24,7 +24,6 @@
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Suas chaves reais do projeto qgestudo
     const firebaseConfig = {
       apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
       authDomain: "qgestudo.firebaseapp.com",
@@ -35,14 +34,13 @@
       measurementId: "G-PC8ESJHFZ5"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     window.auth = auth;
     window.db = db;
-    window.firebaseServices = {
+    window.fb = {
       createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       onAuthStateChanged,
@@ -52,16 +50,16 @@
       onSnapshot
     };
   </script>
-  
+
   <style>
-    .sidebar-transition { transition: transform 0.3s ease-in-out; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    #drawing-canvas { touch-action: none; pointer-events: auto; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
 
-  <!-- Tela de Auth (Login / Cadastro) -->
+  <!-- TELA DE LOGIN / CADASTRO -->
   <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 w-full max-w-md shadow-2xl">
       <div class="flex flex-col items-center mb-6">
@@ -69,7 +67,7 @@
           <i data-lucide="graduation-cap" class="w-8 h-8"></i>
         </div>
         <h2 id="auth-title" class="text-2xl font-bold text-white">QG Estudo</h2>
-        <p class="text-xs text-slate-400 mt-1">Acesse seu histórico e progresso na nuvem</p>
+        <p class="text-xs text-slate-400 mt-1">Plataforma Avançada para Concursos</p>
       </div>
 
       <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
@@ -95,13 +93,14 @@
     </div>
   </div>
 
-  <!-- Layout Principal -->
+  <!-- APLICAÇÃO PRINCIPAL -->
   <div id="app-screen" class="hidden flex-1 flex overflow-hidden">
-    
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 border-r border-slate-800 transform -translate-x-full md:translate-x-0 sidebar-transition flex flex-col">
+
+    <!-- MENU LATERAL (HAMBÚRGUER) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 border-r border-slate-800 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
       <div class="p-4 border-b border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i data-lucide="graduation-cap" class="w-6 h-6 text-blue-400"></i>
+          <i data-lucide="shield-check" class="w-6 h-6 text-blue-400"></i>
           <span class="font-bold text-slate-100 text-lg">QG Estudo</span>
         </div>
         <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
@@ -109,7 +108,7 @@
         </button>
       </div>
 
-      <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto custom-scroll">
         <button onclick="navigate('dashboard')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
           <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-400"></i>
           <span>Dashboard</span>
@@ -118,15 +117,24 @@
           <i data-lucide="list-checks" class="w-4 h-4 text-emerald-400"></i>
           <span>Edital Verticalizado</span>
         </button>
+        <button onclick="navigate('disciplinas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i data-lucide="book-open" class="w-4 h-4 text-purple-400"></i>
+          <span>Disciplinas e Assuntos</span>
+        </button>
+        <button onclick="navigate('questoes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i data-lucide="help-circle" class="w-4 h-4 text-amber-400"></i>
+          <span>Banco de Questões (JSON)</span>
+        </button>
+        <button onclick="navigate('cronometro')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <i data-lucide="timer" class="w-4 h-4 text-rose-400"></i>
+          <span>Cronômetro</span>
+        </button>
       </nav>
 
       <div class="p-4 border-t border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400 text-xs" id="user-avatar">US</div>
-          <div class="text-xs">
-            <p class="font-semibold text-white truncate max-w-[110px]" id="user-email-display">usuario@email.com</p>
-            <p class="text-slate-400 text-[10px]">QG Sincronizado</p>
-          </div>
+        <div class="text-xs">
+          <p class="font-semibold text-white truncate max-w-[130px]" id="user-email-display">carregando...</p>
+          <p class="text-emerald-400 text-[10px]">● Conectado</p>
         </div>
         <button onclick="logoutFirebase()" class="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg transition" title="Sair">
           <i data-lucide="log-out" class="w-4 h-4"></i>
@@ -136,7 +144,8 @@
 
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
 
-    <main class="flex-1 md:ml-64 flex flex-col min-h-screen bg-slate-900 overflow-y-auto custom-scrollbar">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 md:ml-64 flex flex-col min-h-screen bg-slate-900 overflow-y-auto custom-scroll relative">
       
       <header class="h-16 border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-20 px-4 md:px-6 flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -145,44 +154,163 @@
           </button>
           <h1 id="page-title" class="text-lg font-bold text-white">Dashboard Geral</h1>
         </div>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Conectado ao Firebase
-        </span>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleLousa()" id="btn-lousa" class="px-3 py-1.5 bg-amber-600/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-semibold hover:bg-amber-600 hover:text-white transition flex items-center gap-1.5">
+            <i data-lucide="pen-tool" class="w-4 h-4"></i>
+            <span>Lousa / Rabisco</span>
+          </button>
+        </div>
       </header>
+
+      <!-- LOUSA / CANVAS PARA RABISCO OVERLAY -->
+      <div id="lousa-container" class="hidden fixed inset-0 z-30 pointer-events-none">
+        <canvas id="drawing-canvas" class="w-full h-full bg-black/10"></canvas>
+        <div class="absolute top-20 right-6 pointer-events-auto bg-slate-950 border border-slate-800 rounded-xl p-2 flex gap-2 shadow-2xl">
+          <button onclick="setCanvasColor('#ef4444')" class="w-6 h-6 rounded-full bg-red-500 border border-white/20"></button>
+          <button onclick="setCanvasColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 border border-white/20"></button>
+          <button onclick="setCanvasColor('#eab308')" class="w-6 h-6 rounded-full bg-yellow-500 border border-white/20"></button>
+          <button onclick="clearCanvas()" class="px-2 py-1 bg-slate-800 text-xs text-white rounded hover:bg-slate-700">Limpar</button>
+        </div>
+      </div>
 
       <div class="p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
         
+        <!-- SEÇÃO DASHBOARD -->
         <section id="page-dashboard" class="space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-2xl">
+            <h2 class="text-sm font-semibold text-slate-300">Filtrar Período de Desempenho:</h2>
+            <div class="flex gap-2">
+              <button onclick="setPeriodoFiltro('hoje')" id="filter-hoje" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold">Hoje (00h - 24h)</button>
+              <button onclick="setPeriodoFiltro('semana')" id="filter-semana" class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-700">Esta Semana</button>
+              <button onclick="setPeriodoFiltro('mes')" id="filter-mes" class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-700">Este Mês</button>
+              <button onclick="setPeriodoFiltro('geral')" id="filter-geral" class="px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-700">Geral</button>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
               <p class="text-xs font-semibold text-slate-400 uppercase">Total Resolvido</p>
-              <h3 id="dash-total-questoes" class="text-2xl font-black text-white mt-1">0</h3>
+              <h3 id="dash-total" class="text-2xl font-black text-white mt-1">0</h3>
             </div>
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
-              <p class="text-xs font-semibold text-emerald-400 uppercase">Taxa de Acertos</p>
-              <h3 id="dash-pct-acerto" class="text-2xl font-black text-emerald-400 mt-1">0%</h3>
+              <p class="text-xs font-semibold text-emerald-400 uppercase">Acertos</p>
+              <h3 id="dash-acertos" class="text-2xl font-black text-emerald-400 mt-1">0</h3>
             </div>
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
-              <p class="text-xs font-semibold text-rose-400 uppercase">Margem de Erro</p>
-              <h3 id="dash-pct-erro" class="text-2xl font-black text-rose-400 mt-1">0%</h3>
+              <p class="text-xs font-semibold text-rose-400 uppercase">Erros</p>
+              <h3 id="dash-erros" class="text-2xl font-black text-rose-400 mt-1">0</h3>
             </div>
             <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-4">
-              <p class="text-xs font-semibold text-purple-400 uppercase">Horas Líquidas</p>
-              <h3 id="dash-horas" class="text-2xl font-black text-purple-400 mt-1">0h</h3>
+              <p class="text-xs font-semibold text-blue-400 uppercase">Aproveitamento (%)</p>
+              <h3 id="dash-aproveitamento" class="text-2xl font-black text-blue-400 mt-1">0%</h3>
+            </div>
+          </div>
+
+          <!-- APROVEITAMENTO POR DISCIPLINA -->
+          <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <h3 class="font-bold text-white text-base">Aproveitamento por Disciplina</h3>
+            <div id="dash-disciplinas-list" class="space-y-3">
+              <!-- Renderizado via JS -->
             </div>
           </div>
         </section>
 
+        <!-- SEÇÃO EDITAL VERTICALIZADO -->
         <section id="page-edital" class="hidden space-y-6">
           <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-              <h2 class="text-lg font-bold text-white">Edital Verticalizado</h2>
-              <button onclick="addDisciplinaCloud()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold">
-                + Nova Disciplina
-              </button>
+            <h2 class="text-lg font-bold text-white border-b border-slate-800 pb-3">Progresso do Edital Verticalizado</h2>
+            <div id="edital-vertical-list" class="space-y-4"></div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO CADASTRO E GESTÃO DE DISCIPLINAS -->
+        <section id="page-disciplinas" class="hidden space-y-6">
+          <div class="flex justify-between items-center bg-slate-950/60 p-4 border border-slate-800 rounded-2xl">
+            <h2 class="text-base font-bold text-white">Gerenciar Disciplinas e Assuntos</h2>
+            <button onclick="cadastrarDisciplinaModal()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Nova Disciplina</span>
+            </button>
+          </div>
+          <div id="disciplinas-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- SEÇÃO BANCO DE QUESTÕES E RESOLUÇÃO -->
+        <section id="page-questoes" class="hidden space-y-6">
+          <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <h2 class="text-lg font-bold text-white">Banco e Resolução de Questões</h2>
+                <p class="text-xs text-slate-400">Importe via JSON e responda por lotes</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="importarJSONModal()" class="px-3 py-2 bg-amber-600/20 text-amber-400 border border-amber-500/30 hover:bg-amber-600 hover:text-white rounded-xl text-xs font-semibold transition">
+                  + Importar JSON
+                </button>
+              </div>
             </div>
-            <div id="edital-container" class="space-y-4"></div>
+
+            <!-- FILTROS DE INÍCIO -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Modo de Resolução</label>
+                <select id="modo-lote-select" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                  <option value="20">Lote de 20 Questões</option>
+                  <option value="geral">Modo Geral (Todas)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Disciplina</label>
+                <select id="filtro-questao-disc" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                  <option value="todas">Todas as Disciplinas</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button onclick="iniciarSessaoQuestoes()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition">
+                  Iniciar / Continuar onde Parou
+                </button>
+              </div>
+            </div>
+
+            <!-- CONTAINER DA QUESTÃO ATIVA -->
+            <div id="questao-card-active" class="hidden space-y-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <span id="q-materia-tag" class="px-2.5 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-xs font-bold">Português</span>
+                <span id="q-progresso-tag" class="text-xs text-slate-400 font-mono">Questão 1 de 20</span>
+              </div>
+
+              <div id="q-enunciado" class="text-sm text-slate-200 leading-relaxed font-medium"></div>
+
+              <div id="q-alternativas" class="space-y-2 pt-2"></div>
+
+              <div class="flex gap-3 pt-4 border-t border-slate-800">
+                <button onclick="confirmarResposta()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition">
+                  Responder
+                </button>
+                <button onclick="proximaQuestao()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+                  Próxima Questão →
+                </button>
+              </div>
+
+              <!-- GABARITO COMENTADO -->
+              <div id="q-gabarito-box" class="hidden p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2 mt-4">
+                <h4 class="text-xs font-bold text-emerald-400 uppercase">Gabarito Comentado</h4>
+                <p id="q-comentario-text" class="text-xs text-slate-300 leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO CRONÔMETRO -->
+        <section id="page-cronometro" class="hidden space-y-6">
+          <div class="bg-slate-950/60 border border-slate-800 rounded-2xl p-8 text-center max-w-md mx-auto space-y-6">
+            <h2 class="text-lg font-bold text-white">Cronômetro de Estudo</h2>
+            <div id="timer-display" class="text-5xl font-black text-blue-400 font-mono tracking-wider">00:00:00</div>
+            <div class="flex justify-center gap-3">
+              <button onclick="startTimer()" class="px-6 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-500">Iniciar</button>
+              <button onclick="pauseTimer()" class="px-6 py-2.5 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-500">Pausar</button>
+              <button onclick="resetTimer()" class="px-6 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-500">Zerar</button>
+            </div>
           </div>
         </section>
 
@@ -190,25 +318,36 @@
     </main>
   </div>
 
+  <!-- LÓGICA DE JAVASCRIPT E LIGAÇÃO COM FIREBASE -->
   <script>
     let isLoginMode = true;
-    let userState = { disciplinas: [] };
-    let currentUserUid = null;
+    let currentUser = null;
+    let filtroPeriodo = 'hoje';
+    let appState = {
+      disciplinas: [],
+      questoes: [],
+      historicoRespostas: [],
+      progressoAtualIdx: 0
+    };
+
+    // LOUSA CANVAS
+    let canvas, ctx, drawing = false, strokeColor = '#ef4444';
 
     window.addEventListener('load', () => {
       lucide.createIcons();
+      initCanvas();
+      
       setTimeout(() => {
-        if (!window.auth) return;
-        
-        window.firebaseServices.onAuthStateChanged(window.auth, (user) => {
+        if(!window.auth) return;
+        window.fb.onAuthStateChanged(window.auth, (user) => {
           if (user) {
-            currentUserUid = user.uid;
+            currentUser = user;
             document.getElementById("auth-screen").classList.add("hidden");
             document.getElementById("app-screen").classList.remove("hidden");
             document.getElementById("user-email-display").innerText = user.email;
-            syncUserData(user.uid);
+            conectarFirebaseDoc(user.uid);
           } else {
-            currentUserUid = null;
+            currentUser = null;
             document.getElementById("auth-screen").classList.remove("hidden");
             document.getElementById("app-screen").classList.add("hidden");
           }
@@ -218,7 +357,7 @@
 
     function toggleAuthMode() {
       isLoginMode = !isLoginMode;
-      document.getElementById("auth-title").innerText = isLoginMode ? "QG Estudo" : "Criar Conta no QG Estudo";
+      document.getElementById("auth-title").innerText = isLoginMode ? "QG Estudo" : "Criar Conta QG Estudo";
       document.getElementById("auth-btn").querySelector("span").innerText = isLoginMode ? "Entrar no Painel" : "Cadastrar Conta";
       document.getElementById("toggle-auth-btn").innerText = isLoginMode ? "Não tem conta? Cadastre-se gratuitamente" : "Já tem conta? Faça login";
     }
@@ -230,93 +369,363 @@
 
       try {
         if (isLoginMode) {
-          await window.firebaseServices.signInWithEmailAndPassword(window.auth, email, pass);
+          await window.fb.signInWithEmailAndPassword(window.auth, email, pass);
         } else {
-          const userCredential = await window.firebaseServices.createUserWithEmailAndPassword(window.auth, email, pass);
-          await window.firebaseServices.setDoc(window.firebaseServices.doc(window.db, "users", userCredential.user.uid), {
-            disciplinas: [
-              { id: 1, nome: "Língua Portuguesa", horas: 10, questoesAcertos: 20, questoesErros: 5 }
-            ]
+          const res = await window.fb.createUserWithEmailAndPassword(window.auth, email, pass);
+          await window.fb.setDoc(window.fb.doc(window.db, "users", res.user.uid), {
+            disciplinas: [{ id: 1, nome: "Língua Portuguesa", assuntos: [{ id: 101, nome: "Acentuação Gráfica", concluido: false, googleDocUrl: "" }] }],
+            questoes: [],
+            historicoRespostas: [],
+            progressoAtualIdx: 0
           });
         }
-      } catch (error) {
-        alert("Erro de Autenticação: " + error.message);
+      } catch (err) {
+        alert("Erro no Login: " + err.message);
       }
     }
 
     function logoutFirebase() {
-      window.firebaseServices.signOut(window.auth);
+      window.fb.signOut(window.auth);
     }
 
-    function syncUserData(uid) {
-      const userRef = window.firebaseServices.doc(window.db, "users", uid);
-      window.firebaseServices.onSnapshot(userRef, (docSnap) => {
+    function conectarFirebaseDoc(uid) {
+      const ref = window.fb.doc(window.db, "users", uid);
+      window.fb.onSnapshot(ref, (docSnap) => {
         if (docSnap.exists()) {
-          userState = docSnap.data();
-          renderDashboard();
-          renderEdital();
+          appState = Object.assign({ disciplinas: [], questoes: [], historicoRespostas: [], progressoAtualIdx: 0 }, docSnap.data());
+          renderAll();
         }
       });
     }
 
-    async function saveUserData() {
-      if (!currentUserUid) return;
-      const userRef = window.firebaseServices.doc(window.db, "users", currentUserUid);
-      await window.firebaseServices.setDoc(userRef, userState);
+    async function salvarFirebase() {
+      if (!currentUser) return;
+      const ref = window.fb.doc(window.db, "users", currentUser.uid);
+      await window.fb.setDoc(ref, appState);
+    }
+
+    function renderAll() {
+      renderDashboard();
+      renderEdital();
+      renderDisciplinas();
+      populareSelects();
+    }
+
+    /* DASHBOARD LOGIC */
+    function setPeriodoFiltro(p) {
+      filtroPeriodo = p;
+      ['hoje', 'semana', 'mes', 'geral'].forEach(f => {
+        const btn = document.getElementById(`filter-${f}`);
+        if(f === p) {
+          btn.className = "px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold";
+        } else {
+          btn.className = "px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-700";
+        }
+      });
+      renderDashboard();
     }
 
     function renderDashboard() {
-      let acertos = 0, erros = 0, horas = 0;
-      (userState.disciplinas || []).forEach(d => {
-        acertos += (d.questoesAcertos || 0);
-        erros += (d.questoesErros || 0);
-        horas += (d.horas || 0);
+      const agora = new Date();
+      let inicioDia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate()).getTime();
+      let inicioSemana = new Date(agora.setDate(agora.getDate() - agora.getDay())).getTime();
+      let inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1).getTime();
+
+      let filtrados = (appState.historicoRespostas || []).filter(h => {
+        if (filtroPeriodo === 'hoje') return h.timestamp >= inicioDia;
+        if (filtroPeriodo === 'semana') return h.timestamp >= inicioSemana;
+        if (filtroPeriodo === 'mes') return h.timestamp >= inicioMes;
+        return true;
       });
 
-      const total = acertos + erros;
-      document.getElementById("dash-total-questoes").innerText = total;
-      document.getElementById("dash-pct-acerto").innerText = total > 0 ? ((acertos/total)*100).toFixed(1) + "%" : "0%";
-      document.getElementById("dash-pct-erro").innerText = total > 0 ? ((erros/total)*100).toFixed(1) + "%" : "0%";
-      document.getElementById("dash-horas").innerText = `${horas}h`;
+      let acertos = filtrados.filter(h => h.correto).length;
+      let erros = filtrados.filter(h => !h.correto).length;
+      let total = filtrados.length;
+      let pct = total > 0 ? ((acertos / total) * 100).toFixed(1) : 0;
+
+      document.getElementById("dash-total").innerText = total;
+      document.getElementById("dash-acertos").innerText = acertos;
+      document.getElementById("dash-erros").innerText = erros;
+      document.getElementById("dash-aproveitamento").innerText = `${pct}%`;
+
+      // Aproveitamento por Disciplina
+      const container = document.getElementById("dash-disciplinas-list");
+      container.innerHTML = (appState.disciplinas || []).map(d => {
+        let respDisc = filtrados.filter(h => h.disciplinaId === d.id);
+        let dAcertos = respDisc.filter(h => h.correto).length;
+        let dTotal = respDisc.length;
+        let dPct = dTotal > 0 ? ((dAcertos / dTotal) * 100).toFixed(0) : 0;
+
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-200">${d.nome}</span>
+              <span class="text-slate-400">${dAcertos}/${dTotal} acertos (${dPct}%)</span>
+            </div>
+            <div class="w-full bg-slate-900 rounded-full h-2 border border-slate-800 overflow-hidden">
+              <div class="bg-blue-500 h-2 rounded-full" style="width: ${dPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("") || '<p class="text-xs text-slate-500">Nenhuma disciplina cadastrada.</p>';
     }
 
+    /* EDITAL VERTICALIZADO LOGIC */
     function renderEdital() {
-      const container = document.getElementById("edital-container");
-      container.innerHTML = (userState.disciplinas || []).map(d => `
-        <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
-          <div>
-            <h4 class="font-bold text-white text-sm">${d.nome}</h4>
-            <p class="text-xs text-slate-400">${d.horas || 0}h estudadas • ${d.questoesAcertos || 0} acertos / ${d.questoesErros || 0} erros</p>
+      const container = document.getElementById("edital-vertical-list");
+      container.innerHTML = (appState.disciplinas || []).map(d => {
+        let totalAssuntos = (d.assuntos || []).length;
+        let concluidos = (d.assuntos || []).filter(a => a.concluido).length;
+        let pct = totalAssuntos > 0 ? ((concluidos / totalAssuntos) * 100).toFixed(0) : 0;
+
+        return `
+          <div class="p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-3">
+            <div class="flex justify-between items-center">
+              <h4 class="font-bold text-white text-sm">${d.nome}</h4>
+              <span class="text-xs font-semibold text-emerald-400">${pct}% Concluído</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div>
+            </div>
+            <div class="space-y-1.5 pt-2">
+              ${(d.assuntos || []).map(a => `
+                <div class="flex items-center justify-between text-xs bg-slate-950/40 p-2 rounded-lg">
+                  <div class="flex items-center gap-2">
+                    <input type="checkbox" ${a.concluido ? 'checked' : ''} onchange="toggleAssuntoConcluido(${d.id},${a.id})" class="rounded border-slate-700 bg-slate-900 text-emerald-500">
+                    <span class="${a.concluido ? 'line-through text-slate-500' : 'text-slate-200'}">${a.nome}</span>
+                  </div>
+                  ${a.googleDocUrl ? `<a href="${a.googleDocUrl}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1"><i data-lucide="file-text" class="w-3 h-3"></i> Resumo Doc</a>` : ''}
+                </div>
+              `).join("")}
+            </div>
           </div>
-          <button onclick="simularSimuladoCloud(${d.id})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg font-medium">
-            + Registrar Acerto
-          </button>
+        `;
+      }).join("");
+      lucide.createIcons();
+    }
+
+    async function toggleAssuntoConcluido(discId, assId) {
+      let disc = appState.disciplinas.find(d => d.id === discId);
+      if (disc) {
+        let ass = (disc.assuntos || []).find(a => a.id === assId);
+        if (ass) {
+          ass.concluido = !ass.concluido;
+          await salvarFirebase();
+        }
+      }
+    }
+
+    /* GESTÃO DE DISCIPLINAS */
+    function renderDisciplinas() {
+      const container = document.getElementById("disciplinas-cards-container");
+      container.innerHTML = (appState.disciplinas || []).map(d => `
+        <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <h3 class="font-bold text-white text-sm">${d.nome}</h3>
+            <div class="flex gap-2">
+              <button onclick="adicionarAssuntoModal(${d.id})" class="text-xs text-purple-400 hover:underline">+ Assunto</button>
+              <button onclick="excluirDisciplina(${d.id})" class="text-xs text-rose-400 hover:underline">Excluir</button>
+            </div>
+          </div>
+          <div class="space-y-1">
+            ${(d.assuntos || []).map(a => `
+              <div class="text-xs text-slate-300 flex justify-between items-center py-1 border-b border-slate-900">
+                <span>• ${a.nome}</span>
+                <button onclick="vincularGoogleDoc(${d.id},${a.id})" class="text-[10px] text-slate-500 hover:text-blue-400">
+                  ${a.googleDocUrl ? 'Editar Doc' : '+ Link Google Doc'}
+                </button>
+              </div>
+            `).join("")}
+          </div>
         </div>
       `).join("");
     }
 
-    async function addDisciplinaCloud() {
+    async function cadastrarDisciplinaModal() {
       const nome = prompt("Nome da nova disciplina:");
       if (!nome) return;
-      if (!userState.disciplinas) userState.disciplinas = [];
-      userState.disciplinas.push({
-        id: Date.now(),
-        nome: nome,
-        horas: 0,
-        questoesAcertos: 0,
-        questoesErros: 0
-      });
-      await saveUserData();
+      appState.disciplinas.push({ id: Date.now(), nome: nome, assuntos: [] });
+      await salvarFirebase();
     }
 
-    async function simularSimuladoCloud(discId) {
-      const disc = userState.disciplinas.find(d => d.id === discId);
-      if (disc) {
-        disc.questoesAcertos = (disc.questoesAcertos || 0) + 1;
-        await saveUserData();
+    async function excluirDisciplina(id) {
+      if (confirm("Deseja realmente excluir esta disciplina?")) {
+        appState.disciplinas = appState.disciplinas.filter(d => d.id !== id);
+        await salvarFirebase();
       }
     }
 
+    async function adicionarAssuntoModal(discId) {
+      const nome = prompt("Nome do Assunto:");
+      if (!nome) return;
+      let disc = appState.disciplinas.find(d => d.id === discId);
+      if (disc) {
+        if (!disc.assuntos) disc.assuntos = [];
+        disc.assuntos.push({ id: Date.now(), nome: nome, concluido: false, googleDocUrl: "" });
+        await salvarFirebase();
+      }
+    }
+
+    async function vincularGoogleDoc(discId, assId) {
+      let disc = appState.disciplinas.find(d => d.id === discId);
+      if (disc) {
+        let ass = disc.assuntos.find(a => a.id === assId);
+        if (ass) {
+          const url = prompt("Cole a URL do resumo no Google Docs:", ass.googleDocUrl || "");
+          if (url !== null) {
+            ass.googleDocUrl = url;
+            await salvarFirebase();
+          }
+        }
+      }
+    }
+
+    /* BANCO DE QUESTÕES E MÓDULO JSON */
+    function populareSelects() {
+      const sel = document.getElementById("filtro-questao-disc");
+      sel.innerHTML = `<option value="todas">Todas as Disciplinas</option>` + 
+        (appState.disciplinas || []).map(d => `<option value="${d.id}">${d.nome}</option>`).join("");
+    }
+
+    async function importarJSONModal() {
+      const jsonStr = prompt(`Cole o JSON das questões no formato:\n[\n  {\n    "enunciado": "...",\n    "alternativas": ["A) ...", "B) ..."],\n    "correta": 0,\n    "comentario": "..."\n  }\n]`);
+      if (!jsonStr) return;
+
+      try {
+        const parsed = JSON.parse(jsonStr);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(q => {
+            q.id = Date.now() + Math.random();
+            q.disciplinaId = appState.disciplinas[0] ? appState.disciplinas[0].id : 1;
+            appState.questoes.push(q);
+          });
+          await salvarFirebase();
+          alert(`${parsed.length} Questões importadas com sucesso!`);
+        }
+      } catch (err) {
+        alert("Erro no formato JSON: " + err.message);
+      }
+    }
+
+    let questaoSelecionadaOpcao = null;
+
+    function iniciarSessaoQuestoes() {
+      if ((appState.questoes || []).length === 0) {
+        alert("Nenhuma questão cadastrada. Importe via JSON primeiro!");
+        return;
+      }
+      document.getElementById("questao-card-active").classList.remove("hidden");
+      renderQuestaoAtual();
+    }
+
+    function renderQuestaoAtual() {
+      let idx = appState.progressoAtualIdx || 0;
+      let q = appState.questoes[idx];
+      if (!q) {
+        alert("Você chegou ao final do banco de questões!");
+        appState.progressoAtualIdx = 0;
+        salvarFirebase();
+        return;
+      }
+
+      document.getElementById("q-gabarito-box").classList.add("hidden");
+      document.getElementById("q-progresso-tag").innerText = `Questão ${idx + 1} de ${appState.questoes.length}`;
+      document.getElementById("q-enunciado").innerText = q.enunciado;
+
+      const altBox = document.getElementById("q-alternativas");
+      altBox.innerHTML = (q.alternativas || []).map((alt, i) => `
+        <label class="flex items-center gap-3 p-3 bg-slate-950 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800 transition text-xs text-slate-200">
+          <input type="radio" name="opcao-q" value="${i}" onchange="questaoSelecionadaOpcao = ${i}" class="text-blue-500">
+          <span>${alt}</span>
+        </label>
+      `).join("");
+    }
+
+    async function confirmarResposta() {
+      if (questaoSelecionadaOpcao === null) {
+        alert("Selecione uma alternativa!");
+        return;
+      }
+
+      let idx = appState.progressoAtualIdx || 0;
+      let q = appState.questoes[idx];
+      let correto = parseInt(questaoSelecionadaOpcao) === parseInt(q.correta);
+
+      if (!appState.historicoRespostas) appState.historicoRespostas = [];
+      appState.historicoRespostas.push({
+        questaoId: q.id,
+        disciplinaId: q.disciplinaId,
+        correto: correto,
+        timestamp: Date.now()
+      });
+
+      document.getElementById("q-gabarito-box").classList.remove("hidden");
+      document.getElementById("q-comentario-text").innerText = (correto ? "✓ Parabéns, você acertou! " : "✕ Que pena, você errou. ") + (q.comentario || "");
+
+      await salvarFirebase();
+    }
+
+    async function proximaQuestao() {
+      questaoSelecionadaOpcao = null;
+      appState.progressoAtualIdx = (appState.progressoAtualIdx || 0) + 1;
+      await salvarFirebase();
+      renderQuestaoAtual();
+    }
+
+    /* LOUSA CANVAS INTERATIVA */
+    function initCanvas() {
+      canvas = document.getElementById("drawing-canvas");
+      ctx = canvas.getContext("2d");
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      canvas.addEventListener("mousedown", (e) => { drawing = true; draw(e); });
+      canvas.addEventListener("mouseup", () => { drawing = false; ctx.beginPath(); });
+      canvas.addEventListener("mousemove", draw);
+    }
+
+    function resizeCanvas() {
+      if(!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function toggleLousa() {
+      const container = document.getElementById("lousa-container");
+      container.classList.toggle("hidden");
+    }
+
+    function setCanvasColor(color) { strokeColor = color; }
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = strokeColor;
+
+      ctx.lineTo(e.clientX, e.clientY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX, e.clientY);
+    }
+
+    /* CRONÔMETRO */
+    let timerInterval, seconds = 0;
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        seconds++;
+        let hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+        let mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+        let secs = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById("timer-display").innerText = `${hrs}:${mins}:${secs}`;
+      }, 1000);
+    }
+    function pauseTimer() { clearInterval(timerInterval); }
+    function resetTimer() { pauseTimer(); seconds = 0; document.getElementById("timer-display").innerText = "00:00:00"; }
+
+    /* NAVEGAÇÃO E MENU */
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("-translate-x-full");
       document.getElementById("sidebar-overlay").classList.toggle("hidden");
@@ -325,6 +734,15 @@
     function navigate(page) {
       document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
       document.getElementById(`page-${page}`).classList.remove("hidden");
+      const titles = {
+        dashboard: "Dashboard Geral",
+        edital: "Edital Verticalizado",
+        disciplinas: "Gestão de Disciplinas",
+        questoes: "Banco de Questões JSON",
+        cronometro: "Cronômetro de Estudo"
+      };
+      document.getElementById("page-title").innerText = titles[page] || "Dashboard";
+      if(window.innerWidth < 768) toggleSidebar();
     }
   </script>
 </body>
