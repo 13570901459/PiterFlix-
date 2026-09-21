@@ -1,92 +1,1450 @@
-Atue como um Desenvolvedor Front-end Expert em JavaScript Vanilla, HTML5, CSS3 e Firebase SDK v10 (utilizando ES Modules via CDN).
-
-Crie uma aplicação web comercial de alto nível contida em um ÚNICO ARQUIVO HTML (com estilos CSS na tag <style> e scripts na tag <script type="module">) para uma Plataforma Profissional de Questões, Edital Verticalizado, Cronograma Semanal e Gestão de Estudos para Concursos Públicos.
-
-Utilize exatamente esta configuração do Firebase no código:
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
-  authDomain: "qgestudo.firebaseapp.com",
-  projectId: "qgestudo",
-  storageBucket: "qgestudo.firebasestorage.app",
-  messagingSenderId: "939034677008",
-  appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
-  measurementId: "G-PC8ESJHFZ5"
-};
-
----
-
-### 1. DASHBOARD PRINCIPAL (TELA INICIAL)
-Ao realizar o login, a tela de abertura exibe:
-- **Painel Geral (Acumulado Histórico):** Total de questões respondidas, total de acertos, total de erros e gráficos de % de aproveitamento.
-- **Painel do Dia (00:00 às 23:59):** Métricas diárias que reiniciam o contador às 00:00.
-- **Relatório de Encerramento Diário:** Botão "Encerrar Estudo do Dia" com modal resumindo: total de questões feitas no dia e o detalhamento por disciplina.
-- **Progresso do Edital Verticalizado:** Barras gráficas do percentual concluído por disciplina.
-
----
-
-### 2. MENU HAMBÚRGUER (NAVEGAÇÃO LATERAL)
-O menu retrátil da esquerda contém:
-1. **Dashboard**
-2. **Cronômetro de Estudo (Horas Líquidas):** Seleção de disciplina e salvamento do tempo diário/semanal no Firestore.
-3. **Disciplinas & Conteúdos (Com Gestão de Lotes de Questões e Link do Google Docs em cada assunto)**
-4. **Edital Verticalizado Completo & Check-in**
-5. **Cronograma Semanal de Estudos (NOVO):**
-   - Planejador de ciclo de estudos por dias da semana (Segunda a Domingo).
-   - O usuário pode configurar os parâmetros para cada dia: selecionar Disciplina, Assunto, meta de Horas Líquidas, número de Questões e se a meta inclui Ler Resumo (Google Docs).
-   - Rotina estruturada:
-     - **Segunda a Sexta:** Disciplinas, leitura de resumo e resolução de questões (ex: 15, 20, 30 questões).
-     - **Sábado:** Marcação dedicada para "Revisão Geral".
-     - **Domingo:** Marcação dedicada para "Simulado".
-   - Sincronização e salvamento total da rotina semanal no Firestore.
-6. **Filtro Avançado de Questões (ATUALIZADO):**
-   - Seleção refinada por **Disciplina**, **Assunto** e **Status Exacto da Questão**:
-     - *Apenas Questões Acertadas* (para reforço e consolidação)
-     - *Apenas Questões Erradas* (para correção de pontos fracos/caderno de erros)
-     - *Apenas Questões Em Branco / Não Respondidas* (para avançar no conteúdo inédito)
-7. **Quadro de Revisões Espaçadas (SRS)**
-
----
-
-### 3. ESTRUTURA DE DISCIPLINAS, ASSUNTOS E IMPORTADOR DE QUESTÕES JSON
-- **Disciplinas & Assuntos:** Cadastro completo com campo para salvar e abrir a URL do Resumo no Google Docs.
-- **Importador JSON de Questões:** Modal para importar baterias/lotes colando a estrutura de JSON:
-
-  {
-    "disciplina": "Língua Portuguesa",
-    "tema": "Concordância Verbal e Nominal",
-    "questoes": [
-      {
-        "id": 1,
-        "enunciado": "Assinale a alternativa em que a concordância verbal está de acordo...",
-        "alternativas": {
-          "A": "Haviam muitos candidatos...",
-          "B": "Faziam anos...",
-          "C": "Existe várias...",
-          "D": "A maioria dos inscritos compareceu..."
-        },
-        "resposta_correta": "D",
-        "comentario": "Com expressão partitiva..."
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QG do Estudo - Plataforma Alta Performance para Concursos</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          }
+        }
       }
-    ]
-  }
+    }
+  </script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Touch canvas canvas reset */
+    #scratchCanvas { touch-action: none; }
+  </style>
+</head>
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex flex-col md:flex-row overflow-x-hidden">
 
-- **Resolução de Lotes:** Opção para executar **Lote Específico** ou **Lote Geral do Assunto**, com botões de **"Continuar Onde Parei"** e **"Reiniciar do Zero"**.
+  <!-- APP CONTAINER -->
+  <div id="app" class="flex w-full h-full min-h-screen relative">
 
----
+    <!-- LOGIN / REGISTER SCREEN -->
+    <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]">
+      <div class="w-full max-w-md p-8 rounded-2xl glass-card shadow-2xl space-y-6 border border-slate-800">
+        <div class="text-center space-y-2">
+          <div class="inline-flex p-3 bg-brand-500/10 text-brand-500 rounded-xl mb-2">
+            <i data-lucide="graduation-cap" class="w-10 h-10"></i>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-white">QG do Estudo</h1>
+          <p class="text-sm text-slate-400">Plataforma Profissional de Alto Desempenho</p>
+        </div>
 
-### 4. LOUSA FLUTUANTE EXPANDÍVEL E MÓVEL (DRAGGABLE CANVAS OVERLAY)
-- **Design Flexível e Flutuante:**
-  - Inicialmente exibida como um **ícone/botão flutuante discreto (um lápis/engrenagem)** no canto da tela.
-  - Ao clicar no ícone, a lousa se expande em uma janela móvel (com barra superior para **arrastar/mover** para qualquer lugar da tela).
-  - Pode ser minimizada a qualquer momento voltando ao ícone de lápis sem perder o que foi desenhado.
-- **Funcionalidades da Lousa:**
-  - Canvas transparente sobreposto que permite rolagem da página sem desalinhar ou apagar a marcação.
-  - Seleção de cores do lápis, ferramenta borracha, controle de espessura e botão "Limpar Tudo".
+        <div class="space-y-4">
+          <button id="googleAuthBtn" class="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-slate-200 font-medium rounded-xl border border-slate-700 transition duration-200 shadow-sm">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Entrar com Google
+          </button>
 
----
+          <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-slate-800"></div>
+            <span class="flex-shrink mx-4 text-xs uppercase tracking-wider text-slate-500">ou e-mail</span>
+            <div class="flex-grow border-t border-slate-800"></div>
+          </div>
 
-### REQUISITOS TÉCNICOS, ESTÉTICOS E COMERCIAIS
-1. **Design System:** Interface comercial ultra-moderna, limpa, totalmente responsiva (mobile-first) em Tema Escuro (Dark Mode) usando Tailwind CSS via CDN.
-2. **Estrutura:** Código contido integralmente em 1 único arquivo `.html`.
-3. **Persistência no Firebase:** Sincronização imediata de todas as ações no Cloud Firestore sob a árvore do usuário (`users/{uid}/...`).
+          <form id="authForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">E-mail</label>
+              <input type="email" id="authEmail" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-100 placeholder-slate-500" placeholder="seu@email.com">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Senha</label>
+              <input type="password" id="authPassword" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-100 placeholder-slate-500" placeholder="••••••••">
+            </div>
+            <div class="flex gap-3 pt-2">
+              <button type="submit" id="loginBtn" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition duration-200 shadow-lg shadow-brand-600/20">Entrar</button>
+              <button type="button" id="registerBtn" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition duration-200">Cadastrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN APP STRUCTURE (SIDEBAR & MAIN CONTENT) -->
+    <div id="mainApp" class="hidden flex-1 flex flex-col md:flex-row min-h-screen w-full">
+      
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="w-full md:w-64 bg-slate-900/90 border-r border-slate-800 flex flex-col justify-between shrink-0 transition-all duration-300 z-40">
+        <div>
+          <!-- Sidebar Header -->
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-brand-500/10 text-brand-500 rounded-lg">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <span class="font-bold text-lg text-white tracking-wide">QG Concursos</span>
+            </div>
+            <button id="closeMobileSidebar" class="md:hidden text-slate-400 hover:text-white">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="p-3 space-y-1">
+            <button data-nav="dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </button>
+            <button data-nav="timer" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="timer" class="w-4 h-4"></i> Horas Líquidas
+            </button>
+            <button data-nav="disciplines" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="book-open" class="w-4 h-4"></i> Disciplinas & Conteúdos
+            </button>
+            <button data-nav="edital" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="check-square" class="w-4 h-4"></i> Edital Verticalizado
+            </button>
+            <button data-nav="schedule" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="calendar" class="w-4 h-4"></i> Cronograma Semanal
+            </button>
+            <button data-nav="questionsFilter" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="filter" class="w-4 h-4"></i> Banco de Questões
+            </button>
+            <button data-nav="backup" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="database" class="w-4 h-4"></i> Backup & Restauração
+            </button>
+            <button data-nav="srs" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition font-medium text-sm">
+              <i data-lucide="repeat" class="w-4 h-4"></i> Revisões Espaçadas
+            </button>
+          </nav>
+        </div>
+
+        <!-- User Profile Footer -->
+        <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div id="userAvatar" class="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center font-bold text-white text-sm shrink-0">U</div>
+            <div class="truncate">
+              <p id="userName" class="text-sm font-medium text-white truncate">Usuário</p>
+              <p id="userEmail" class="text-xs text-slate-500 truncate">email@exemplo.com</p>
+            </div>
+          </div>
+          <button id="logoutBtn" class="text-slate-400 hover:text-red-400 p-2 transition" title="Sair">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT WRAPPER -->
+      <main class="flex-1 flex flex-col min-w-0 overflow-y-auto h-screen bg-slate-950">
+        
+        <!-- TOP MOBILE HEADER -->
+        <header class="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+          <button id="openMobileSidebar" class="text-slate-300 hover:text-white">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          <span class="font-bold text-white">QG Concursos</span>
+          <div class="w-6"></div>
+        </header>
+
+        <!-- DYNAMIC VIEWS CONTAINER -->
+        <div class="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-8 flex-1">
+
+          <!-- VIEW: DASHBOARD -->
+          <section id="view-dashboard" class="view-section space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold text-white">Dashboard Geral</h2>
+                <p class="text-slate-400 text-sm">Acompanhe seu desempenho e metas diárias de estudos.</p>
+              </div>
+              <button id="closeDayBtn" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition flex items-center gap-2 shadow-lg shadow-brand-600/20 text-sm">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Encerrar Estudo do Dia
+              </button>
+            </div>
+
+            <!-- PAINEL DO DIA -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Desempenho Hoje (00:00 às 23:59)</h3>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-4 rounded-xl glass-card border border-slate-800">
+                  <p class="text-xs text-slate-400 font-medium">Resolvidas Hoje</p>
+                  <p id="todayTotal" class="text-2xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="p-4 rounded-xl glass-card border border-slate-800">
+                  <p class="text-xs text-slate-400 font-medium">Acertos Hoje</p>
+                  <p id="todayCorrect" class="text-2xl font-bold text-emerald-400 mt-1">0</p>
+                </div>
+                <div class="p-4 rounded-xl glass-card border border-slate-800">
+                  <p class="text-xs text-slate-400 font-medium">Erros Hoje</p>
+                  <p id="todayWrong" class="text-2xl font-bold text-rose-400 mt-1">0</p>
+                </div>
+                <div class="p-4 rounded-xl glass-card border border-slate-800">
+                  <p class="text-xs text-slate-400 font-medium">Precisão Hoje</p>
+                  <p id="todayAcc" class="text-2xl font-bold text-brand-400 mt-1">0%</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAINEL ACUMULADO HISTÓRICO -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Acumulado Histórico</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-1 p-5 rounded-2xl glass-card border border-slate-800 flex flex-col justify-center items-center">
+                  <div class="w-48 h-48 relative">
+                    <canvas id="historyChart"></canvas>
+                  </div>
+                  <div class="mt-4 text-center">
+                    <p class="text-3xl font-extrabold text-white" id="histTotal">0</p>
+                    <p class="text-xs text-slate-400">Questões Respondidas</p>
+                  </div>
+                </div>
+
+                <div class="md:col-span-2 p-5 rounded-2xl glass-card border border-slate-800 space-y-4">
+                  <h4 class="font-bold text-white">Progresso do Edital Verticalizado</h4>
+                  <div id="editalSummaryBars" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    <!-- Dynamic Progress Bars -->
+                    <p class="text-sm text-slate-500 italic">Nenhuma disciplina cadastrada ainda.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: CRONÔMETRO DE HORAS LÍQUIDAS -->
+          <section id="view-timer" class="view-section hidden space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Cronômetro de Horas Líquidas</h2>
+              <p class="text-slate-400 text-sm">Registre o tempo real de estudo concentrado.</p>
+            </div>
+
+            <div class="max-w-xl mx-auto p-8 rounded-2xl glass-card border border-slate-800 text-center space-y-6">
+              <div class="space-y-2">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Selecione a Disciplina</label>
+                <select id="timerDisciplineSelect" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none text-slate-100">
+                  <option value="">-- Escolha uma disciplina --</option>
+                </select>
+              </div>
+
+              <div id="timerDisplay" class="text-6xl font-mono font-extrabold tracking-wider text-brand-400 py-6 bg-slate-900/60 rounded-2xl border border-slate-800/80">
+                00:00:00
+              </div>
+
+              <div class="flex justify-center gap-4">
+                <button id="startTimerBtn" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-lg shadow-brand-600/20">
+                  <i data-lucide="play" class="w-5 h-5"></i> Iniciar
+                </button>
+                <button id="pauseTimerBtn" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl transition flex items-center gap-2 hidden">
+                  <i data-lucide="pause" class="w-5 h-5"></i> Pausar
+                </button>
+                <button id="saveTimerBtn" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition flex items-center gap-2">
+                  <i data-lucide="save" class="w-5 h-5"></i> Salvar Sessão
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: DISCIPLINAS & CONTEÚDOS -->
+          <section id="view-disciplines" class="view-section hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold text-white">Disciplinas & Assuntos</h2>
+                <p class="text-slate-400 text-sm">Gerencie conteúdos, links de resumos e baterias de questões.</p>
+              </div>
+              <div class="flex gap-2">
+                <button id="openAddDisciplineModal" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition flex items-center gap-2 text-sm shadow-lg shadow-brand-600/20">
+                  <i data-lucide="plus" class="w-4 h-4"></i> Nova Disciplina
+                </button>
+                <button id="openImportJsonModal" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition flex items-center gap-2 text-sm">
+                  <i data-lucide="file-json" class="w-4 h-4"></i> Importar Questões JSON
+                </button>
+              </div>
+            </div>
+
+            <!-- List of Disciplines Accordion/Cards -->
+            <div id="disciplinesList" class="space-y-4">
+              <!-- Dynamically populated -->
+            </div>
+          </section>
+
+          <!-- VIEW: EDITAL VERTICALIZADO -->
+          <section id="view-edital" class="view-section hidden space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Edital Verticalizado</h2>
+              <p class="text-slate-400 text-sm">Marque seu progresso tópico por tópico.</p>
+            </div>
+
+            <div id="editalVerticalContainer" class="space-y-6">
+              <!-- Dynamically populated -->
+            </div>
+          </section>
+
+          <!-- VIEW: CRONOGRAMA SEMANAL -->
+          <section id="view-schedule" class="view-section hidden space-y-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-2xl font-bold text-white">Cronograma Semanal de Estudos</h2>
+                <p class="text-slate-400 text-sm">Planeje suas metas diárias, revisões e simulados.</p>
+              </div>
+              <button id="openScheduleModalBtn" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl transition flex items-center gap-2 text-sm">
+                <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Meta
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
+              <!-- Days Seg to Dom -->
+              <div data-day="Segunda" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-brand-400 text-sm border-b border-slate-800 pb-2">Segunda</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Terça" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-brand-400 text-sm border-b border-slate-800 pb-2">Terça</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Quarta" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-brand-400 text-sm border-b border-slate-800 pb-2">Quarta</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Quinta" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-brand-400 text-sm border-b border-slate-800 pb-2">Quinta</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Sexta" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-brand-400 text-sm border-b border-slate-800 pb-2">Sexta</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Sábado" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-amber-400 text-sm border-b border-slate-800 pb-2">Sábado (Revisão)</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+              <div data-day="Domingo" class="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                <h4 class="font-bold text-center text-rose-400 text-sm border-b border-slate-800 pb-2">Domingo (Simulado)</h4>
+                <div class="schedule-items space-y-2"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: FILTRO AVANÇADO DE QUESTÕES / MÓDULO RESOLUÇÃO -->
+          <section id="view-questionsFilter" class="view-section hidden space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Banco de Questões & Filtros</h2>
+              <p class="text-slate-400 text-sm">Filtre questões por estado exato de resolução.</p>
+            </div>
+
+            <!-- Filter Card -->
+            <div class="p-5 rounded-2xl glass-card border border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Disciplina</label>
+                <select id="filterDiscipline" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Assunto</label>
+                <select id="filterTopic" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Status de Resolução</label>
+                <select id="filterStatus" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm">
+                  <option value="ALL">Todas as Questões</option>
+                  <option value="CORRECT">Apenas Acertadas</option>
+                  <option value="WRONG">Apenas Erradas</option>
+                  <option value="UNANSWERED">Apenas Em Branco / Não Respondidas</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button id="applyQuestionFilterBtn" class="w-full py-2 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-xl text-sm transition">
+                  Filtrar Questões
+                </button>
+              </div>
+            </div>
+
+            <!-- RESOLUTION CONTAINER (Modo Resolver) -->
+            <div id="questionResolutionArea" class="hidden p-6 rounded-2xl glass-card border border-slate-800 space-y-6 relative">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <span id="questionCategoryBadge" class="px-3 py-1 bg-brand-500/10 text-brand-400 text-xs font-semibold rounded-full border border-brand-500/20">Disciplina - Tema</span>
+                <span id="questionCounter" class="text-xs text-slate-400 font-mono">Questão 1 de 10</span>
+              </div>
+
+              <div id="questionStatement" class="text-lg text-slate-100 font-medium leading-relaxed">
+                <!-- Enunciado -->
+              </div>
+
+              <div id="questionOptions" class="space-y-3">
+                <!-- Alternativas -->
+              </div>
+
+              <div id="questionFeedback" class="hidden p-4 rounded-xl space-y-2 text-sm">
+                <!-- Feedback/Comentário -->
+              </div>
+
+              <div class="flex justify-between items-center pt-4 border-t border-slate-800">
+                <button id="prevQuestionBtn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition">Anterior</button>
+                <button id="submitAnswerBtn" class="px-6 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-semibold transition shadow-lg shadow-brand-600/20">Responder</button>
+                <button id="nextQuestionBtn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition">Próxima</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: BACKUP & RESTAURAÇÃO -->
+          <section id="view-backup" class="view-section hidden space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Sistema de Backup & Restauração</h2>
+              <p class="text-slate-400 text-sm">Exporte ou importe seus dados para compartilhamento ou segurança.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- EXPORT CARD -->
+              <div class="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
+                <div class="p-3 bg-brand-500/10 text-brand-400 w-fit rounded-xl">
+                  <i data-lucide="download" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Exportar Backup (.JSON)</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                  Baixe um arquivo contendo todo o estado atual da plataforma: banco de questões, disciplinas, resumos, edital e progresso histórico.
+                </p>
+                <button id="exportBackupBtn" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20">
+                  <i data-lucide="file-output" class="w-5 h-5"></i> Exportar Dados
+                </button>
+              </div>
+
+              <!-- IMPORT CARD -->
+              <div class="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
+                <div class="p-3 bg-blue-500/10 text-blue-400 w-fit rounded-xl">
+                  <i data-lucide="upload" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Importar Backup (.JSON)</h3>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                  Carregue um arquivo JSON de backup para restaurar ou mesclar informações à sua conta do Firestore.
+                </p>
+                <input type="file" id="importBackupInput" accept=".json" class="hidden">
+                <button id="triggerImportBtn" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                  <i data-lucide="file-input" class="w-5 h-5"></i> Selecionar Arquivo JSON
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: REVISÕES ESPAÇADAS (SRS) -->
+          <section id="view-srs" class="view-section hidden space-y-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white">Quadro de Revisões Espaçadas (SRS)</h2>
+              <p class="text-slate-400 text-sm">Algoritmo de repetição espaçada para fixação contínua.</p>
+            </div>
+            <div class="p-6 rounded-2xl glass-card border border-slate-800 text-center py-12 space-y-3">
+              <i data-lucide="sparkles" class="w-10 h-10 text-brand-400 mx-auto"></i>
+              <h3 class="text-lg font-bold text-white">Revisões Automáticas Ativas</h3>
+              <p class="text-sm text-slate-400 max-w-md mx-auto">
+                Questões erradas no módulo de resoluções são agendadas automaticamente para revisão em 24h, 7 dias e 30 dias.
+              </p>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- FLOATING LOUSA / RABISCO CANVASES (CORREÇÃO DE BUG: Exibida APENAS na Resolução) -->
+    <div id="lousaFloatingTrigger" class="hidden fixed bottom-6 right-6 z-50">
+      <button id="toggleLousaBtn" class="p-4 bg-brand-600 hover:bg-brand-500 text-white rounded-full shadow-2xl transition hover:scale-105 border-2 border-brand-400/30 flex items-center justify-center">
+        <i data-lucide="pencil" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- LOUSA EXPANDÍVEL E ARRASTÁVEL OVERLAY -->
+    <div id="lousaWindow" class="hidden fixed top-20 right-10 w-96 md:w-[500px] h-[450px] glass-card border border-slate-700 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
+      <!-- Drag Bar Header -->
+      <div id="lousaHeader" class="bg-slate-900/90 p-3 flex items-center justify-between border-b border-slate-800 cursor-move select-none">
+        <div class="flex items-center gap-2">
+          <i data-lucide="move" class="w-4 h-4 text-slate-400"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-200">Lousa Flutuante</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="clearCanvasBtn" class="text-xs px-2 py-1 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition">Limpar</button>
+          <button id="closeLousaBtn" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Toolbar -->
+      <div class="p-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
+        <div class="flex gap-2 items-center">
+          <button id="toolPencil" class="p-1.5 bg-brand-600 text-white rounded"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+          <button id="toolEraser" class="p-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 text-xs">Espessura:</span>
+          <input type="range" id="pencilSize" min="1" max="20" value="3" class="w-20 accent-brand-500">
+        </div>
+      </div>
+
+      <!-- Canvas Box -->
+      <div class="flex-1 bg-slate-950/80 relative">
+        <canvas id="scratchCanvas" class="w-full h-full cursor-crosshair"></canvas>
+      </div>
+    </div>
+
+    <!-- MODAL: ENCERRAMENTO DIÁRIO -->
+    <div id="closeDayModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-lg p-6 rounded-2xl glass-card border border-slate-800 space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="award" class="w-5 h-5 text-brand-400"></i> Resumo do Dia
+          </h3>
+          <button class="modal-close text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <div id="closeDayModalContent" class="space-y-4 text-sm">
+          <!-- Populated dynamically -->
+        </div>
+
+        <button id="confirmCloseDayBtn" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition">
+          Confirmar e Salvar Registro
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: IMPORTAR JSON QUESTÕES -->
+    <div id="importJsonModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-lg p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="text-lg font-bold text-white">Importar Lote de Questões JSON</h3>
+          <button class="modal-close text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <textarea id="jsonInputArea" rows="8" class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl font-mono text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-500" placeholder='Cole a estrutura JSON aqui...'></textarea>
+        <button id="submitJsonImportBtn" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition">
+          Processar Lote
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: NOVA DISCIPLINA -->
+    <div id="addDisciplineModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-md p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="text-lg font-bold text-white">Nova Disciplina</h3>
+          <button class="modal-close text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="addDisciplineForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Nome da Disciplina</label>
+            <input type="text" id="newDisciplineName" required class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500">
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition text-sm">
+            Criar Disciplina
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: NOVA META CRONOGRAMA -->
+    <div id="addScheduleModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="w-full max-w-md p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="text-lg font-bold text-white">Adicionar Meta no Cronograma</h3>
+          <button class="modal-close text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="addScheduleForm" class="space-y-3 text-sm">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Dia da Semana</label>
+            <select id="schedDay" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200">
+              <option value="Segunda">Segunda</option>
+              <option value="Terça">Terça</option>
+              <option value="Quarta">Quarta</option>
+              <option value="Quinta">Quinta</option>
+              <option value="Sexta">Sexta</option>
+              <option value="Sábado">Sábado</option>
+              <option value="Domingo">Domingo</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Disciplina</label>
+            <input type="text" id="schedDiscipline" required class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1">Assunto / Meta</label>
+            <input type="text" id="schedTopic" required class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Meta Horas</label>
+              <input type="number" id="schedHours" min="0" step="0.5" value="1" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Meta Questões</label>
+              <input type="number" id="schedQuestions" min="0" value="20" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200">
+            </div>
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition mt-2">
+            Salvar Meta
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FIREBASE SDK V10 & APPLICATION LOGIC MODULE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // EXAC CONFIGURATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
+      authDomain: "qgestudo.firebaseapp.com",
+      projectId: "qgestudo",
+      storageBucket: "qgestudo.firebasestorage.app",
+      messagingSenderId: "939034677008",
+      appId: "1:939034677008:web:348adbf8cd89b3ed145f95",
+      measurementId: "G-PC8ESJHFZ5"
+    };
+
+    // Firebase Initialization
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global Application State
+    let currentUser = null;
+    let userState = {
+      disciplines: [], // [{ id, name, topics: [{ id, name, docsUrl, editalDone }] }]
+      questions: [],    // [{ id, discipline, topic, statement, options, correct, comment }]
+      history: {},      // { [qId]: { answered, correct, date } }
+      schedule: [],     // [{ day, discipline, topic, hours, questions }]
+      todayStats: { total: 0, correct: 0, wrong: 0, dateStr: new Date().toLocaleDateString('pt-BR') }
+    };
+
+    let activeFilterQuestions = [];
+    let currentQuestionIndex = 0;
+    let historyChartInstance = null;
+
+    // --- INITIALIZATION & AUTH ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initCanvasDraggable();
+      initCanvasDrawing();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        
+        // Update user profile UI
+        document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('userAvatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+
+        await loadUserData();
+        switchView('dashboard');
+      } else {
+        currentUser = null;
+        document.getElementById('authScreen').classList.remove('hidden');
+        document.getElementById('mainApp').classList.add('hidden');
+        toggleLousaVisibility(false);
+      }
+    });
+
+    // Auth Event Handlers
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Erro na autenticação: " + err.message);
+      }
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', async () => {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Erro ao cadastrar: " + err.message);
+      }
+    });
+
+    document.getElementById('googleAuthBtn').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        alert("Erro no Google Sign-In: " + err.message);
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+    // --- FIRESTORE PERSISTENCE ---
+    async function loadUserData() {
+      if (!currentUser) return;
+      const userRef = doc(db, 'users', currentUser.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        userState = { ...userState, ...data };
+        
+        // Check day reset for todayStats
+        const todayStr = new Date().toLocaleDateString('pt-BR');
+        if (userState.todayStats?.dateStr !== todayStr) {
+          userState.todayStats = { total: 0, correct: 0, wrong: 0, dateStr: todayStr };
+        }
+      } else {
+        // Initialize default user document
+        await saveUserData();
+      }
+      renderAllViews();
+    }
+
+    async function saveUserData() {
+      if (!currentUser) return;
+      const userRef = doc(db, 'users', currentUser.uid);
+      await setDoc(userRef, userState, { merge: true });
+    }
+
+    // --- NAVIGATION & LOUSA CONTROL ---
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetView = btn.getAttribute('data-nav');
+        switchView(targetView);
+      });
+    });
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
+
+      // REGRA CRUCIAL: A lousa APARECE EXCLUSIVAMENTE no banco de questões / resolução
+      const isQuestionView = (viewId === 'questionsFilter');
+      toggleLousaVisibility(isQuestionView);
+
+      // Mobile menu auto-close
+      document.getElementById('sidebar').classList.add('hidden', 'md:flex');
+
+      // View-specific renders
+      if (viewId === 'dashboard') renderDashboard();
+      if (viewId === 'edital') renderEdital();
+      if (viewId === 'schedule') renderSchedule();
+      if (viewId === 'disciplines') renderDisciplines();
+      if (viewId === 'questionsFilter') populateFilterSelects();
+    }
+
+    function toggleLousaVisibility(show) {
+      const trigger = document.getElementById('lousaFloatingTrigger');
+      const window = document.getElementById('lousaWindow');
+      if (show) {
+        trigger.classList.remove('hidden');
+      } else {
+        trigger.classList.add('hidden');
+        window.classList.add('hidden');
+      }
+    }
+
+    // Mobile Sidebar Toggles
+    document.getElementById('openMobileSidebar').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('hidden');
+    });
+    document.getElementById('closeMobileSidebar').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.add('hidden');
+    });
+
+    // --- DASHBOARD RENDER & CHART ---
+    function renderDashboard() {
+      // Today Stats
+      const today = userState.todayStats || { total: 0, correct: 0, wrong: 0 };
+      document.getElementById('todayTotal').textContent = today.total;
+      document.getElementById('todayCorrect').textContent = today.correct;
+      document.getElementById('todayWrong').textContent = today.wrong;
+      const todayAcc = today.total > 0 ? Math.round((today.correct / today.total) * 100) : 0;
+      document.getElementById('todayAcc').textContent = `${todayAcc}%`;
+
+      // History Stats
+      const historyKeys = Object.keys(userState.history || {});
+      let totalHist = historyKeys.length;
+      let correctHist = 0;
+      historyKeys.forEach(k => {
+        if (userState.history[k].correct) correctHist++;
+      });
+      let wrongHist = totalHist - correctHist;
+
+      document.getElementById('histTotal').textContent = totalHist;
+
+      // Render Chart.js
+      const ctx = document.getElementById('historyChart').getContext('2d');
+      if (historyChartInstance) historyChartInstance.destroy();
+
+      historyChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Acertos', 'Erros'],
+          datasets: [{
+            data: [correctHist, wrongHist],
+            backgroundColor: ['#22c55e', '#f43f5e'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '75%',
+          plugins: { legend: { display: false } },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      // Edital vertical bars
+      renderEditalSummaryBars();
+    }
+
+    function renderEditalSummaryBars() {
+      const container = document.getElementById('editalSummaryBars');
+      container.innerHTML = '';
+
+      if (!userState.disciplines || userState.disciplines.length === 0) {
+        container.innerHTML = `<p class="text-sm text-slate-500 italic">Nenhuma disciplina cadastrada ainda.</p>`;
+        return;
+      }
+
+      userState.disciplines.forEach(disc => {
+        const topics = disc.topics || [];
+        const doneCount = topics.filter(t => t.editalDone).length;
+        const pct = topics.length > 0 ? Math.round((doneCount / topics.length) * 100) : 0;
+
+        const item = document.createElement('div');
+        item.className = "space-y-1";
+        item.innerHTML = `
+          <div class="flex justify-between text-xs font-medium">
+            <span class="text-slate-300">${disc.name}</span>
+            <span class="text-brand-400">${pct}%</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-2">
+            <div class="bg-brand-500 h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- ENCERRAMENTO DIÁRIO MODAL ---
+    document.getElementById('closeDayBtn').addEventListener('click', () => {
+      const modal = document.getElementById('closeDayModal');
+      const content = document.getElementById('closeDayModalContent');
+      const today = userState.todayStats || { total: 0, correct: 0, wrong: 0 };
+
+      content.innerHTML = `
+        <div class="p-4 bg-slate-900 rounded-xl space-y-2 border border-slate-800">
+          <p class="font-bold text-white">Resumo Geral de Hoje:</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div><p class="text-xs text-slate-400">Total</p><p class="font-bold text-white">${today.total}</p></div>
+            <div><p class="text-xs text-slate-400">Acertos</p><p class="font-bold text-emerald-400">${today.correct}</p></div>
+            <div><p class="text-xs text-slate-400">Erros</p><p class="font-bold text-rose-400">${today.wrong}</p></div>
+          </div>
+        </div>
+        <p class="text-xs text-slate-400 italic">Ao confirmar, as métricas diárias serão consolidadas no histórico e o contador diário será preparado para o próximo ciclo.</p>
+      `;
+      modal.classList.remove('hidden');
+    });
+
+    document.getElementById('confirmCloseDayBtn').addEventListener('click', async () => {
+      userState.todayStats = { total: 0, correct: 0, wrong: 0, dateStr: new Date().toLocaleDateString('pt-BR') };
+      await saveUserData();
+      document.getElementById('closeDayModal').classList.add('hidden');
+      renderDashboard();
+    });
+
+    // --- DISCIPLINAS & ASSUNTOS ---
+    function renderDisciplines() {
+      const list = document.getElementById('disciplinesList');
+      list.innerHTML = '';
+
+      if (!userState.disciplines || userState.disciplines.length === 0) {
+        list.innerHTML = `<div class="p-8 text-center text-slate-500 glass-card rounded-2xl">Nenhuma disciplina cadastrada. Clique em "Nova Disciplina" acima.</div>`;
+        return;
+      }
+
+      userState.disciplines.forEach((disc, dIdx) => {
+        const card = document.createElement('div');
+        card.className = "p-5 rounded-2xl glass-card border border-slate-800 space-y-4";
+        
+        let topicsHtml = (disc.topics || []).map((t, tIdx) => `
+          <div class="flex items-center justify-between p-3 bg-slate-900/80 rounded-xl border border-slate-800/80 text-sm">
+            <span class="text-slate-200 font-medium">${t.name}</span>
+            <div class="flex items-center gap-3">
+              ${t.docsUrl ? `<a href="${t.docsUrl}" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Google Docs</a>` : `<button onclick="addDocsUrl(${dIdx},${tIdx})" class="text-xs text-slate-400 hover:text-white">+ Docs</button>`}
+              <button onclick="startBatchQuestions('${disc.name}', '${t.name}')" class="px-3 py-1 bg-brand-600/20 text-brand-400 hover:bg-brand-600/30 rounded-lg text-xs font-semibold transition">Resolver Questões</button>
+            </div>
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-lg text-white">${disc.name}</h3>
+            <button onclick="addTopicToDiscipline(${dIdx})" class="text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition">+ Assunto</button>
+          </div>
+          <div class="space-y-2">
+            ${topicsHtml || `<p class="text-xs text-slate-500 italic">Nenhum assunto adicionado.</p>`}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    window.addTopicToDiscipline = async (dIdx) => {
+      const topicName = prompt("Nome do novo assunto:");
+      if (!topicName) return;
+      const docsUrl = prompt("URL do Resumo no Google Docs (opcional):");
+      
+      if (!userState.disciplines[dIdx].topics) userState.disciplines[dIdx].topics = [];
+      userState.disciplines[dIdx].topics.push({
+        id: Date.now(),
+        name: topicName,
+        docsUrl: docsUrl || "",
+        editalDone: false
+      });
+      await saveUserData();
+      renderDisciplines();
+    };
+
+    window.addDocsUrl = async (dIdx, tIdx) => {
+      const url = prompt("Cole a URL do Google Docs:");
+      if (url) {
+        userState.disciplines[dIdx].topics[tIdx].docsUrl = url;
+        await saveUserData();
+        renderDisciplines();
+      }
+    };
+
+    // Modal Create Discipline
+    document.getElementById('openAddDisciplineModal').addEventListener('click', () => {
+      document.getElementById('addDisciplineModal').classList.remove('hidden');
+    });
+
+    document.getElementById('addDisciplineForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('newDisciplineName').value;
+      if (!userState.disciplines) userState.disciplines = [];
+      userState.disciplines.push({ id: Date.now(), name, topics: [] });
+      await saveUserData();
+      document.getElementById('addDisciplineModal').classList.add('hidden');
+      document.getElementById('newDisciplineName').value = '';
+      renderDisciplines();
+    });
+
+    // --- IMPORTADOR JSON DE QUESTÕES ---
+    document.getElementById('openImportJsonModal').addEventListener('click', () => {
+      document.getElementById('importJsonModal').classList.remove('hidden');
+    });
+
+    document.getElementById('submitJsonImportBtn').addEventListener('click', async () => {
+      const raw = document.getElementById('jsonInputArea').value;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.disciplina || !parsed.questoes) throw new Error("Formato JSON inválido.");
+
+        // Ensure discipline & topic exist
+        let discObj = userState.disciplines.find(d => d.name === parsed.disciplina);
+        if (!discObj) {
+          discObj = { id: Date.now(), name: parsed.disciplina, topics: [] };
+          userState.disciplines.push(discObj);
+        }
+        if (parsed.tema && !discObj.topics.some(t => t.name === parsed.tema)) {
+          discObj.topics.push({ id: Date.now(), name: parsed.tema, docsUrl: "", editalDone: false });
+        }
+
+        // Add questions
+        parsed.questoes.forEach(q => {
+          userState.questions.push({
+            id: Date.now() + Math.random(),
+            discipline: parsed.disciplina,
+            topic: parsed.tema || "Geral",
+            statement: q.enunciado,
+            options: q.alternativas,
+            correct: q.resposta_correta,
+            comment: q.comentario || ""
+          });
+        });
+
+        await saveUserData();
+        alert(`Lote com ${parsed.questoes.length} questões importado com sucesso!`);
+        document.getElementById('importJsonModal').classList.add('hidden');
+        document.getElementById('jsonInputArea').value = '';
+        renderDisciplines();
+      } catch (err) {
+        alert("Erro no parse do JSON: " + err.message);
+      }
+    });
+
+    // --- EDITAL VERTICALIZADO ---
+    function renderEdital() {
+      const container = document.getElementById('editalVerticalContainer');
+      container.innerHTML = '';
+
+      if (!userState.disciplines || userState.disciplines.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 italic">Nenhuma disciplina cadastrada para o Edital.</p>`;
+        return;
+      }
+
+      userState.disciplines.forEach((disc, dIdx) => {
+        const card = document.createElement('div');
+        card.className = "p-5 rounded-2xl glass-card border border-slate-800 space-y-3";
+
+        let topicsCheck = (disc.topics || []).map((t, tIdx) => `
+          <label class="flex items-center gap-3 p-2 bg-slate-900 rounded-xl cursor-pointer hover:bg-slate-800 transition">
+            <input type="checkbox" ${t.editalDone ? 'checked' : ''} onchange="toggleEditalTopic(${dIdx}, ${tIdx})" class="w-4 h-4 rounded accent-brand-500 bg-slate-800 border-slate-700">
+            <span class="text-sm ${t.editalDone ? 'line-through text-slate-500' : 'text-slate-200'}">${t.name}</span>
+          </label>
+        `).join('');
+
+        card.innerHTML = `
+          <h3 class="font-bold text-white text-md border-b border-slate-800 pb-2">${disc.name}</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            ${topicsCheck || `<p class="text-xs text-slate-500">Sem tópicos.</p>`}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.toggleEditalTopic = async (dIdx, tIdx) => {
+      const topic = userState.disciplines[dIdx].topics[tIdx];
+      topic.editalDone = !topic.editalDone;
+      await saveUserData();
+      renderEdital();
+    };
+
+    // --- CRONOGRAMA SEMANAL ---
+    function renderSchedule() {
+      document.querySelectorAll('.schedule-items').forEach(el => el.innerHTML = '');
+
+      (userState.schedule || []).forEach((item, idx) => {
+        const dayContainer = document.querySelector(`[data-day="${item.day}"] .schedule-items`);
+        if (dayContainer) {
+          const div = document.createElement('div');
+          div.className = "p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-xs space-y-1 relative group";
+          div.innerHTML = `
+            <p class="font-bold text-white truncate">${item.discipline}</p>
+            <p class="text-slate-400 truncate">${item.topic}</p>
+            <div class="flex justify-between text-[10px] text-brand-400 font-mono">
+              <span>${item.hours}h líq.</span>
+              <span>${item.questions} qst.</span>
+            </div>
+            <button onclick="deleteScheduleItem(${idx})" class="absolute top-1 right-1 text-slate-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          `;
+          dayContainer.appendChild(div);
+        }
+      });
+      lucide.createIcons();
+    }
+
+    document.getElementById('openScheduleModalBtn').addEventListener('click', () => {
+      document.getElementById('addScheduleModal').classList.remove('hidden');
+    });
+
+    document.getElementById('addScheduleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newItem = {
+        day: document.getElementById('schedDay').value,
+        discipline: document.getElementById('schedDiscipline').value,
+        topic: document.getElementById('schedTopic').value,
+        hours: document.getElementById('schedHours').value,
+        questions: document.getElementById('schedQuestions').value
+      };
+
+      if (!userState.schedule) userState.schedule = [];
+      userState.schedule.push(newItem);
+      await saveUserData();
+      document.getElementById('addScheduleModal').classList.add('hidden');
+      renderSchedule();
+    });
+
+    window.deleteScheduleItem = async (idx) => {
+      userState.schedule.splice(idx, 1);
+      await saveUserData();
+      renderSchedule();
+    };
+
+    // --- BANCO DE QUESTÕES & FILTRO AVANÇADO ---
+    function populateFilterSelects() {
+      const discSel = document.getElementById('filterDiscipline');
+      discSel.innerHTML = '<option value="">Todas as Disciplinas</option>';
+      (userState.disciplines || []).forEach(d => {
+        discSel.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+      });
+
+      populateTopicFilter();
+    }
+
+    document.getElementById('filterDiscipline').addEventListener('change', populateTopicFilter);
+
+    function populateTopicFilter() {
+      const discName = document.getElementById('filterDiscipline').value;
+      const topicSel = document.getElementById('filterTopic');
+      topicSel.innerHTML = '<option value="">Todos os Assuntos</option>';
+
+      if (discName) {
+        const disc = userState.disciplines.find(d => d.name === discName);
+        if (disc && disc.topics) {
+          disc.topics.forEach(t => {
+            topicSel.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+          });
+        }
+      }
+    }
+
+    document.getElementById('applyQuestionFilterBtn').addEventListener('click', () => {
+      const disc = document.getElementById('filterDiscipline').value;
+      const topic = document.getElementById('filterTopic').value;
+      const status = document.getElementById('filterStatus').value;
+
+      activeFilterQuestions = (userState.questions || []).filter(q => {
+        if (disc && q.discipline !== disc) return false;
+        if (topic && q.topic !== topic) return false;
+
+        const hist = userState.history[q.id];
+        if (status === 'CORRECT') return hist && hist.correct === true;
+        if (status === 'WRONG') return hist && hist.correct === false;
+        if (status === 'UNANSWERED') return !hist;
+        return true;
+      });
+
+      if (activeFilterQuestions.length === 0) {
+        alert("Nenhuma questão encontrada com esses critérios.");
+        document.getElementById('questionResolutionArea').classList.add('hidden');
+        return;
+      }
+
+      currentQuestionIndex = 0;
+      document.getElementById('questionResolutionArea').classList.remove('hidden');
+      renderCurrentQuestion();
+    });
+
+    window.startBatchQuestions = (discName, topicName) => {
+      switchView('questionsFilter');
+      document.getElementById('filterDiscipline').value = discName;
+      populateTopicFilter();
+      document.getElementById('filterTopic').value = topicName;
+      document.getElementById('applyQuestionFilterBtn').click();
+    };
+
+    function renderCurrentQuestion() {
+      if (activeFilterQuestions.length === 0) return;
+      const q = activeFilterQuestions[currentQuestionIndex];
+
+      document.getElementById('questionCategoryBadge').textContent = `${q.discipline} › ${q.topic}`;
+      document.getElementById('questionCounter').textContent = `Questão ${currentQuestionIndex + 1} de ${activeFilterQuestions.length}`;
+      document.getElementById('questionStatement').textContent = q.statement;
+
+      const optsContainer = document.getElementById('questionOptions');
+      optsContainer.innerHTML = '';
+
+      const optionsObj = q.options || {};
+      Object.keys(optionsObj).forEach(key => {
+        const label = document.createElement('label');
+        label.className = "flex items-start gap-3 p-3.5 bg-slate-900 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-850 transition";
+        label.innerHTML = `
+          <input type="radio" name="optChoice" value="${key}" class="mt-1 accent-brand-500">
+          <span class="text-sm text-slate-200"><strong class="text-brand-400">${key})</strong> ${optionsObj[key]}</span>
+        `;
+        optsContainer.appendChild(label);
+      });
+
+      document.getElementById('questionFeedback').classList.add('hidden');
+    }
+
+    document.getElementById('submitAnswerBtn').addEventListener('click', async () => {
+      const selected = document.querySelector('input[name="optChoice"]:checked');
+      if (!selected) return alert("Selecione uma alternativa.");
+
+      const q = activeFilterQuestions[currentQuestionIndex];
+      const isCorrect = (selected.value === q.correct);
+
+      // Register History
+      if (!userState.history) userState.history = {};
+      userState.history[q.id] = { answered: true, correct: isCorrect, date: new Date().toISOString() };
+
+      // Update Today Stats
+      if (!userState.todayStats) userState.todayStats = { total: 0, correct: 0, wrong: 0, dateStr: new Date().toLocaleDateString('pt-BR') };
+      userState.todayStats.total++;
+      if (isCorrect) userState.todayStats.correct++;
+      else userState.todayStats.wrong++;
+
+      await saveUserData();
+
+      // Show Feedback
+      const feedback = document.getElementById('questionFeedback');
+      feedback.classList.remove('hidden');
+      if (isCorrect) {
+        feedback.className = "p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold";
+        feedback.innerHTML = `✓ Resposta Correta! (${q.correct})`;
+      } else {
+        feedback.className = "p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-semibold";
+        feedback.innerHTML = `✕ Resposta Incorreta. A alternativa certa é a (${q.correct}).<br><span class="text-xs text-slate-300 font-normal mt-1 block">${q.comment}</span>`;
+      }
+    });
+
+    document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+      if (currentQuestionIndex < activeFilterQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderCurrentQuestion();
+      }
+    });
+
+    document.getElementById('prevQuestionBtn').addEventListener('click', () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderCurrentQuestion();
+      }
+    });
+
+    // --- CRONÔMETRO DE HORAS LÍQUIDAS ---
+    let timerInterval = null;
+    let timerSeconds = 0;
+
+    document.getElementById('startTimerBtn').addEventListener('click', () => {
+      const disc = document.getElementById('timerDisciplineSelect').value;
+      if (!disc) return alert("Selecione uma disciplina antes de iniciar!");
+
+      document.getElementById('startTimerBtn').classList.add('hidden');
+      document.getElementById('pauseTimerBtn').classList.remove('hidden');
+
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(timerSeconds % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = `${hrs}:${mins}:${secs}`;
+      }, 1000);
+    });
+
+    document.getElementById('pauseTimerBtn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      document.getElementById('startTimerBtn').classList.remove('hidden');
+      document.getElementById('pauseTimerBtn').classList.add('hidden');
+    });
+
+    document.getElementById('saveTimerBtn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      alert(`Sessão de ${Math.round(timerSeconds / 60)} minutos salva com sucesso!`);
+      timerSeconds = 0;
+      document.getElementById('timerDisplay').textContent = "00:00:00";
+      document.getElementById('startTimerBtn').classList.remove('hidden');
+      document.getElementById('pauseTimerBtn').classList.add('hidden');
+    });
+
+    // --- BACKUP & RESTAURAÇÃO (JSON) ---
+    document.getElementById('exportBackupBtn').addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `QG_Backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    document.getElementById('triggerImportBtn').addEventListener('click', () => {
+      document.getElementById('importBackupInput').click();
+    });
+
+    document.getElementById('importBackupInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const importedData = JSON.parse(event.target.result);
+          userState = { ...userState, ...importedData };
+          await saveUserData();
+          alert("Backup importado e sincronizado com o Firestore com sucesso!");
+          renderAllViews();
+        } catch (err) {
+          alert("Arquivo JSON de backup inválido.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    function renderAllViews() {
+      // Populate select options in Timer
+      const timerSel = document.getElementById('timerDisciplineSelect');
+      timerSel.innerHTML = '<option value="">-- Escolha uma disciplina --</option>';
+      (userState.disciplines || []).forEach(d => {
+        timerSel.innerHTML += `<option value="${d.name}">${d.name}</option>`;
+      });
+
+      renderDashboard();
+      renderDisciplines();
+      renderEdital();
+      renderSchedule();
+    }
+
+    // Modal close event generic listener
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.fixed').classList.add('hidden');
+      });
+    });
+
+    // --- LOUSA FLUTUANTE EXPANDÍVEL & DRAGGABLE ---
+    function initCanvasDraggable() {
+      const lousaWin = document.getElementById('lousaWindow');
+      const lousaHeader = document.getElementById('lousaHeader');
+      let isDragging = false;
+      let offsetX = 0, offsetY = 0;
+
+      lousaHeader.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - lousaWin.offsetLeft;
+        offsetY = e.clientY - lousaWin.offsetTop;
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        lousaWin.style.left = `${e.clientX - offsetX}px`;
+        lousaWin.style.top = `${e.clientY - offsetY}px`;
+        lousaWin.style.right = 'auto'; // release fixed right anchor
+      });
+
+      document.addEventListener('mouseup', () => isDragging = false);
+
+      document.getElementById('toggleLousaBtn').addEventListener('click', () => {
+        lousaWin.classList.toggle('hidden');
+        resizeCanvas();
+      });
+
+      document.getElementById('closeLousaBtn').addEventListener('click', () => {
+        lousaWin.classList.add('hidden');
+      });
+    }
+
+    let canvasCtx = null;
+    let isDrawing = false;
+    let currentTool = 'pencil';
+
+    function initCanvasDrawing() {
+      const canvas = document.getElementById('scratchCanvas');
+      canvasCtx = canvas.getContext('2d');
+      resizeCanvas();
+
+      document.getElementById('toolPencil').addEventListener('click', () => {
+        currentTool = 'pencil';
+        document.getElementById('toolPencil').className = "p-1.5 bg-brand-600 text-white rounded";
+        document.getElementById('toolEraser').className = "p-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded";
+      });
+
+      document.getElementById('toolEraser').addEventListener('click', () => {
+        currentTool = 'eraser';
+        document.getElementById('toolEraser').className = "p-1.5 bg-brand-600 text-white rounded";
+        document.getElementById('toolPencil').className = "p-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded";
+      });
+
+      document.getElementById('clearCanvasBtn').addEventListener('click', () => {
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+
+      // Drawing logic
+      const startDraw = (e) => {
+        isDrawing = true;
+        draw(e);
+      };
+      const stopDraw = () => {
+        isDrawing = false;
+        canvasCtx.beginPath();
+      };
+      const draw = (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        const size = document.getElementById('pencilSize').value;
+        canvasCtx.lineWidth = size;
+        canvasCtx.lineCap = 'round';
+
+        if (currentTool === 'pencil') {
+          canvasCtx.strokeStyle = '#22c55e';
+          canvasCtx.globalCompositeOperation = 'source-over';
+        } else {
+          canvasCtx.globalCompositeOperation = 'destination-out';
+        }
+
+        canvasCtx.lineTo(x, y);
+        canvasCtx.stroke();
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(x, y);
+      };
+
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDraw);
+
+      canvas.addEventListener('touchstart', startDraw);
+      canvas.addEventListener('touchmove', draw);
+      canvas.addEventListener('touchend', stopDraw);
+    }
+
+    function resizeCanvas() {
+      const canvas = document.getElementById('scratchCanvas');
+      if (canvas && canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      }
+    }
+  </script>
+</body>
+</html>
