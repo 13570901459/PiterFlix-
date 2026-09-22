@@ -1,405 +1,285 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QG Estudos - Gestão de Concursos & Questões</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-              900: '#14532d',
-            }
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plataforma de Estudos Premium</title>
+    <style>
+        :root {
+            --bg-main: #0b1329;
+            --bg-card: #1c2541;
+            --bg-input: #3a506b;
+            --accent: #3a86ff;
+            --accent-hover: #2563eb;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #334155;
         }
-      }
-    }
-  </script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <style>
-    /* Estilos para Canvas de Rabisco */
-    #drawingCanvas {
-      pointer-events: none;
-    }
-    #drawingCanvas.active {
-      pointer-events: auto;
-      cursor: crosshair;
-    }
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1f2937;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #374151;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #4b5563;
-    }
-  </style>
-</head>
-<body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col relative">
 
-  <!-- ==================== TELA DE AUTENTICAÇÃO ==================== -->
-  <div id="authScreen" class="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center p-4">
-    <div class="bg-gray-800 border border-gray-700 rounded-xl p-8 max-w-md w-full shadow-2xl">
-      <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-600/20 text-brand-500 mb-4">
-          <i data-lucide="book-open-check" class="w-8 h-8"></i>
-        </div>
-        <h1 class="text-2xl font-bold text-white">QG Estudos</h1>
-        <p class="text-gray-400 text-sm mt-1">Plataforma Interativa de Concursos</p>
-      </div>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-      <form id="authForm" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">E-mail</label>
-          <input type="email" id="authEmail" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Senha</label>
-          <input type="password" id="authPassword" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition">
-        </div>
-        
-        <div class="flex gap-2 pt-2">
-          <button type="submit" id="btnLogin" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg transition text-sm">Entrar</button>
-          <button type="button" id="btnSignUp" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2.5 rounded-lg transition text-sm">Cadastrar</button>
-        </div>
-      </form>
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-700"></div></div>
-        <div class="relative flex justify-center text-xs uppercase"><span class="bg-gray-800 px-2 text-gray-400">Ou acesse com</span></div>
-      </div>
+        header {
+            background-color: var(--bg-card);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-      <button id="btnGoogleAuth" class="w-full bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition text-sm">
-        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
-        Continuar com Google
-      </button>
-    </div>
-  </div>
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
 
-  <!-- ==================== APLICAÇÃO PRINCIPAL ==================== -->
-  <div id="appScreen" class="hidden flex-1 flex flex-col">
-    <!-- Header/Navbar -->
-    <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <i data-lucide="book-open-check" class="w-6 h-6 text-brand-500"></i>
-          <span class="font-bold text-lg text-white">QG Estudos</span>
-        </div>
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
 
-        <!-- Cronômetro Flutuante/Header -->
-        <div class="flex items-center gap-3 bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-lg text-sm">
-          <i data-lucide="timer" class="w-4 h-4 text-brand-500"></i>
-          <span id="timerDisplay" class="font-mono font-bold w-16">00:00:00</span>
-          <button id="btnToggleTimer" class="text-gray-400 hover:text-white"><i data-lucide="play" class="w-4 h-4"></i></button>
-          <button id="btnResetTimer" class="text-gray-400 hover:text-white"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-        </div>
+        /* Drawer Hambúrguer */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
 
-        <div class="flex items-center gap-4">
-          <span id="userEmailDisplay" class="text-xs text-gray-400 hidden sm:inline"></span>
-          <button id="btnLogout" class="text-gray-400 hover:text-red-400 text-sm flex items-center gap-1 transition">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Sair
-          </button>
-        </div>
-      </div>
-    </header>
+        .drawer-overlay.active { opacity: 1; pointer-events: auto; }
 
-    <!-- Sub-Navbar de Navegação Principal -->
-    <nav class="bg-gray-800/50 border-b border-gray-700/50">
-      <div class="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto">
-        <button data-tab="tabDashboard" class="nav-btn px-4 py-3 border-b-2 border-brand-500 text-brand-500 font-medium text-sm flex items-center gap-2 whitespace-nowrap">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-        </button>
-        <button data-tab="tabEdital" class="nav-btn px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-medium text-sm flex items-center gap-2 whitespace-nowrap">
-          <i data-lucide="list-checks" class="w-4 h-4"></i> Edital Verticalizado
-        </button>
-        <button data-tab="tabRevisoes" class="nav-btn px-4 py-3 border-b-2 border-transparent text-gray-400 hover:text-gray-200 font-medium text-sm flex items-center gap-2 whitespace-nowrap relative">
-          <i data-lucide="calendar" class="w-4 h-4"></i> Revisões
-          <span id="srsBadge" class="hidden bg-amber-500 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
-        </button>
-      </div>
-    </nav>
+        .drawer {
+            position: fixed; top: 0; left: -320px;
+            width: 300px; height: 100%;
+            background: var(--bg-card);
+            z-index: 201;
+            transition: left 0.3s ease;
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+        }
 
-    <!-- Conteúdo Dinâmico das Abas -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
-      
-      <!-- ABA 1: DASHBOARD DE DESEMPENHO -->
-      <section id="tabDashboard" class="tab-content space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase">Resoluções Hoje</p>
-            <h3 id="dashTodayCount" class="text-2xl font-bold text-white mt-1">0</h3>
-            <span id="dashTodayTax" class="text-xs text-gray-400">0% de acertos</span>
-          </div>
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase">Total de Questões</p>
-            <h3 id="dashTotalCount" class="text-2xl font-bold text-white mt-1">0</h3>
-            <span id="dashTotalTax" class="text-xs text-gray-400">Histórico completo</span>
-          </div>
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase">Taxa Geral de Acerto</p>
-            <h3 id="dashGlobalTax" class="text-2xl font-bold text-brand-500 mt-1">0%</h3>
-            <span class="text-xs text-gray-400">Aproveitamento</span>
-          </div>
-          <div class="bg-gray-800 border border-gray-700 rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase">Revisões Pendentes</p>
-            <h3 id="dashSrsPending" class="text-2xl font-bold text-amber-500 mt-1">0</h3>
-            <span class="text-xs text-gray-400">Ações para hoje</span>
-          </div>
-        </div>
+        .drawer.active { left: 0; }
 
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
-          <h2 class="text-lg font-bold text-white mb-4">Desempenho por Disciplina</h2>
-          <div id="disciplineStatsList" class="space-y-4">
-            <!-- Barras dinamicas de desempenho por materia -->
-            <p class="text-gray-400 text-sm italic">Nenhuma disciplina cadastrada ou questão resolvida ainda.</p>
-          </div>
-        </div>
-      </section>
+        .drawer-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold;
+        }
 
-      <!-- ABA 2: EDITAL VERTICALIZADO & DISCIPLINAS -->
-      <section id="tabEdital" class="tab-content hidden space-y-6">
-        <div class="flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <h2 class="text-xl font-bold text-white">Edital Verticalizado</h2>
-            <p class="text-sm text-gray-400">Organize disciplinas, tópicos, resumos e questões em lotes.</p>
-          </div>
-          <div class="flex gap-2">
-            <button id="btnOpenImportModal" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
-              <i data-lucide="file-json" class="w-4 h-4"></i> Importar JSON
-            </button>
-            <button id="btnOpenAddDisciplineModal" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
-              <i data-lucide="plus" class="w-4 h-4"></i> Nova Disciplina
-            </button>
-          </div>
-        </div>
+        .drawer-content { padding: 20px; overflow-y: auto; flex: 1; }
+        .menu-section { margin-bottom: 25px; }
+        .menu-section h4 {
+            font-size: 0.75rem; text-transform: uppercase;
+            color: var(--text-sub); margin-bottom: 10px; letter-spacing: 1px;
+        }
 
-        <div id="disciplinesContainer" class="space-y-4">
-          <!-- Renderização Dinâmica de Disciplinas -->
-        </div>
-      </section>
+        .menu-item {
+            width: 100%; padding: 12px;
+            background: var(--bg-input); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 8px; margin-bottom: 8px;
+            text-align: left; cursor: pointer; font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: background 0.2s;
+        }
 
-      <!-- ABA 3: REVISÕES ESPAÇADAS (SRS) -->
-      <section id="tabRevisoes" class="tab-content hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-bold text-white">Quadro de Revisões Espaçadas</h2>
-          <p class="text-sm text-gray-400">Agendamentos automáticos em ciclos de 1, 3, 7, 15 e 30 dias após os estudos.</p>
-        </div>
+        .menu-item:hover { background: var(--accent); }
 
-        <div id="srsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Lista dinamica de revisões pendentes/futuras -->
-        </div>
-      </section>
+        /* Layout Container */
+        .container {
+            padding: 20px; max-width: 1100px;
+            margin: 0 auto; width: 100%; flex: 1;
+        }
 
-      <!-- ABA 4: SIMULADO / RESOLUÇÃO DE QUESTÕES -->
-      <section id="tabSimulado" class="tab-content hidden space-y-6 relative">
-        <!-- Barra Superior da Sessão -->
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 sticky top-20 z-20 shadow-md">
-          <div class="flex items-center gap-4">
-            <button id="btnExitSimulado" class="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium">
-              <i data-lucide="arrow-left" class="w-4 h-4"></i> Sair
-            </button>
-            <div>
-              <span id="simuladoTopicTitle" class="text-xs text-brand-500 font-bold uppercase tracking-wider block">Tema</span>
-              <h3 id="simuladoBatchTitle" class="text-base font-bold text-white">Lote de Questões</h3>
-            </div>
-          </div>
+        .section-title {
+            font-size: 1rem; margin-bottom: 12px;
+            color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px;
+        }
 
-          <!-- Placar de Desempenho em Tempo Real -->
-          <div class="flex items-center gap-4 bg-gray-900 border border-gray-700 px-4 py-2 rounded-lg text-sm">
-            <div class="text-center">
-              <span class="text-[10px] text-gray-400 block uppercase">Acertos</span>
-              <span id="simulatedHits" class="font-bold text-emerald-400">0</span>
-            </div>
-            <div class="w-px h-6 bg-gray-700"></div>
-            <div class="text-center">
-              <span class="text-[10px] text-gray-400 block uppercase">Erros</span>
-              <span id="simulatedErrors" class="font-bold text-red-400">0</span>
-            </div>
-            <div class="w-px h-6 bg-gray-700"></div>
-            <div class="text-center">
-              <span class="text-[10px] text-gray-400 block uppercase">Taxa</span>
-              <span id="simulatedRate" class="font-bold text-white">0%</span>
-            </div>
-          </div>
+        .grid-stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px; margin-bottom: 25px;
+        }
 
-          <!-- Ferramenta de Lousa/Rabisco Toggle -->
-          <div class="flex items-center gap-2">
-            <button id="btnToggleScratchpad" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 border border-gray-600">
-              <i data-lucide="pencil" class="w-4 h-4"></i> Rabiscar
-            </button>
-          </div>
-        </div>
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 15px; text-align: center;
+        }
 
-        <!-- Card da Questão -->
-        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 space-y-6 relative z-10">
-          <div class="flex justify-between items-center border-b border-gray-700 pb-4">
-            <span id="simuladoProgress" class="text-sm font-semibold text-gray-400">Questão 1/1</span>
-            <span id="simuladoQuestionId" class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">ID: 1</span>
-          </div>
+        .stat-card h5 { color: var(--text-sub); font-size: 0.75rem; margin-bottom: 6px; }
+        .stat-card .num { font-size: 1.5rem; font-weight: bold; }
 
-          <div id="simuladoEnunciado" class="text-lg text-gray-100 font-medium leading-relaxed">
-            <!-- Texto da questão -->
-          </div>
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-accent { color: var(--accent); }
+        .text-warning { color: var(--warning); }
 
-          <div id="simuladoOptions" class="space-y-3">
-            <!-- Opções A, B, C, D, E renderizadas aqui -->
-          </div>
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px; margin-bottom: 20px;
+        }
 
-          <div class="pt-4 flex justify-between items-center border-t border-gray-700">
-            <button id="btnConfirmAnswer" disabled class="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm">
-              Responder
-            </button>
-            <button id="btnNextQuestion" class="hidden bg-gray-700 hover:bg-gray-600 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm flex items-center gap-2">
-              Próxima <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </button>
-          </div>
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 6px; }
 
-          <!-- Gabarito Comentado -->
-          <div id="simuladoFeedback" class="hidden border-t border-gray-700 pt-6 mt-6 space-y-4">
-            <div id="feedbackBanner" class="p-4 rounded-lg flex items-center gap-3">
-              <!-- Ícone e Resultado (Acertou/Errou) -->
-            </div>
-            <div class="bg-gray-900 border border-gray-700 p-4 rounded-lg space-y-2">
-              <h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="message-square" class="w-4 h-4 text-brand-500"></i> Comentário do Professor
-              </h4>
-              <p id="feedbackComment" class="text-sm text-gray-300 leading-relaxed"></p>
-            </div>
-          </div>
-        </div>
-      </section>
+        .form-control {
+            width: 100%; padding: 10px;
+            background: var(--bg-main); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-main); font-size: 0.95rem;
+        }
 
-    </main>
-  </div>
+        textarea.form-control { resize: vertical; min-height: 100px; }
 
-  <!-- ==================== FERRAMENTA DE LOUSA / RABISCO (OVERLAY) ==================== -->
-  <div id="scratchpadControls" class="hidden fixed bottom-6 right-6 z-50 bg-gray-800 border border-gray-700 rounded-xl p-3 shadow-2xl flex items-center gap-3">
-    <input type="color" id="scratchColor" value="#22c55e" class="w-8 h-8 rounded cursor-pointer bg-transparent border-0">
-    <input type="range" id="scratchSize" min="1" max="10" value="3" class="w-20">
-    <button id="btnScratchEraser" class="p-2 rounded bg-gray-700 hover:bg-gray-600 text-white" title="Borracha"><i data-lucide="eraser" class="w-4 h-4"></i></button>
-    <button id="btnScratchClear" class="p-2 rounded bg-red-600/20 text-red-400 hover:bg-red-600/30" title="Limpar Tudo"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-  </div>
-  <canvas id="drawingCanvas" class="fixed inset-0 z-40 w-full h-full"></canvas>
+        .btn {
+            padding: 10px 16px; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem;
+        }
 
-  <!-- ==================== MODAIS ==================== -->
-  
-  <!-- Modal: Nova/Editar Disciplina -->
-  <div id="modalDiscipline" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md w-full">
-      <h3 id="modalDisciplineTitle" class="text-lg font-bold text-white mb-4">Nova Disciplina</h3>
-      <form id="formDiscipline" class="space-y-4">
-        <input type="hidden" id="disciplineId">
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Nome da Disciplina</label>
-          <input type="text" id="disciplineName" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-500">
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('modalDiscipline')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: #0b1329; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: #0b1329; }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); }
 
-  <!-- Modal: Novo Assunto/Tópico -->
-  <div id="modalTopic" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md w-full">
-      <h3 id="modalTopicTitle" class="text-lg font-bold text-white mb-4">Novo Assunto</h3>
-      <form id="formTopic" class="space-y-4">
-        <input type="hidden" id="topicDisciplineId">
-        <input type="hidden" id="topicId">
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Nome do Assunto/Tópico</label>
-          <input type="text" id="topicName" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Prioridade / Ordem de Cobrança</label>
-          <select id="topicPriority" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none">
-            <option value="P1">P1 - Prioridade Alta</option>
-            <option value="P2" selected>P2 - Prioridade Média</option>
-            <option value="P3">P3 - Prioridade Baixa</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">URL Resumo (Google Docs)</label>
-          <input type="url" id="topicSummaryUrl" placeholder="https://docs.google.com/..." class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none">
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('modalTopic')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        .progress-bar-bg {
+            background: var(--bg-main); height: 8px;
+            border-radius: 4px; overflow: hidden; margin: 8px 0 15px;
+        }
 
-  <!-- Modal: Importador JSON de Questões -->
-  <div id="modalImport" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-2xl w-full">
-      <h3 class="text-lg font-bold text-white mb-2">Importar Lote de Questões (JSON)</h3>
-      <p class="text-xs text-gray-400 mb-4">Cole abaixo a estrutura em JSON para criar/alimentar a disciplina, o assunto e o lote automaticamente.</p>
-      
-      <form id="formImport" class="space-y-4">
-        <div>
-          <textarea id="importJsonText" rows="10" placeholder='{ "disciplina": "...", "tema": "...", "questoes": [...] }' required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-xs font-mono text-emerald-400 focus:outline-none focus:border-brand-500"></textarea>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button type="button" onclick="closeModal('modalImport')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm">Cancelar</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold">Importar Dados</button>
-        </div>
-      </form>
-    </div>
-  </div>
+        .progress-bar-fill {
+            background: var(--success); height: 100%; width: 0%; transition: width 0.3s ease;
+        }
 
+        .topic-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.2s;
+        }
 
-  <!-- ==================== LOGICA DA APLICAÇÃO (FIREBASE V10 ES MODULES) ==================== -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signInWithPopup, 
-      GoogleAuthProvider, 
-      onAuthStateChanged, 
-      signOut 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      setDoc, 
-      getDoc, 
-      collection, 
-      addDoc, 
-      getDocs, 
-      updateDoc, 
-      deleteDoc, 
-      query, 
-      where, 
-      onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        .topic-item:hover { border-color: var(--accent); transform: translateX(4px); }
 
-    // Firebase Config Oficial
-    const firebaseConfig = {
+        .hidden { display: none !important; }
+
+        .timer-box {
+            text-align: center; padding: 10px; background: var(--bg-main);
+            border-radius: 8px; margin-bottom: 15px;
+        }
+
+        .timer-display { font-size: 1.8rem; font-family: monospace; font-weight: bold; color: var(--warning); }
+
+        /* QUIZ OVERLAY */
+        #quiz-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--bg-main); z-index: 300; display: flex; flex-direction: column;
+        }
+
+        .quiz-top-bar {
+            background: var(--bg-card); padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);
+        }
+
+        .quiz-nav-top {
+            background: var(--bg-card); padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; gap: 8px; z-index: 15;
+        }
+
+        .quiz-body { flex: 1; padding: 15px 15px 90px 15px; overflow-y: auto; position: relative; }
+
+        .options-list { list-style: none; margin-top: 15px; }
+
+        .option-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 14px; border-radius: 8px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s; font-size: 0.95rem; line-height: 1.4;
+        }
+
+        .option-card.selected { border-color: var(--accent); background: rgba(58, 134, 255, 0.15); }
+        .option-card.correct { border-color: var(--success); background: rgba(6, 214, 160, 0.15); }
+        .option-card.wrong { border-color: var(--danger); background: rgba(239, 71, 111, 0.15); }
+
+        /* ESTILO DO GABARITO COMENTADO */
+        .comment-box {
+            background: rgba(58, 80, 107, 0.3);
+            border: 1px solid var(--accent);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .comment-box h5 {
+            color: var(--warning);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #scratch-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10; pointer-events: none;
+        }
+
+        #scratch-canvas.active { pointer-events: auto; cursor: crosshair; }
+
+        .canvas-tools {
+            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 8px 12px; border-radius: 30px; display: flex; align-items: center; gap: 8px;
+            z-index: 20; box-shadow: 0 4px 20px rgba(0,0,0,0.6); max-width: 95vw; overflow-x: auto;
+        }
+
+        .color-dot {
+            width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; flex-shrink: 0;
+        }
+
+        .color-dot.active { border-color: white; transform: scale(1.1); }
+    </style>
+
+    <!-- INICIALIZAÇÃO E INTEGRAÇÃO DO FIREBASE -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        // ⚠️ SUBSTITUA PELAS SUAS CHAVE DO FIREBASE CONSOLE:
+        const firebaseConfig = {
       apiKey: "AIzaSyCUpkn3zhkdt3nCEaURN8GzaBbtimpQKOE",
       authDomain: "qgestudo.firebaseapp.com",
       projectId: "qgestudo",
@@ -409,692 +289,909 @@
       measurementId: "G-PC8ESJHFZ5"
     };
 
-    // Inicialização
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const docRef = doc(db, "plataforma_estudos", "usuario_dados");
 
-    // Estado Global
-    let currentUser = null;
-    let localData = {
-      disciplines: [],
-      topics: [],
-      batches: [],
-      history: [],
-      srs: []
-    };
-    let currentSimulatedSession = null;
+        // Sobrescrever funções globais de persistência com Firebase
+        window.saveStorage = async function() {
+            localStorage.setItem('estudo_pro_v5_data', JSON.stringify(window.appState));
+            try {
+                await setDoc(docRef, window.appState, { merge: true });
+            } catch (err) {
+                console.error("Erro ao salvar no Firebase:", err);
+            }
+        };
 
-    // Inicializa ícones Lucide
-    lucide.createIcons();
+        window.loadStorage = function() {
+            const local = localStorage.getItem('estudo_pro_v5_data');
+            if (local) window.appState = JSON.parse(local);
 
-    // ==================== AUTENTICAÇÃO ====================
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('authScreen').classList.add('hidden');
-        document.getElementById('appScreen').classList.remove('hidden');
-        document.getElementById('userEmailDisplay').innerText = user.email;
-        loadUserData();
-      } else {
-        currentUser = null;
-        document.getElementById('authScreen').classList.remove('hidden');
-        document.getElementById('appScreen').classList.add('hidden');
-      }
-    });
+            // Escutar alterações do banco em tempo real
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    window.appState = docSnap.data();
+                    localStorage.setItem('estudo_pro_v5_data', JSON.stringify(window.appState));
+                    if (window.renderDashboard) window.renderDashboard();
+                    if (window.renderDrawerSubjects) window.renderDrawerSubjects();
+                }
+            });
+        };
+    </script>
+</head>
+<body>
 
-    document.getElementById('authForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPassword').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (err) {
-        alert("Erro ao entrar: " + err.message);
-      }
-    });
+    <!-- Header Topo -->
+    <header>
+        <button class="menu-btn" onclick="toggleDrawer()">☰</button>
+        <div class="header-title" id="top-title">Dashboard</div>
+        <div></div>
+    </header>
 
-    document.getElementById('btnSignUp').addEventListener('click', async () => {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPassword').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-      } catch (err) {
-        alert("Erro ao cadastrar: " + err.message);
-      }
-    });
-
-    document.getElementById('btnGoogleAuth').addEventListener('click', async () => {
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        alert("Erro no Login com Google: " + err.message);
-      }
-    });
-
-    document.getElementById('btnLogout').addEventListener('click', () => signOut(auth));
-
-    // ==================== FIRESTORE SYNC ====================
-    function loadUserData() {
-      if (!currentUser) return;
-      const uid = currentUser.uid;
-
-      // Realtime Listeners
-      onSnapshot(collection(db, `users/${uid}/disciplines`), (snap) => {
-        localData.disciplines = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderEdital();
-        renderDashboard();
-      });
-
-      onSnapshot(collection(db, `users/${uid}/topics`), (snap) => {
-        localData.topics = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderEdital();
-        renderDashboard();
-      });
-
-      onSnapshot(collection(db, `users/${uid}/batches`), (snap) => {
-        localData.batches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderEdital();
-      });
-
-      onSnapshot(collection(db, `users/${uid}/history`), (snap) => {
-        localData.history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderDashboard();
-      });
-
-      onSnapshot(collection(db, `users/${uid}/srs`), (snap) => {
-        localData.srs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderSrs();
-      });
-    }
-
-    // ==================== NAVEGAÇÃO ENTRE ABAS ====================
-    window.switchTab = function(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-btn').forEach(el => {
-        el.classList.remove('border-brand-500', 'text-brand-500');
-        el.classList.add('border-transparent', 'text-gray-400');
-      });
-
-      const targetTab = document.getElementById(tabId);
-      if (targetTab) targetTab.classList.remove('hidden');
-
-      const btn = document.querySelector(`[data-tab="${tabId}"]`);
-      if (btn) {
-        btn.classList.remove('border-transparent', 'text-gray-400');
-        btn.classList.add('border-brand-500', 'text-brand-500');
-      }
-    };
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-
-    // ==================== CRUD DISCIPLINAS E TÓPICOS ====================
-    window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
-    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-
-    document.getElementById('btnOpenAddDisciplineModal').addEventListener('click', () => {
-      document.getElementById('disciplineId').value = '';
-      document.getElementById('disciplineName').value = '';
-      document.getElementById('modalDisciplineTitle').innerText = 'Nova Disciplina';
-      openModal('modalDiscipline');
-    });
-
-    document.getElementById('formDiscipline').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('disciplineId').value;
-      const name = document.getElementById('disciplineName').value;
-      const ref = id 
-        ? doc(db, `users/${currentUser.uid}/disciplines`, id) 
-        : doc(collection(db, `users/${currentUser.uid}/disciplines`));
-
-      await setDoc(ref, { name }, { merge: true });
-      closeModal('modalDiscipline');
-    });
-
-    window.openAddTopicModal = (disciplineId) => {
-      document.getElementById('topicDisciplineId').value = disciplineId;
-      document.getElementById('topicId').value = '';
-      document.getElementById('topicName').value = '';
-      document.getElementById('topicPriority').value = 'P2';
-      document.getElementById('topicSummaryUrl').value = '';
-      document.getElementById('modalTopicTitle').innerText = 'Novo Assunto';
-      openModal('modalTopic');
-    };
-
-    document.getElementById('formTopic').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const discId = document.getElementById('topicDisciplineId').value;
-      const topicId = document.getElementById('topicId').value;
-      const name = document.getElementById('topicName').value;
-      const priority = document.getElementById('topicPriority').value;
-      const summaryUrl = document.getElementById('topicSummaryUrl').value;
-
-      const ref = topicId 
-        ? doc(db, `users/${currentUser.uid}/topics`, topicId) 
-        : doc(collection(db, `users/${currentUser.uid}/topics`));
-
-      await setDoc(ref, {
-        disciplineId: discId,
-        name,
-        priority,
-        summaryUrl,
-        status: 'Não Iniciado'
-      }, { merge: true });
-
-      closeModal('modalTopic');
-    });
-
-    window.updateTopicStatus = async (topicId, status) => {
-      await updateDoc(doc(db, `users/${currentUser.uid}/topics`, topicId), { status });
-      if (status === 'Concluído') {
-        scheduleSRS(topicId);
-      }
-    };
-
-    window.deleteDiscipline = async (id) => {
-      if (confirm("Deseja realmente excluir esta disciplina e seus tópicos?")) {
-        await deleteDoc(doc(db, `users/${currentUser.uid}/disciplines`, id));
-      }
-    };
-
-    window.deleteTopic = async (id) => {
-      if (confirm("Deseja excluir este assunto?")) {
-        await deleteDoc(doc(db, `users/${currentUser.uid}/topics`, id));
-      }
-    };
-
-    // ==================== RENDERIZAR EDITAL VERTICALIZADO ====================
-    function renderEdital() {
-      const container = document.getElementById('disciplinesContainer');
-      container.innerHTML = '';
-
-      if (localData.disciplines.length === 0) {
-        container.innerHTML = `<div class="bg-gray-800 border border-gray-700 rounded-xl p-8 text-center text-gray-400">Nenhuma disciplina cadastrada. Clique em "Nova Disciplina" ou "Importar JSON".</div>`;
-        return;
-      }
-
-      localData.disciplines.forEach(disc => {
-        const topics = localData.topics.filter(t => t.disciplineId === disc.id);
-        const completed = topics.filter(t => t.status === 'Concluído').length;
-        const progress = topics.length > 0 ? Math.round((completed / topics.length) * 100) : 0;
-
-        const discEl = document.createElement('div');
-        discEl.className = "bg-gray-800 border border-gray-700 rounded-xl overflow-hidden";
-        discEl.innerHTML = `
-          <div class="p-4 bg-gray-800/80 border-b border-gray-700 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <h3 class="font-bold text-lg text-white">${disc.name}</h3>
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-600/20 text-brand-400">${progress}% Concluído</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="openAddTopicModal('${disc.id}')" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded flex items-center gap-1">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Assunto
-              </button>
-              <button onclick="deleteDiscipline('${disc.id}')" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 px-2 py-1.5 rounded">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-          <div class="w-full bg-gray-700 h-1.5"><div class="bg-brand-500 h-1.5 transition-all" style="width: ${progress}%"></div></div>
-          
-          <div class="p-4 divide-y divide-gray-700/50">
-            ${topics.length === 0 ? '<p class="text-xs text-gray-500 italic py-2">Nenhum assunto cadastrado nesta disciplina.</p>' : ''}
-            ${topics.map(top => {
-              const topicBatches = localData.batches.filter(b => b.topicId === top.id);
-              return `
-                <div class="py-3 flex flex-wrap items-center justify-between gap-3">
-                  <div class="flex items-center gap-3 min-w-[200px]">
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${                       top.priority === 'P1' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :                       top.priority === 'P2' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :                       'bg-blue-500/20 text-blue-400 border border-blue-500/30'                     }">${top.priority}</span>
-                    <span class="text-sm font-medium text-gray-200">${top.name}</span>
-                  </div>
-
-                  <div class="flex items-center gap-3">
-                    ${top.summaryUrl ? `
-                      <a href="${top.summaryUrl}" target="_blank" class="text-xs text-blue-400 hover:underline flex items-center gap-1">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Resumo
-                      </a>
-                    ` : ''}
-
-                    <select onchange="updateTopicStatus('${top.id}', this.value)" class="bg-gray-700 text-xs text-white rounded px-2 py-1 border border-gray-600">
-                      <option value="Não Iniciado" ${top.status === 'Não Iniciado' ? 'selected' : ''}>Não Iniciado</option>
-                      <option value="Estudado" ${top.status === 'Estudado' ? 'selected' : ''}>Estudado</option>
-                      <option value="Em Revisão" ${top.status === 'Em Revisão' ? 'selected' : ''}>Em Revisão</option>
-                      <option value="Concluído" ${top.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
-                    </select>
-
-                    <button onclick="startBatchMode('${top.id}')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1 rounded font-medium flex items-center gap-1">
-                      <i data-lucide="play" class="w-3 h-3"></i> Lotes (${topicBatches.length})
-                    </button>
-
-                    <button onclick="deleteTopic('${top.id}')" class="text-gray-500 hover:text-red-400"><i data-lucide="x" class="w-4 h-4"></i></button>
-                  </div>
+    <!-- Menu Hambúrguer -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span>⚙️ Opções do Sistema</span>
+            <button class="menu-btn" onclick="toggleDrawer()">✕</button>
+        </div>
+        <div class="drawer-content">
+            <div class="menu-section">
+                <h4>⏱️ Cronômetro de Estudo</h4>
+                <div class="timer-box">
+                    <div class="timer-display" id="timer-display">00:00:00</div>
                 </div>
-              `;
-            }).join('')}
-          </div>
-        `;
-        container.appendChild(discEl);
-      });
-      lucide.createIcons();
-    }
+                <div style="display: flex; gap: 5px; justify-content: center;">
+                    <button class="btn btn-success" style="padding: 5px 8px;" onclick="startTimer()">Iniciar</button>
+                    <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="pauseTimer()">Pausar</button>
+                    <button class="btn btn-danger" style="padding: 5px 8px;" onclick="resetTimer()">Zerar</button>
+                </div>
+            </div>
 
-    // ==================== IMPORTADOR JSON DE QUESTÕES ====================
-    document.getElementById('btnOpenImportModal').addEventListener('click', () => openModal('modalImport'));
+            <div class="menu-section">
+                <h4>Navegação</h4>
+                <button class="menu-item" onclick="navigate('dashboard')">📊 Dashboard Principal</button>
+                <button class="menu-item" onclick="navigate('add-subject')">➕ Cadastrar Disciplina</button>
+            </div>
 
-    document.getElementById('formImport').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try {
-        const rawJson = document.getElementById('importJsonText').value;
-        const data = JSON.parse(rawJson);
+            <div class="menu-section">
+                <h4>Disciplinas</h4>
+                <div id="drawer-subjects-list"></div>
+            </div>
 
-        if (!data.disciplina || !data.tema || !Array.isArray(data.questoes)) {
-          throw new Error("Estrutura JSON inválida. Requer 'disciplina', 'tema' e lista 'questoes'.");
+            <div class="menu-section">
+                <h4>Backup & Dados</h4>
+                <button class="menu-item" onclick="exportData('global')">📥 Exportar Banco Geral (JSON)</button>
+                <label class="menu-item" style="cursor: pointer;">
+                    📤 Importar Banco Geral (JSON)
+                    <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display: none;">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container">
+        
+        <!-- DASHBOARD -->
+        <div id="view-dashboard">
+            <div class="section-title">Desempenho de Hoje</div>
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <h5>Feitas Hoje</h5>
+                    <div class="num" id="dash-today-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h5>Acertos Hoje</h5>
+                    <div class="num text-success" id="dash-today-correct">0</div>
+                </div>
+                <div class="stat-card">
+                    <h5>Erros Hoje</h5>
+                    <div class="num text-danger" id="dash-today-wrong">0</div>
+                </div>
+            </div>
+
+            <div class="section-title">Desempenho Geral</div>
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <h5>Total Feitas</h5>
+                    <div class="num" id="dash-global-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h5>Acertos Geral</h5>
+                    <div class="num text-success" id="dash-global-correct">0</div>
+                </div>
+                <div class="stat-card">
+                    <h5>Erros Geral</h5>
+                    <div class="num text-danger" id="dash-global-wrong">0</div>
+                </div>
+                <div class="stat-card">
+                    <h5>Banco de Questões</h5>
+                    <div class="num text-accent" id="dash-global-bank">0</div>
+                </div>
+            </div>
+
+            <div class="section-title">Aproveitamento por Disciplina</div>
+            <div id="dash-subjects-progress"></div>
+        </div>
+
+        <!-- NOVA DISCIPLINA -->
+        <div id="view-add-subject" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom: 15px;">Cadastrar Nova Disciplina</h3>
+                <div class="form-group">
+                    <label>Nome da Disciplina</label>
+                    <input type="text" id="input-subject-name" class="form-control" placeholder="Ex: Língua Portuguesa">
+                </div>
+                <button class="btn btn-primary" onclick="saveSubject()">Salvar Disciplina</button>
+            </div>
+        </div>
+
+        <!-- VISTA DA DISCIPLINA -->
+        <div id="view-subject-detail" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 id="subject-detail-name">Disciplina</h3>
+                    <button class="btn btn-danger" style="padding: 5px 8px;" onclick="deleteCurrentSubject()">🗑️ Excluir</button>
+                </div>
+
+                <h4 style="margin-bottom: 5px; color: var(--text-sub);">Progresso no Edital Verticalizado</h4>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="subject-edital-progress"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Cadastrar Assunto / Tópico</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="input-topic-name" class="form-control" placeholder="Ex: Sintaxe da Oração">
+                        <button class="btn btn-primary" onclick="addTopic()">Adicionar</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Configuração do Edital em Lote (JSON Array)</label>
+                    <textarea id="input-edital-json" class="form-control" placeholder='["1. Ortografia", "2. Acentuação", "3. Morfologia"]'></textarea>
+                    <button class="btn btn-secondary" style="margin-top: 8px;" onclick="saveEditalJson()">Carregar Vários Assuntos (JSON)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 15px;">Assuntos para Estudo (Clique para Acessar os Lotes)</h4>
+                <div id="topics-list-container"></div>
+            </div>
+        </div>
+
+        <!-- VISTA DO ASSUNTO -->
+        <div id="view-topic-detail" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; margin-bottom: 6px;" onclick="backToSubject()">← Voltar para Disciplina</button>
+                        <h3 id="topic-detail-name">Assunto</h3>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-bottom: 15px;" id="topic-resume-actions">
+                    <button class="btn btn-warning" id="btn-resume-topic" onclick="resumeTopicProgress()">▶️ Continuar Onde Parei</button>
+                    <button class="btn btn-secondary" onclick="startTopicFromScratch()">🔄 Começar do Zero</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Cadastrar Lote de Questões em JSON (com Gabarito Comentado)</label>
+                    <input type="text" id="input-batch-name" class="form-control" placeholder="Nome do Lote (Ex: Lote 1)" style="margin-bottom: 8px;">
+                    <textarea id="input-batch-json" class="form-control" placeholder='[{"pergunta": "Qual a alternativa correta?", "opcoes": ["A) Opção 1", "B) Opção 2"], "resposta": 0, "comentario": "Gabarito A. Explicativo aqui..."}]'></textarea>
+                    <button class="btn btn-success" style="margin-top: 8px;" onclick="saveBatchJson()">Colar Lote de Questões (JSON)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 15px;">Lotes de Questões Cadastrados</h4>
+                <div id="batches-container"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RESOLUÇÃO DE QUESTÕES E LOUSA -->
+    <div id="quiz-overlay" class="hidden">
+        <canvas id="scratch-canvas"></canvas>
+
+        <!-- Barra Superior: Contagem e Pausar -->
+        <div class="quiz-top-bar">
+            <div style="font-size: 0.85rem;">
+                <span id="quiz-progress-num" style="font-weight: bold;">Questão 1/10</span> |
+                <span class="text-success">A: <b id="quiz-stat-correct">0</b></span>
+                <span class="text-danger">E: <b id="quiz-stat-wrong">0</b></span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+                <button class="btn btn-warning" style="padding: 4px 8px;" onclick="pauseQuiz()">⏸️ Pausar</button>
+                <button class="btn btn-danger" style="padding: 4px 8px;" onclick="deleteCurrentQuestion()">🗑️ Excluir</button>
+            </div>
+        </div>
+
+        <!-- Navegação no Topo -->
+        <div class="quiz-nav-top">
+            <button class="btn btn-secondary" id="btn-prev-q" style="flex:1;" onclick="navigateQuestion(-1)">← Voltar</button>
+            <button class="btn btn-primary" id="btn-confirm-q" style="flex:2;" onclick="confirmAnswer()">Confirmar</button>
+            <button class="btn btn-secondary" id="btn-next-q" style="flex:1;" onclick="navigateQuestion(1)">Próxima →</button>
+        </div>
+
+        <!-- Corpo da Questão -->
+        <div class="quiz-body">
+            <div class="card">
+                <p id="quiz-question-text" style="font-size: 1.05rem; line-height: 1.5; font-weight: 500;"></p>
+                <ul class="options-list" id="quiz-options-container"></ul>
+                
+                <!-- ÁREA DO GABARITO COMENTADO -->
+                <div id="quiz-comment-container" class="comment-box hidden">
+                    <h5>💡 Gabarito Comentado</h5>
+                    <div id="quiz-comment-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra da Lousa no Rodapé -->
+        <div class="canvas-tools">
+            <button class="btn btn-secondary" id="btn-toggle-scratch" style="padding: 4px 8px;" onclick="toggleScratchpad()">✏️ Lousa</button>
+            <div class="color-dot active" style="background: #ffd166;" onclick="setColor('#ffd166', this)"></div>
+            <div class="color-dot" style="background: #06d6a0;" onclick="setColor('#06d6a0', this)"></div>
+            <div class="color-dot" style="background: #ef476f;" onclick="setColor('#ef476f', this)"></div>
+            <div class="color-dot" style="background: #3a86ff;" onclick="setColor('#3a86ff', this)"></div>
+            <div class="color-dot" style="background: #ffffff;" onclick="setColor('#ffffff', this)"></div>
+            <button class="btn btn-secondary" style="padding: 4px 8px;" onclick="setEraser()">🧹 Borracha</button>
+            <button class="btn btn-danger" style="padding: 4px 8px;" onclick="clearCanvas()">🗑️ Limpar</button>
+        </div>
+    </div>
+
+    <script>
+        var appState = {
+            subjects: [],
+            stats: {
+                today: { date: '', total: 0, correct: 0, wrong: 0 },
+                global: { total: 0, correct: 0, wrong: 0 },
+                batchLastScores: {}
+            },
+            topicProgress: {},
+            activeSession: null
+        };
+
+        let currentSubjectId = null;
+        let currentTopicId = null;
+        let currentQuiz = null;
+        let timerInterval = null;
+        let timerSeconds = 0;
+
+        const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+        window.onload = () => {
+            if (typeof loadStorage === 'function') loadStorage();
+            checkTodayDate();
+            renderDashboard();
+            renderDrawerSubjects();
+            initCanvas();
+
+            if (appState.activeSession) {
+                if (confirm("Você tem um treino pausado. Deseja retornar onde parou?")) {
+                    currentQuiz = appState.activeSession;
+                    openQuizView();
+                }
+            }
+        };
+
+        function checkTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            if (appState.stats.today.date !== today) {
+                appState.stats.today = { date: today, total: 0, correct: 0, wrong: 0 };
+                if (typeof saveStorage === 'function') saveStorage();
+            }
         }
 
-        const uid = currentUser.uid;
-
-        // 1. Garantir/Criar Disciplina
-        let disc = localData.disciplines.find(d => d.name.toLowerCase() === data.disciplina.toLowerCase());
-        let discId = disc ? disc.id : null;
-
-        if (!discId) {
-          const discRef = await addDoc(collection(db, `users/${uid}/disciplines`), { name: data.disciplina });
-          discId = discRef.id;
+        function toggleDrawer() {
+            document.getElementById('drawer').classList.toggle('active');
+            document.getElementById('drawer-overlay').classList.toggle('active');
         }
 
-        // 2. Garantir/Criar Assunto
-        let topic = localData.topics.find(t => t.disciplineId === discId && t.name.toLowerCase() === data.tema.toLowerCase());
-        let topicId = topic ? topic.id : null;
-
-        if (!topicId) {
-          const topicRef = await addDoc(collection(db, `users/${uid}/topics`), {
-            disciplineId: discId,
-            name: data.tema,
-            priority: 'P2',
-            status: 'Não Iniciado',
-            summaryUrl: ''
-          });
-          topicId = topicRef.id;
+        function navigate(viewName) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            if (viewName === 'dashboard') renderDashboard();
+            toggleDrawer();
         }
 
-        // 3. Criar Lote de Questões
-        await addDoc(collection(db, `users/${uid}/batches`), {
-          topicId,
-          title: `Lote Importado - ${new Date().toLocaleDateString('pt-BR')}`,
-          questions: data.questoes,
-          lastIndex: 0
-        });
+        function saveSubject() {
+            const name = document.getElementById('input-subject-name').value.trim();
+            if (!name) return alert('Informe o nome da disciplina.');
 
-        closeModal('modalImport');
-        document.getElementById('importJsonText').value = '';
-        alert("Lote de questões importado com sucesso!");
+            const newSub = { id: 'sub_' + Date.now(), name: name, topics: [] };
+            appState.subjects.push(newSub);
+            if (typeof saveStorage === 'function') saveStorage();
+            document.getElementById('input-subject-name').value = '';
+            renderDrawerSubjects();
+            openSubjectDetail(newSub.id);
+        }
 
-      } catch (err) {
-        alert("Falha na importação: " + err.message);
-      }
-    });
+        function renderDrawerSubjects() {
+            const container = document.getElementById('drawer-subjects-list');
+            if (!container) return;
+            container.innerHTML = '';
+            appState.subjects.forEach(sub => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-item';
+                btn.innerHTML = `<span>📖 ${sub.name}</span>`;
+                btn.onclick = () => { openSubjectDetail(sub.id); toggleDrawer(); };
+                container.appendChild(btn);
+            });
+        }
 
-    // ==================== MÓDULO DE RESOLUÇÃO / SIMULADO ====================
-    window.startBatchMode = (topicId) => {
-      const topicBatches = localData.batches.filter(b => b.topicId === topicId);
-      
-      if (topicBatches.length === 0) {
-        alert("Nenhum lote de questões disponível para este assunto. Importe um JSON primeiro.");
-        return;
-      }
+        function openSubjectDetail(id) {
+            currentSubjectId = id;
+            const sub = appState.subjects.find(s => s.id === id);
+            if (!sub) return;
 
-      // Por padrão junta todas as questões do assunto em um Lote Geral ou pega o primeiro
-      const batch = topicBatches[0];
-      const topic = localData.topics.find(t => t.id === topicId);
+            document.getElementById('subject-detail-name').innerText = sub.name;
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById('view-subject-detail').classList.remove('hidden');
+            document.getElementById('top-title').innerText = sub.name;
 
-      currentSimulatedSession = {
-        batchId: batch.id,
-        topicName: topic ? topic.name : 'Assunto',
-        questions: batch.questions || [],
-        currentIndex: batch.lastIndex || 0,
-        hits: 0,
-        errors: 0,
-        selectedOption: null
-      };
+            renderTopics(sub);
+        }
 
-      switchTab('tabSimulado');
-      renderSimulatedQuestion();
-    };
+        function deleteCurrentSubject() {
+            if (confirm('Deseja excluir esta disciplina?')) {
+                appState.subjects = appState.subjects.filter(s => s.id !== currentSubjectId);
+                if (typeof saveStorage === 'function') saveStorage();
+                renderDrawerSubjects();
+                navigate('dashboard');
+            }
+        }
 
-    function renderSimulatedQuestion() {
-      const session = currentSimulatedSession;
-      if (!session || !session.questions[session.currentIndex]) {
-        alert("Fim das questões do lote!");
-        switchTab('tabEdital');
-        return;
-      }
+        function addTopic() {
+            const name = document.getElementById('input-topic-name').value.trim();
+            if (!name) return alert('Digite o nome do assunto.');
 
-      const q = session.questions[session.currentIndex];
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            sub.topics.push({ id: 'top_' + Date.now(), title: name, done: false, batches: [] });
+            if (typeof saveStorage === 'function') saveStorage();
+            document.getElementById('input-topic-name').value = '';
+            renderTopics(sub);
+        }
 
-      document.getElementById('simuladoTopicTitle').innerText = session.topicName;
-      document.getElementById('simuladoBatchTitle').innerText = `Lote de Resolução`;
-      document.getElementById('simuladoProgress').innerText = `Questão ${session.currentIndex + 1} de ${session.questions.length}`;
-      document.getElementById('simuladoQuestionId').innerText = `ID: ${q.id || session.currentIndex + 1}`;
-      document.getElementById('simuladoEnunciado').innerText = q.enunciado;
+        function saveEditalJson() {
+            const jsonText = document.getElementById('input-edital-json').value.trim();
+            if (!jsonText) return;
 
-      // Reset de UI
-      document.getElementById('simuladoFeedback').classList.add('hidden');
-      document.getElementById('btnConfirmAnswer').classList.remove('hidden');
-      document.getElementById('btnConfirmAnswer').disabled = true;
-      document.getElementById('btnNextQuestion').classList.add('hidden');
-      session.selectedOption = null;
+            try {
+                const parsed = JSON.parse(jsonText);
+                if (!Array.isArray(parsed)) throw new Error('O JSON deve ser um array.');
 
-      // Renderizar Opções
-      const container = document.getElementById('simuladoOptions');
-      container.innerHTML = '';
+                const sub = appState.subjects.find(s => s.id === currentSubjectId);
+                parsed.forEach(item => {
+                    sub.topics.push({
+                        id: 'top_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        title: typeof item === 'string' ? item : item.title,
+                        done: false,
+                        batches: []
+                    });
+                });
 
-      const alts = q.alternativas || {};
-      Object.keys(alts).forEach(key => {
-        const optionKey = key.toUpperCase();
-        const optionText = alts[key];
+                if (typeof saveStorage === 'function') saveStorage();
+                document.getElementById('input-edital-json').value = '';
+                renderTopics(sub);
+            } catch (e) {
+                alert('Erro no JSON do Edital: ' + e.message);
+            }
+        }
 
-        const btn = document.createElement('button');
-        btn.className = "option-btn w-full text-left p-4 rounded-lg bg-gray-900 border border-gray-700 hover:border-gray-500 transition flex items-start gap-3";
-        btn.dataset.key = optionKey;
-        btn.innerHTML = `
-          <span class="font-bold text-brand-500 bg-gray-800 border border-gray-700 w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">${optionKey}</span>
-          <span class="text-sm text-gray-200 leading-normal">${optionText}</span>
-        `;
+        function renderTopics(sub) {
+            const container = document.getElementById('topics-list-container');
+            container.innerHTML = '';
 
-        btn.addEventListener('click', () => {
-          if (document.getElementById('btnConfirmAnswer').classList.contains('hidden')) return; // Já respondeu
-          document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('border-brand-500', 'bg-brand-950/20'));
-          btn.classList.add('border-brand-500', 'bg-brand-950/20');
-          session.selectedOption = optionKey;
-          document.getElementById('btnConfirmAnswer').disabled = false;
-        });
+            let doneCount = 0;
+            if (sub.topics.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-sub); font-size:0.85rem;">Nenhum assunto cadastrado ainda.</p>';
+                document.getElementById('subject-edital-progress').style.width = '0%';
+                return;
+            }
 
-        container.appendChild(btn);
-      });
+            sub.topics.forEach((top) => {
+                if (top.done) doneCount++;
 
-      updateSimulatedStats();
-    }
+                let qCount = 0;
+                top.batches.forEach(b => qCount += b.questions.length);
 
-    function updateSimulatedStats() {
-      const s = currentSimulatedSession;
-      const total = s.hits + s.errors;
-      const rate = total > 0 ? Math.round((s.hits / total) * 100) : 0;
+                const div = document.createElement('div');
+                div.className = 'topic-item';
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" ${top.done ? 'checked' : ''} onclick="event.stopPropagation(); toggleTopicDone('${top.id}')">
+                        <div>
+                            <strong style="${top.done ? 'text-decoration: line-through; color: var(--text-sub);' : ''}">${top.title}</strong>
+                            <div style="font-size:0.75rem; color: var(--text-sub);">${qCount} questões em lotes</div>
+                        </div>
+                    </div>
+                    <span>➔</span>
+                `;
+                div.onclick = () => openTopicDetail(top.id);
+                container.appendChild(div);
+            });
 
-      document.getElementById('simulatedHits').innerText = s.hits;
-      document.getElementById('simulatedErrors').innerText = s.errors;
-      document.getElementById('simulatedRate').innerText = `${rate}%`;
-    }
+            const pct = Math.round((doneCount / sub.topics.length) * 100);
+            document.getElementById('subject-edital-progress').style.width = pct + '%';
+        }
 
-    document.getElementById('btnConfirmAnswer').addEventListener('click', async () => {
-      const session = currentSimulatedSession;
-      if (!session || !session.selectedOption) return;
+        function toggleTopicDone(topicId) {
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            const top = sub.topics.find(t => t.id === topicId);
+            if (top) top.done = !top.done;
+            if (typeof saveStorage === 'function') saveStorage();
+            renderTopics(sub);
+        }
 
-      const q = session.questions[session.currentIndex];
-      const correct = (q.resposta_correta || '').toUpperCase();
-      const isCorrect = session.selectedOption === correct;
+        function openTopicDetail(topicId) {
+            currentTopicId = topicId;
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            const topic = sub.topics.find(t => t.id === topicId);
 
-      if (isCorrect) session.hits++;
-      else session.errors++;
+            document.getElementById('topic-detail-name').innerText = topic.title;
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById('view-topic-detail').classList.remove('hidden');
 
-      // Exibir Feedback / Gabarito
-      const feedbackBanner = document.getElementById('feedbackBanner');
-      if (isCorrect) {
-        feedbackBanner.className = "p-4 rounded-lg flex items-center gap-3 bg-emerald-900/30 border border-emerald-500/30 text-emerald-400";
-        feedbackBanner.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> <span class="font-bold text-sm">Resposta Correta!</span>`;
-      } else {
-        feedbackBanner.className = "p-4 rounded-lg flex items-center gap-3 bg-red-900/30 border border-red-500/30 text-red-400";
-        feedbackBanner.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5"></i> <span class="font-bold text-sm">Resposta Incorreta. A alternativa correta é a letra ${correct}.</span>`;
-      }
+            const hasSaved = appState.topicProgress[topicId];
+            document.getElementById('btn-resume-topic').style.display = hasSaved ? 'inline-flex' : 'none';
 
-      document.getElementById('feedbackComment').innerText = q.comentario || "Nenhum comentário cadastrado para esta questão.";
-      document.getElementById('simuladoFeedback').classList.remove('hidden');
+            renderBatches(topic);
+        }
 
-      document.getElementById('btnConfirmAnswer').classList.add('hidden');
-      document.getElementById('btnNextQuestion').classList.remove('hidden');
+        function backToSubject() {
+            if (currentSubjectId) openSubjectDetail(currentSubjectId);
+        }
 
-      updateSimulatedStats();
-      lucide.createIcons();
+        function saveBatchJson() {
+            const name = document.getElementById('input-batch-name').value.trim() || 'Lote Regular';
+            const jsonText = document.getElementById('input-batch-json').value.trim();
 
-      // Salvar Histórico no Firestore
-      await addDoc(collection(db, `users/${currentUser.uid}/history`), {
-        timestamp: new Date().toISOString(),
-        dateStr: new Date().toISOString().split('T')[0],
-        batchId: session.batchId,
-        questionId: q.id || session.currentIndex,
-        isCorrect
-      });
+            if (!jsonText) return alert('Insira as questões no formato JSON.');
 
-      // Salvar progresso no Lote
-      await updateDoc(doc(db, `users/${currentUser.uid}/batches`, session.batchId), {
-        lastIndex: session.currentIndex + 1
-      });
-    });
+            try {
+                const parsed = JSON.parse(jsonText);
+                if (!Array.isArray(parsed)) throw new Error('O JSON precisa ser um array.');
 
-    document.getElementById('btnNextQuestion').addEventListener('click', () => {
-      if (currentSimulatedSession) {
-        currentSimulatedSession.currentIndex++;
-        renderSimulatedQuestion();
-      }
-    });
+                const sub = appState.subjects.find(s => s.id === currentSubjectId);
+                const topic = sub.topics.find(t => t.id === currentTopicId);
 
-    document.getElementById('btnExitSimulado').addEventListener('click', () => switchTab('tabEdital'));
+                const newBatch = {
+                    id: 'batch_' + Date.now(),
+                    name: name,
+                    questions: parsed.map((q, i) => ({
+                        id: 'q_' + Date.now() + '_' + i,
+                        pergunta: q.pergunta || q.question,
+                        opcoes: q.opcoes || q.options,
+                        resposta: q.resposta !== undefined ? q.resposta : q.answer,
+                        comentario: q.comentario || q.gabarito || q.comment || ''
+                    }))
+                };
 
-    // ==================== SISTEMA DE REVISÃO ESPAÇADA (SRS) ====================
-    async function scheduleSRS(topicId) {
-      const uid = currentUser.uid;
-      const intervals = [1, 3, 7, 15, 30]; // Dias
-      const now = new Date();
+                topic.batches.push(newBatch);
+                if (typeof saveStorage === 'function') saveStorage();
+                document.getElementById('input-batch-name').value = '';
+                document.getElementById('input-batch-json').value = '';
+                renderBatches(topic);
+            } catch (e) {
+                alert('Erro na estrutura JSON: ' + e.message);
+            }
+        }
 
-      for (const days of intervals) {
-        const dueDate = new Date(now);
-        dueDate.setDate(dueDate.getDate() + days);
+        function renderBatches(topic) {
+            const container = document.getElementById('batches-container');
+            container.innerHTML = '';
 
-        await addDoc(collection(db, `users/${uid}/srs`), {
-          topicId,
-          intervalDays: days,
-          dueDateStr: dueDate.toISOString().split('T')[0],
-          completed: false
-        });
-      }
-    }
+            let totalQuestions = 0;
+            topic.batches.forEach(b => totalQuestions += b.questions.length);
 
-    function renderSrs() {
-      const container = document.getElementById('srsList');
-      container.innerHTML = '';
+            const generalDiv = document.createElement('div');
+            generalDiv.style.marginBottom = '12px';
+            generalDiv.style.padding = '12px';
+            generalDiv.style.background = 'var(--bg-input)';
+            generalDiv.style.borderRadius = '8px';
+            generalDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>🔥 Lote Geral do Assunto</strong>
+                        <div style="font-size:0.8rem; color:var(--text-sub);">${totalQuestions} questões agrupadas</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startQuiz('all')">Iniciar Lote Geral</button>
+                </div>
+            `;
+            container.appendChild(generalDiv);
 
-      const todayStr = new Date().toISOString().split('T')[0];
-      const pendingSrs = localData.srs.filter(s => !s.completed && s.dueDateStr <= todayStr);
-      
-      document.getElementById('srsBadge').innerText = pendingSrs.length;
-      if(pendingSrs.length > 0) document.getElementById('srsBadge').classList.remove('hidden');
-      else document.getElementById('srsBadge').classList.add('hidden');
+            topic.batches.forEach(b => {
+                const score = appState.stats.batchLastScores[b.id] || { correct: 0, wrong: 0 };
+                const div = document.createElement('div');
+                div.style.padding = '10px 0';
+                div.style.borderBottom = '1px solid var(--border)';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${b.name}</strong> (${b.questions.length} q)
+                            <div style="font-size:0.8rem; margin-top:3px;">
+                                Desempenho: <span class="text-success">${score.correct} acertos</span> / <span class="text-danger">${score.wrong} erros</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="startQuiz('${b.id}')">Iniciar Lote</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-      if (localData.srs.length === 0) {
-        container.innerHTML = `<p class="text-gray-400 text-sm italic col-span-full">Nenhuma revisão agendada no momento.</p>`;
-        return;
-      }
+        function startQuiz(batchScope) {
+            const sub = appState.subjects.find(s => s.id === currentSubjectId);
+            const topic = sub.topics.find(t => t.id === currentTopicId);
+            let questionsList = [];
 
-      localData.srs.forEach(s => {
-        const topic = localData.topics.find(t => t.id === s.topicId);
-        const isPending = !s.completed && s.dueDateStr <= todayStr;
+            if (batchScope === 'all') {
+                topic.batches.forEach(b => questionsList.push(...b.questions));
+            } else {
+                const batch = topic.batches.find(b => b.id === batchScope);
+                if (batch) questionsList = [...batch.questions];
+            }
 
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-xl border ${isPending ? 'bg-amber-950/20 border-amber-500/50' : 'bg-gray-800 border-gray-700'}`;
-        card.innerHTML = `
-          <div class="flex justify-between items-start mb-2">
-            <span class="text-xs font-bold px-2 py-0.5 rounded ${isPending ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-700 text-gray-400'}">Revisão de ${s.intervalDays} dia(s)</span>
-            <span class="text-xs text-gray-400">${s.dueDateStr}</span>
-          </div>
-          <h4 class="font-bold text-white text-sm mb-3">${topic ? topic.name : 'Assunto Desconhecido'}</h4>
-          <button onclick="completeSrs('${s.id}')" ${s.completed ? 'disabled' : ''} class="w-full text-xs font-semibold py-1.5 rounded ${s.completed ? 'bg-gray-700 text-gray-500' : 'bg-brand-600 hover:bg-brand-700 text-white'}">
-            ${s.completed ? 'Concluído' : 'Marcar como Revisado'}
-          </button>
-        `;
-        container.appendChild(card);
-      });
-    }
+            if (questionsList.length === 0) return alert('Nenhuma questão cadastrada neste lote.');
 
-    window.completeSrs = async (srsId) => {
-      await updateDoc(doc(db, `users/${currentUser.uid}/srs`, srsId), { completed: true });
-    };
+            currentQuiz = {
+                subjectId: currentSubjectId,
+                topicId: currentTopicId,
+                batchScope: batchScope,
+                questions: questionsList,
+                currentIndex: 0,
+                correctCount: 0,
+                wrongCount: 0,
+                userAnswers: {},
+                confirmedQuestions: {}
+            };
 
-    // ==================== DASHBOARD & ESTATÍSTICAS ====================
-    function renderDashboard() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const todayHistory = localData.history.filter(h => h.dateStr === todayStr);
+            openQuizView();
+        }
 
-      const todayHits = todayHistory.filter(h => h.isCorrect).length;
-      const todayCount = todayHistory.length;
-      const todayTax = todayCount > 0 ? Math.round((todayHits / todayCount) * 100) : 0;
+        function resumeTopicProgress() {
+            const saved = appState.topicProgress[currentTopicId];
+            if (saved) {
+                currentQuiz = saved;
+                openQuizView();
+            }
+        }
 
-      document.getElementById('dashTodayCount').innerText = todayCount;
-      document.getElementById('dashTodayTax').innerText = `${todayTax}% de acertos`;
+        function startTopicFromScratch() {
+            delete appState.topicProgress[currentTopicId];
+            if (typeof saveStorage === 'function') saveStorage();
+            startQuiz('all');
+        }
 
-      const totalHits = localData.history.filter(h => h.isCorrect).length;
-      const totalCount = localData.history.length;
-      const globalTax = totalCount > 0 ? Math.round((totalHits / totalCount) * 100) : 0;
+        function openQuizView() {
+            document.getElementById('quiz-overlay').classList.remove('hidden');
+            renderCurrentQuestion();
+        }
 
-      document.getElementById('dashTotalCount').innerText = totalCount;
-      document.getElementById('dashGlobalTax').innerText = `${globalTax}%`;
+        function renderCurrentQuestion() {
+            const q = currentQuiz.questions[currentQuiz.currentIndex];
+            document.getElementById('quiz-progress-num').innerText = `Questão ${currentQuiz.currentIndex + 1} de ${currentQuiz.questions.length}`;
+            document.getElementById('quiz-stat-correct').innerText = currentQuiz.correctCount;
+            document.getElementById('quiz-stat-wrong').innerText = currentQuiz.wrongCount;
+            document.getElementById('quiz-question-text').innerText = q.pergunta;
 
-      const pendingSrs = localData.srs.filter(s => !s.completed && s.dueDateStr <= todayStr).length;
-      document.getElementById('dashSrsPending').innerText = pendingSrs;
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = '';
 
-      // Stats por Disciplina
-      const container = document.getElementById('disciplineStatsList');
-      container.innerHTML = '';
+            const isConfirmed = currentQuiz.confirmedQuestions[currentQuiz.currentIndex] === true;
 
-      if (localData.disciplines.length === 0) {
-        container.innerHTML = `<p class="text-gray-400 text-sm italic">Nenhuma disciplina cadastrada ainda.</p>`;
-        return;
-      }
+            q.opcoes.forEach((optText, idx) => {
+                const li = document.createElement('li');
+                li.className = 'option-card';
 
-      localData.disciplines.forEach(disc => {
-        const topics = localData.topics.filter(t => t.disciplineId === disc.id);
-        const topicIds = topics.map(t => t.id);
-        const batches = localData.batches.filter(b => topicIds.includes(b.topicId));
-        const batchIds = batches.map(b => b.id);
+                if (currentQuiz.userAnswers[currentQuiz.currentIndex] === idx) {
+                    li.classList.add('selected');
+                }
 
-        const discHistory = localData.history.filter(h => batchIds.includes(h.batchId));
-        const discHits = discHistory.filter(h => h.isCorrect).length;
-        const discTotal = discHistory.length;
-        const discTax = discTotal > 0 ? Math.round((discHits / discTotal) * 100) : 0;
+                if (isConfirmed) {
+                    if (idx === q.resposta) li.classList.add('correct');
+                    if (currentQuiz.userAnswers[currentQuiz.currentIndex] === idx && idx !== q.resposta) li.classList.add('wrong');
+                }
 
-        const row = document.createElement('div');
-        row.className = "space-y-1";
-        row.innerHTML = `
-          <div class="flex justify-between text-sm">
-            <span class="font-medium text-gray-200">${disc.name}</span>
-            <span class="text-gray-400">${discHits}/${discTotal} (${discTax}%)</span>
-          </div>
-          <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
-            <div class="bg-brand-500 h-2 transition-all" style="width: ${discTax}%"></div>
-          </div>
-        `;
-        container.appendChild(row);
-      });
-    }
+                let displayText = optText;
+                const prefix = labels[idx] ? `${labels[idx]}) ` : '';
+                if (!optText.trim().match(/^[A-Ea-e][\)\.\-]/)) {
+                    displayText = prefix + optText;
+                }
 
-    // ==================== CRONÔMETRO DE ESTUDO ====================
-    let timerInterval = null;
-    let secondsElapsed = 0;
-    let isTimerRunning = false;
+                li.innerText = displayText;
+                li.onclick = () => { if (!isConfirmed) selectOption(idx); };
+                optionsContainer.appendChild(li);
+            });
 
-    function updateTimerDisplay() {
-      const hrs = Math.floor(secondsElapsed / 3600).toString().padStart(2, '0');
-      const mins = Math.floor((secondsElapsed % 3600) / 60).toString().padStart(2, '0');
-      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
-      document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
-    }
+            // RENDERIZAÇÃO DO GABARITO COMENTADO
+            const commentContainer = document.getElementById('quiz-comment-container');
+            const commentText = document.getElementById('quiz-comment-text');
 
-    document.getElementById('btnToggleTimer').addEventListener('click', () => {
-      const btn = document.getElementById('btnToggleTimer');
-      if (isTimerRunning) {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        btn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i>`;
-      } else {
-        timerInterval = setInterval(() => {
-          secondsElapsed++;
-          updateTimerDisplay();
-        }, 1000);
-        isTimerRunning = true;
-        btn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i>`;
-      }
-      lucide.createIcons();
-    });
+            if (isConfirmed && q.comentario) {
+                commentText.innerText = q.comentario;
+                commentContainer.classList.remove('hidden');
+            } else {
+                commentContainer.classList.add('hidden');
+            }
 
-    document.getElementById('btnResetTimer').addEventListener('click', () => {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      secondsElapsed = 0;
-      updateTimerDisplay();
-      document.getElementById('btnToggleTimer').innerHTML = `<i data-lucide="play" class="w-4 h-4"></i>`;
-      lucide.createIcons();
-    });
+            appState.topicProgress[currentQuiz.topicId] = currentQuiz;
+            appState.activeSession = currentQuiz;
+            if (typeof saveStorage === 'function') saveStorage();
+        }
 
-    // ==================== FERRAMENTA DE LOUSA / RABISCO (CANVAS OVERLAY) ====================
-    const canvas = document.getElementById('drawingCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
-    let isEraser = false;
+        function selectOption(idx) {
+            currentQuiz.userAnswers[currentQuiz.currentIndex] = idx;
+            renderCurrentQuestion();
+        }
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+        function confirmAnswer() {
+            const currentIdx = currentQuiz.currentIndex;
 
-    document.getElementById('btnToggleScratchpad').addEventListener('click', () => {
-      const controls = document.getElementById('scratchpadControls');
-      const isActive = canvas.classList.toggle('active');
-      
-      if (isActive) {
-        controls.classList.remove('hidden');
-      } else {
-        controls.classList.add('hidden');
-      }
-    });
+            if (currentQuiz.confirmedQuestions[currentIdx]) return; // Já confirmou esta
 
-    document.getElementById('btnScratchEraser').addEventListener('click', () => {
-      isEraser = !isEraser;
-      document.getElementById('btnScratchEraser').classList.toggle('bg-brand-600', isEraser);
-    });
+            const selectedOpt = currentQuiz.userAnswers[currentIdx];
+            if (selectedOpt === undefined) return alert('Escolha uma alternativa antes de confirmar.');
 
-    document.getElementById('btnScratchClear').addEventListener('click', () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
+            currentQuiz.confirmedQuestions[currentIdx] = true;
 
-    canvas.addEventListener('mousedown', (e) => {
-      if (!canvas.classList.contains('active')) return;
-      isDrawing = true;
-      ctx.beginPath();
-      ctx.moveTo(e.clientX, e.clientY);
-    });
+            const q = currentQuiz.questions[currentIdx];
+            const isCorrect = selectedOpt === q.resposta;
 
-    canvas.addEventListener('mousemove', (e) => {
-      if (!isDrawing || !canvas.classList.contains('active')) return;
-      ctx.lineWidth = document.getElementById('scratchSize').value;
-      ctx.lineCap = 'round';
+            if (isCorrect) currentQuiz.correctCount++;
+            else currentQuiz.wrongCount++;
 
-      if (isEraser) {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.arc(e.clientX, e.clientY, document.getElementById('scratchSize').value * 2, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = document.getElementById('scratchColor').value;
-        ctx.lineTo(e.clientX, e.clientY);
-        ctx.stroke();
-      }
-    });
+            appState.stats.today.total++;
+            appState.stats.global.total++;
 
-    canvas.addEventListener('mouseup', () => isDrawing = false);
+            if (isCorrect) {
+                appState.stats.today.correct++;
+                appState.stats.global.correct++;
+            } else {
+                appState.stats.today.wrong++;
+                appState.stats.global.wrong++;
+            }
 
-  </script>
+            if (currentQuiz.batchScope !== 'all') {
+                appState.stats.batchLastScores[currentQuiz.batchScope] = {
+                    correct: currentQuiz.correctCount,
+                    wrong: currentQuiz.wrongCount
+                };
+            }
+
+            if (typeof saveStorage === 'function') saveStorage();
+            renderCurrentQuestion();
+        }
+
+        function navigateQuestion(dir) {
+            const target = currentQuiz.currentIndex + dir;
+            if (target >= 0 && target < currentQuiz.questions.length) {
+                currentQuiz.currentIndex = target;
+                clearCanvas();
+                renderCurrentQuestion();
+            }
+        }
+
+        function pauseQuiz() {
+            if (typeof saveStorage === 'function') saveStorage();
+            document.getElementById('quiz-overlay').classList.add('hidden');
+            if (currentTopicId) openTopicDetail(currentTopicId);
+        }
+
+        function deleteCurrentQuestion() {
+            if (confirm("Excluir esta questão permanentemente do lote?")) {
+                const qId = currentQuiz.questions[currentQuiz.currentIndex].id;
+
+                const sub = appState.subjects.find(s => s.id === currentQuiz.subjectId);
+                const topic = sub.topics.find(t => t.id === currentQuiz.topicId);
+
+                topic.batches.forEach(b => {
+                    b.questions = b.questions.filter(q => q.id !== qId);
+                });
+
+                currentQuiz.questions.splice(currentQuiz.currentIndex, 1);
+                if (typeof saveStorage === 'function') saveStorage();
+
+                if (currentQuiz.questions.length === 0) {
+                    alert('Nenhuma questão restante.');
+                    pauseQuiz();
+                } else {
+                    if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
+                        currentQuiz.currentIndex = currentQuiz.questions.length - 1;
+                    }
+                    renderCurrentQuestion();
+                }
+            }
+        }
+
+        function renderDashboard() {
+            const dashTodayTotal = document.getElementById('dash-today-total');
+            if (!dashTodayTotal) return;
+
+            dashTodayTotal.innerText = appState.stats.today.total;
+            document.getElementById('dash-today-correct').innerText = appState.stats.today.correct;
+            document.getElementById('dash-today-wrong').innerText = appState.stats.today.wrong;
+
+            document.getElementById('dash-global-total').innerText = appState.stats.global.total;
+            document.getElementById('dash-global-correct').innerText = appState.stats.global.correct;
+            document.getElementById('dash-global-wrong').innerText = appState.stats.global.wrong;
+
+            let bankTotal = 0;
+            appState.subjects.forEach(s => s.topics.forEach(t => t.batches.forEach(b => bankTotal += b.questions.length)));
+            document.getElementById('dash-global-bank').innerText = bankTotal;
+
+            const container = document.getElementById('dash-subjects-progress');
+            container.innerHTML = '';
+
+            appState.subjects.forEach(sub => {
+                let totalTopics = sub.topics ? sub.topics.length : 0;
+                let doneTopics = sub.topics ? sub.topics.filter(i => i.done).length : 0;
+                let pct = totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.marginBottom = '10px';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <strong>${sub.name}</strong>
+                        <span style="font-size:0.85rem; color:var(--text-sub);">${pct}% do edital concluído</span>
+                    </div>
+                    <div class="progress-bar-bg" style="margin: 0;">
+                        <div class="progress-bar-fill" style="width: ${pct}%;"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        /* LOUSA TOUCH/MOUSE */
+        let canvas, ctx;
+        let isDrawing = false;
+        let isScratchActive = false;
+        let currentColor = '#ffd166';
+        let isEraser = false;
+
+        function initCanvas() {
+            canvas = document.getElementById('scratch-canvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function toggleScratchpad() {
+            isScratchActive = !isScratchActive;
+            const btn = document.getElementById('btn-toggle-scratch');
+            if (isScratchActive) {
+                canvas.classList.add('active');
+                btn.innerText = '✏️ Lousa: ON';
+                btn.classList.replace('btn-secondary', 'btn-primary');
+            } else {
+                canvas.classList.remove('active');
+                btn.innerText = '✏️ Lousa: OFF';
+                btn.classList.replace('btn-primary', 'btn-secondary');
+            }
+        }
+
+        function setColor(color, el) {
+            isEraser = false;
+            currentColor = color;
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        function setEraser() { isEraser = true; }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        function startDrawing(e) {
+            if (!isScratchActive) return;
+            isDrawing = true;
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!isDrawing || !isScratchActive) return;
+            ctx.lineWidth = isEraser ? 25 : 3;
+            ctx.lineCap = 'round';
+
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+            }
+
+            const x = e.clientX || (e.touches && e.touches[0].clientX);
+            const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function handleTouch(e) {
+            if (!isScratchActive) return;
+            e.preventDefault();
+            if (e.type === 'touchstart') startDrawing(e);
+            else if (e.type === 'touchmove') draw(e);
+        }
+
+        /* CRONÔMETRO */
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const h = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+                    const m = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+                    const s = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timer-display').innerText = `${h}:${m}:${s}`;
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 0;
+            document.getElementById('timer-display').innerText = '00:00:00';
+        }
+
+        function exportData(type) {
+            let dataObj = appState;
+            let fileName = `backup_estudos_geral_${new Date().toISOString().split('T')[0]}.json`;
+
+            const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    appState = JSON.parse(event.target.result);
+                    if (typeof saveStorage === 'function') saveStorage();
+                    alert('Dados importados com sucesso!');
+                    location.reload();
+                } catch (err) {
+                    alert('Erro ao carregar o arquivo JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
 </body>
 </html>
